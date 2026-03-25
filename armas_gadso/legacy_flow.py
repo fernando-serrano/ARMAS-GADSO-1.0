@@ -352,7 +352,15 @@ def escribir_input_rapido(page, selector: str, valor: str):
         campo.blur()
 
 
+def _is_scheduled_mode() -> bool:
+    return os.getenv("RUN_MODE", "manual").strip().lower() == "scheduled"
+
+
 def solve_captcha_manual(page):
+    if _is_scheduled_mode():
+        raise Exception(
+            "CAPTCHA_MANUAL_REQUERIDO_EN_SCHEDULED: OCR no resolvio captcha y no hay entrada interactiva"
+        )
     print("\n[MANUAL] MODO MANUAL ACTIVADO")
     print("Completa el codigo de verificacion en la ventana del navegador")
     input("[INFO] Cuando hayas escrito el captcha -> presiona ENTER para continuar...")
@@ -2094,6 +2102,20 @@ def llenar_login_sel():
     is_scheduled = run_mode == "scheduled"
     hold_browser_open = os.getenv("HOLD_BROWSER_OPEN", "0").strip().lower() in {"1", "true", "si", "sí", "yes"}
 
+    try:
+        max_run_minutes = float(str(os.getenv("MAX_RUN_MINUTES", "0") or "0").strip())
+    except Exception:
+        max_run_minutes = 0.0
+    if max_run_minutes < 0:
+        max_run_minutes = 0.0
+
+    try:
+        max_login_retries_per_group = int(str(os.getenv("MAX_LOGIN_RETRIES_PER_GROUP", "0") or "0").strip())
+    except Exception:
+        max_login_retries_per_group = 0
+    if max_login_retries_per_group < 0:
+        max_login_retries_per_group = 0
+
     inicio_total_flujo = time.time()
     duracion_total_flujo = None
 
@@ -2163,7 +2185,17 @@ def llenar_login_sel():
                 "Configúralas en .env"
             )
 
+    def validar_tiempo_maximo():
+        if max_run_minutes <= 0:
+            return
+        transcurrido = time.time() - inicio_total_flujo
+        if transcurrido >= max_run_minutes * 60:
+            raise KeyboardInterrupt(
+                f"MAX_RUN_MINUTES alcanzado ({max_run_minutes} min)"
+            )
+
     try:
+        validar_tiempo_maximo()
         trabajos_pendientes = obtener_trabajos_pendientes_excel(EXCEL_PATH)
         if not trabajos_pendientes:
             print("\n No hay registros pendientes para procesar. Todos los registros han sido procesados o marcados.")
@@ -2180,6 +2212,7 @@ def llenar_login_sel():
             trabajos_por_grupo[grupo].append(trabajo)
 
         for grupo_ruc in grupos_ordenados:
+            validar_tiempo_maximo()
             trabajos_grupo = trabajos_por_grupo.get(grupo_ruc, [])
             if not trabajos_grupo:
                 continue
@@ -2192,9 +2225,15 @@ def llenar_login_sel():
 
             intento_global = 0
             while True:
+                validar_tiempo_maximo()
                 start_time = time.time()
                 intento_global += 1
                 print(f"\n[INFO] Intento login {intento_global} (sin limite) para grupo {grupo_ruc}")
+
+                if max_login_retries_per_group > 0 and intento_global > max_login_retries_per_group:
+                    raise Exception(
+                        f"MAX_LOGIN_RETRIES_PER_GROUP alcanzado para grupo {grupo_ruc}: {max_login_retries_per_group}"
+                    )
 
                 if browser is not None:
                     try:
@@ -2267,6 +2306,7 @@ def llenar_login_sel():
                     seleccionar_tipo_cita_poligono(page)
 
                     for n, trabajo in enumerate(trabajos_grupo, start=1):
+                        validar_tiempo_maximo()
                         idx_excel = trabajo["idx_excel"]
                         print(
                             f"\n-------- {grupo_ruc} Registro {n}/{len(trabajos_grupo)} "
@@ -2388,6 +2428,13 @@ def llenar_login_sel():
                             f"durante el login del grupo {grupo_ruc}."
                         )
                         raise KeyboardInterrupt("Ventana del navegador cerrada") from e
+
+                    if "CAPTCHA_MANUAL_REQUERIDO_EN_SCHEDULED" in str(e or ""):
+                        print(
+                            "[ERROR] En modo scheduled no se permite input manual de captcha. "
+                            "Finalizando corrida para evitar bloqueo."
+                        )
+                        raise
 
                     if es_error_transitorio_para_relogin(e):
                         print(

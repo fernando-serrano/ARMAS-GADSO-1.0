@@ -115,6 +115,8 @@ Configurar en `.env`:
 - `VALIDAR_FECHA_PROGRAMACION_HOY` (`1` por defecto)
 - `RUN_MODE` (`manual` o `scheduled`, normalmente lo inyecta `main.py`)
 - `HOLD_BROWSER_OPEN` (`0/1`, normalmente lo inyecta `main.py`)
+- `MAX_RUN_MINUTES` (opcional, `0` = sin límite)
+- `MAX_LOGIN_RETRIES_PER_GROUP` (opcional, `0` = sin límite)
 
 ## Excel esperado
 
@@ -163,6 +165,8 @@ python -m playwright install chromium
 
 El portal puede requerir verificacion visual. Si no es posible resolver captcha automaticamente, el flujo puede requerir operacion manual.
 
+En modo `scheduled`, el flujo ahora evita quedar bloqueado esperando `input()` manual de captcha: si OCR no resuelve, finaliza con error controlado para que el scheduler no quede colgado.
+
 ## Archivo pyc
 
 Archivos como `run_pipeline.cpython-314.pyc` son cache de bytecode Python en `__pycache__`.
@@ -170,3 +174,13 @@ Archivos como `run_pipeline.cpython-314.pyc` son cache de bytecode Python en `__
 - No se editan.
 - Se pueden borrar sin riesgo.
 - Python los regenera automaticamente.
+
+# ¿Cómo levantamos el proyecto?
+    Para levantar el proyecto desde su archivo run_scheduled.bat requerimos el siguiente comando desde la terminal de tu editar de código:
+    cmd /c .\run_scheduled.bat
+
+# ¿Cómo programo una tarea desde el cmd de Windows?
+    Para programar usa el siguiente comando: schtasks /create /tn "ARMAS-GADSO-Test" /sc once /st 13:03 /tr "cmd /c \"C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\armas-gadso-1.0\run_scheduled.bat\"" /f
+
+    Para ello solo se debe cambiar el campo de la fecha
+    
