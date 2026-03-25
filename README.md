@@ -120,6 +120,7 @@ Configurar en `.env`:
 - `LOGIN_VALIDATION_TIMEOUT_MS` (opcional, por defecto `6000`)
 - `TERMINAL_CONFIRM_ATTEMPTS` (opcional, por defecto `2`)
 - `SIN_CUPO_CONFIRM_ATTEMPTS` (opcional, por defecto `1`)
+- `MAX_UNMAPPED_RETRIES_PER_RECORD` (opcional, por defecto `4`; `0` = sin limite)
 
 ## Excel esperado
 
@@ -180,6 +181,7 @@ El procesamiento de registros usa una cola iterativa: errores transitorios se re
 
 - `SIN_CUPO` usa `SIN_CUPO_CONFIRM_ATTEMPTS` (por defecto `1`).
 - Otras causales terminales (`NRO_SOLICITUD`, `DOC_VIGILANTE`, `HORA_NO_DISPONIBLE`) usan `TERMINAL_CONFIRM_ATTEMPTS` (por defecto `2`).
+- Los errores no mapeados tienen tope por registro con `MAX_UNMAPPED_RETRIES_PER_RECORD` para evitar ciclos infinitos de reintento.
 
 ## Archivo pyc
 

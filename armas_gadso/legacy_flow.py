@@ -2150,6 +2150,15 @@ def llenar_login_sel():
     if sin_cupo_confirmaciones_requeridas < 1:
         sin_cupo_confirmaciones_requeridas = 1
 
+    try:
+        max_unmapped_retries_per_record = int(
+            str(os.getenv("MAX_UNMAPPED_RETRIES_PER_RECORD", "4") or "4").strip()
+        )
+    except Exception:
+        max_unmapped_retries_per_record = 4
+    if max_unmapped_retries_per_record < 0:
+        max_unmapped_retries_per_record = 0
+
     inicio_total_flujo = time.time()
     duracion_total_flujo = None
 
@@ -2264,6 +2273,14 @@ def llenar_login_sel():
         if categoria == "SIN_CUPO":
             return sin_cupo_confirmaciones_requeridas
         return terminal_confirmaciones_requeridas
+
+    def observacion_error_no_mapeado(registro_excel: dict, error: BaseException, intentos: int) -> str:
+        hora = registro_excel.get("hora_rango", "")
+        token = registro_excel.get("nro_solicitud", "")
+        return (
+            "Error no mapeado persistente tras "
+            f"{intentos} intentos (hora={hora}, token={token}): {error}"
+        )
 
     try:
         validar_tiempo_maximo()
@@ -2384,6 +2401,7 @@ def llenar_login_sel():
 
                     cola_trabajos = deque(trabajos_grupo)
                     intentos_por_idx = {}
+                    intentos_no_mapeados_por_idx = {}
                     confirmaciones_terminales = {}
                     iteracion = 0
 
@@ -2414,6 +2432,7 @@ def llenar_login_sel():
                             txt_carga = str(e or "")
                             if "no est en estado Pendiente" in txt_carga or "No hay registros con estado 'Pendiente'" in txt_carga:
                                 print(f"[INFO] Registro idx={idx_excel} ya no est pendiente. Se omite.")
+                                intentos_no_mapeados_por_idx.pop(idx_excel, None)
                                 confirmaciones_terminales.pop((idx_excel, "SIN_CUPO"), None)
                                 confirmaciones_terminales.pop((idx_excel, "NRO_SOLICITUD"), None)
                                 confirmaciones_terminales.pop((idx_excel, "DOC_VIGILANTE"), None)
@@ -2441,6 +2460,7 @@ def llenar_login_sel():
 
                             limpiar_para_siguiente_registro(page, motivo="fin de flujo")
                             total_ok += 1
+                            intentos_no_mapeados_por_idx.pop(idx_excel, None)
                             confirmaciones_terminales.pop((idx_excel, "SIN_CUPO"), None)
                             confirmaciones_terminales.pop((idx_excel, "NRO_SOLICITUD"), None)
                             confirmaciones_terminales.pop((idx_excel, "DOC_VIGILANTE"), None)
@@ -2466,6 +2486,7 @@ def llenar_login_sel():
                             print(f"[WARNING] Error en registro idx={idx_excel}: {e}")
 
                             if categoria_terminal:
+                                intentos_no_mapeados_por_idx.pop(idx_excel, None)
                                 clave_conf = (idx_excel, categoria_terminal)
                                 confirmaciones_terminales[clave_conf] = confirmaciones_terminales.get(clave_conf, 0) + 1
                                 hits = confirmaciones_terminales[clave_conf]
@@ -2489,10 +2510,26 @@ def llenar_login_sel():
                                     )
                                     cola_trabajos.append(trabajo)
                             else:
-                                print(
-                                    f"[INFO] Error transitorio/no clasificado en idx={idx_excel}. Reencolando para reintento..."
-                                )
-                                cola_trabajos.append(trabajo)
+                                hits_no_mapeados = intentos_no_mapeados_por_idx.get(idx_excel, 0) + 1
+                                intentos_no_mapeados_por_idx[idx_excel] = hits_no_mapeados
+                                if (
+                                    max_unmapped_retries_per_record > 0
+                                    and hits_no_mapeados >= max_unmapped_retries_per_record
+                                ):
+                                    obs = observacion_error_no_mapeado(registro_excel, e, hits_no_mapeados)
+                                    registrar_sin_cupo_en_excel(EXCEL_PATH, registro_excel, obs)
+                                    total_error += 1
+                                    print(
+                                        f"[INFO] Registro idx={idx_excel} marcado con error no mapeado "
+                                        f"tras {hits_no_mapeados} intentos"
+                                    )
+                                else:
+                                    print(
+                                        f"[INFO] Error transitorio/no clasificado en idx={idx_excel}. "
+                                        f"Reencolando ({hits_no_mapeados}/"
+                                        f"{max_unmapped_retries_per_record if max_unmapped_retries_per_record > 0 else 'sin limite'})..."
+                                    )
+                                    cola_trabajos.append(trabajo)
 
                             try:
                                 limpiar_para_siguiente_registro(page, motivo="recuperación por error")
