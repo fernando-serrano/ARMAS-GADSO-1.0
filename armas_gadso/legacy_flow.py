@@ -5,6 +5,7 @@ import time
 import re
 import unicodedata
 import itertools
+from collections import deque
 from datetime import date, datetime, timedelta
 
 try:
@@ -689,6 +690,12 @@ def validar_resultado_login_por_ui(page, timeout_ms: int = 3000):
     ]
 
     while (time.time() - inicio) * 1000 < timeout_ms:
+        try:
+            if "/faces/aplicacion/inicio.xhtml" in (page.url or ""):
+                return True, None, (time.time() - inicio)
+        except Exception:
+            pass
+
         for sel in selectores_exito:
             try:
                 loc = page.locator(sel)
@@ -711,6 +718,12 @@ def validar_resultado_login_por_ui(page, timeout_ms: int = 3000):
         page.wait_for_timeout(120)
 
     # Última comprobación rápida al vencer el timeout.
+    try:
+        if "/faces/aplicacion/inicio.xhtml" in (page.url or ""):
+            return True, None, (time.time() - inicio)
+    except Exception:
+        pass
+
     for sel in selectores_exito:
         try:
             if page.locator(sel).count() > 0:
@@ -2110,11 +2123,32 @@ def llenar_login_sel():
         max_run_minutes = 0.0
 
     try:
-        max_login_retries_per_group = int(str(os.getenv("MAX_LOGIN_RETRIES_PER_GROUP", "0") or "0").strip())
+        max_login_retries_per_group = int(str(os.getenv("MAX_LOGIN_RETRIES_PER_GROUP", "12") or "12").strip())
     except Exception:
-        max_login_retries_per_group = 0
-    if max_login_retries_per_group < 0:
-        max_login_retries_per_group = 0
+        max_login_retries_per_group = 12
+    if max_login_retries_per_group < 1:
+        max_login_retries_per_group = 1
+
+    try:
+        login_validation_timeout_ms = int(str(os.getenv("LOGIN_VALIDATION_TIMEOUT_MS", "6000") or "6000").strip())
+    except Exception:
+        login_validation_timeout_ms = 6000
+    if login_validation_timeout_ms < 1000:
+        login_validation_timeout_ms = 1000
+
+    try:
+        terminal_confirmaciones_requeridas = int(str(os.getenv("TERMINAL_CONFIRM_ATTEMPTS", "2") or "2").strip())
+    except Exception:
+        terminal_confirmaciones_requeridas = 2
+    if terminal_confirmaciones_requeridas < 1:
+        terminal_confirmaciones_requeridas = 1
+
+    try:
+        sin_cupo_confirmaciones_requeridas = int(str(os.getenv("SIN_CUPO_CONFIRM_ATTEMPTS", "1") or "1").strip())
+    except Exception:
+        sin_cupo_confirmaciones_requeridas = 1
+    if sin_cupo_confirmaciones_requeridas < 1:
+        sin_cupo_confirmaciones_requeridas = 1
 
     inicio_total_flujo = time.time()
     duracion_total_flujo = None
@@ -2194,6 +2228,43 @@ def llenar_login_sel():
                 f"MAX_RUN_MINUTES alcanzado ({max_run_minutes} min)"
             )
 
+    def clasificar_error_terminal_registro(error: BaseException) -> str:
+        txt = str(error or "")
+        txt_low = txt.lower()
+        if isinstance(error, SinCupoError):
+            return "SIN_CUPO"
+        if "no se encontr" in txt_low and "nro solicitud" in txt_low:
+            return "NRO_SOLICITUD"
+        if "no hay opciones en el combo de nro solicitud" in txt_low:
+            return "NRO_SOLICITUD"
+        if "documento vigilante" in txt_low:
+            return "DOC_VIGILANTE"
+        if "no se encontró la hora objetivo en la tabla" in txt:
+            return "HORA_NO_DISPONIBLE"
+        return ""
+
+    def observacion_terminal_por_categoria(categoria: str, registro_excel: dict, error: BaseException) -> str:
+        if categoria == "SIN_CUPO":
+            return f"No alcanzo cupo para horario {registro_excel.get('hora_rango', '')}"
+        if categoria == "NRO_SOLICITUD":
+            return f"No se encontró Nro Solicitud/Código de pago para token de {registro_excel.get('nro_solicitud', '')}"
+        if categoria == "DOC_VIGILANTE":
+            return (
+                "Documento vigilante no disponible para esta razón social/RUC. "
+                f"DNI={registro_excel.get('doc_vigilante', '')} | RUC={registro_excel.get('ruc', '')}"
+            )
+        if categoria == "HORA_NO_DISPONIBLE":
+            return (
+                "Horario no figura en la tabla de cupos: "
+                f"{registro_excel.get('hora_rango', '')}"
+            )
+        return f"Error en procesamiento: {error}"
+
+    def confirmaciones_requeridas_para_categoria(categoria: str) -> int:
+        if categoria == "SIN_CUPO":
+            return sin_cupo_confirmaciones_requeridas
+        return terminal_confirmaciones_requeridas
+
     try:
         validar_tiempo_maximo()
         trabajos_pendientes = obtener_trabajos_pendientes_excel(EXCEL_PATH)
@@ -2228,7 +2299,10 @@ def llenar_login_sel():
                 validar_tiempo_maximo()
                 start_time = time.time()
                 intento_global += 1
-                print(f"\n[INFO] Intento login {intento_global} (sin limite) para grupo {grupo_ruc}")
+                print(
+                    f"\n[INFO] Intento login {intento_global}/{max_login_retries_per_group} "
+                    f"para grupo {grupo_ruc}"
+                )
 
                 if max_login_retries_per_group > 0 and intento_global > max_login_retries_per_group:
                     raise Exception(
@@ -2286,7 +2360,10 @@ def llenar_login_sel():
                     page.locator(SEL["ingresar"]).click(timeout=10000)
 
                     print("[INFO] Validando acceso...")
-                    url_ok, mensaje_error, tiempo_espera = validar_resultado_login_por_ui(page, timeout_ms=3000)
+                    url_ok, mensaje_error, tiempo_espera = validar_resultado_login_por_ui(
+                        page,
+                        timeout_ms=login_validation_timeout_ms,
+                    )
 
                     if not url_ok:
                         print("[ERROR] Login fallo - no se detecto sesion autenticada")
@@ -2305,12 +2382,22 @@ def llenar_login_sel():
                     navegar_reservas_citas(page)
                     seleccionar_tipo_cita_poligono(page)
 
-                    for n, trabajo in enumerate(trabajos_grupo, start=1):
+                    cola_trabajos = deque(trabajos_grupo)
+                    intentos_por_idx = {}
+                    confirmaciones_terminales = {}
+                    iteracion = 0
+
+                    while cola_trabajos:
                         validar_tiempo_maximo()
+                        iteracion += 1
+                        n = iteracion
+                        trabajo = cola_trabajos.popleft()
                         idx_excel = trabajo["idx_excel"]
+                        intentos_por_idx[idx_excel] = intentos_por_idx.get(idx_excel, 0) + 1
                         print(
-                            f"\n-------- {grupo_ruc} Registro {n}/{len(trabajos_grupo)} "
-                            f"(idx={idx_excel}, prioridad={trabajo.get('prioridad', 'Normal')}) --------"
+                            f"\n-------- {grupo_ruc} Registro iterativo {n} "
+                            f"(idx={idx_excel}, prioridad={trabajo.get('prioridad', 'Normal')}, "
+                            f"intento={intentos_por_idx[idx_excel]}, en_cola={len(cola_trabajos)}) --------"
                         )
 
                         esperar_hasta_servicio_disponible(page, page.url, espera_segundos=8)
@@ -2327,6 +2414,10 @@ def llenar_login_sel():
                             txt_carga = str(e or "")
                             if "no est en estado Pendiente" in txt_carga or "No hay registros con estado 'Pendiente'" in txt_carga:
                                 print(f"[INFO] Registro idx={idx_excel} ya no est pendiente. Se omite.")
+                                confirmaciones_terminales.pop((idx_excel, "SIN_CUPO"), None)
+                                confirmaciones_terminales.pop((idx_excel, "NRO_SOLICITUD"), None)
+                                confirmaciones_terminales.pop((idx_excel, "DOC_VIGILANTE"), None)
+                                confirmaciones_terminales.pop((idx_excel, "HORA_NO_DISPONIBLE"), None)
                                 continue
                             raise
 
@@ -2350,16 +2441,10 @@ def llenar_login_sel():
 
                             limpiar_para_siguiente_registro(page, motivo="fin de flujo")
                             total_ok += 1
-
-                        except SinCupoError as e:
-                            total_sin_cupo += 1
-                            print(f" Sin cupo en este registro: {e}")
-                            registrar_sin_cupo_en_excel(
-                                EXCEL_PATH,
-                                registro_excel,
-                                f"No alcanzo cupo para horario {registro_excel.get('hora_rango', '')}"
-                            )
-                            continue
+                            confirmaciones_terminales.pop((idx_excel, "SIN_CUPO"), None)
+                            confirmaciones_terminales.pop((idx_excel, "NRO_SOLICITUD"), None)
+                            confirmaciones_terminales.pop((idx_excel, "DOC_VIGILANTE"), None)
+                            confirmaciones_terminales.pop((idx_excel, "HORA_NO_DISPONIBLE"), None)
 
                         except Exception as e:
                             motivo_detencion = clasificar_motivo_detencion(e)
@@ -2377,44 +2462,43 @@ def llenar_login_sel():
                                 )
                                 raise Exception("RELOGIN_UI_DESYNC") from e
 
-                            total_error += 1
+                            categoria_terminal = clasificar_error_terminal_registro(e)
+                            print(f"[WARNING] Error en registro idx={idx_excel}: {e}")
 
-                            print(f"[ERROR] Error en registro idx={idx_excel}: {e}")
+                            if categoria_terminal:
+                                clave_conf = (idx_excel, categoria_terminal)
+                                confirmaciones_terminales[clave_conf] = confirmaciones_terminales.get(clave_conf, 0) + 1
+                                hits = confirmaciones_terminales[clave_conf]
+                                requeridas = confirmaciones_requeridas_para_categoria(categoria_terminal)
 
-                            error_txt = str(e or "")
-                            if "No se encontró la hora objetivo en la tabla" in error_txt:
-                                registrar_sin_cupo_en_excel(
-                                    EXCEL_PATH,
-                                    registro_excel,
-                                    (
-                                        "Horario no figura en la tabla de cupos: "
-                                        f"{registro_excel.get('hora_rango', '')}"
-                                    ),
-                                )
-
-                            elif "documento vigilante" in error_txt.lower():
-                                registrar_sin_cupo_en_excel(
-                                    EXCEL_PATH,
-                                    registro_excel,
-                                    (
-                                        "Documento vigilante no disponible para esta razón social/RUC. "
-                                        f"DNI={registro_excel.get('doc_vigilante', '')} | "
-                                        f"RUC={registro_excel.get('ruc', '')}"
-                                    ),
-                                )
-
+                                if hits >= requeridas:
+                                    obs = observacion_terminal_por_categoria(categoria_terminal, registro_excel, e)
+                                    registrar_sin_cupo_en_excel(EXCEL_PATH, registro_excel, obs)
+                                    if categoria_terminal == "SIN_CUPO":
+                                        total_sin_cupo += 1
+                                    else:
+                                        total_error += 1
+                                    print(
+                                        f"[INFO] Registro idx={idx_excel} marcado como terminal '{categoria_terminal}' "
+                                        f"tras {hits} confirmaciones"
+                                    )
+                                else:
+                                    print(
+                                        f"[INFO] Registro idx={idx_excel} con causal terminal '{categoria_terminal}' "
+                                        f"pendiente de confirmación ({hits}/{requeridas}). Reencolando..."
+                                    )
+                                    cola_trabajos.append(trabajo)
                             else:
-                                # Registrar otros errores en Excel
-                                registrar_sin_cupo_en_excel(
-                                    EXCEL_PATH,
-                                    registro_excel,
-                                    f"Error en procesamiento: {error_txt}"
+                                print(
+                                    f"[INFO] Error transitorio/no clasificado en idx={idx_excel}. Reencolando para reintento..."
                                 )
+                                cola_trabajos.append(trabajo)
 
                             try:
                                 limpiar_para_siguiente_registro(page, motivo="recuperación por error")
                             except Exception:
                                 pass
+                            time.sleep(1)
                             continue
 
                     grupo_procesado = True
@@ -2445,8 +2529,12 @@ def llenar_login_sel():
                         continue
 
                     print(f"[ERROR] Intento login {intento_global} para grupo {grupo_ruc} fall: {e}")
-                    print("   Reintentando login (modo sin lmite)...")
-                    time.sleep(1)
+                    if intento_global >= max_login_retries_per_group:
+                        raise
+
+                    print("   Reintentando login...")
+                    espera_backoff = min(8, 1 + intento_global)
+                    time.sleep(espera_backoff)
 
             if not grupo_procesado:
                 total_error += len(trabajos_grupo)

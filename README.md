@@ -116,7 +116,10 @@ Configurar en `.env`:
 - `RUN_MODE` (`manual` o `scheduled`, normalmente lo inyecta `main.py`)
 - `HOLD_BROWSER_OPEN` (`0/1`, normalmente lo inyecta `main.py`)
 - `MAX_RUN_MINUTES` (opcional, `0` = sin límite)
-- `MAX_LOGIN_RETRIES_PER_GROUP` (opcional, `0` = sin límite)
+- `MAX_LOGIN_RETRIES_PER_GROUP` (opcional, por defecto `12`)
+- `LOGIN_VALIDATION_TIMEOUT_MS` (opcional, por defecto `6000`)
+- `TERMINAL_CONFIRM_ATTEMPTS` (opcional, por defecto `2`)
+- `SIN_CUPO_CONFIRM_ATTEMPTS` (opcional, por defecto `1`)
 
 ## Excel esperado
 
@@ -166,6 +169,17 @@ python -m playwright install chromium
 El portal puede requerir verificacion visual. Si no es posible resolver captcha automaticamente, el flujo puede requerir operacion manual.
 
 En modo `scheduled`, el flujo ahora evita quedar bloqueado esperando `input()` manual de captcha: si OCR no resuelve, finaliza con error controlado para que el scheduler no quede colgado.
+
+El login inicial ahora usa:
+
+- Reintentos finitos por grupo (`MAX_LOGIN_RETRIES_PER_GROUP`) para evitar saturación del servidor.
+- Backoff incremental entre intentos.
+- Validación de acceso con timeout configurable (`LOGIN_VALIDATION_TIMEOUT_MS`) y fallback por URL de inicio para reducir falsos negativos.
+
+El procesamiento de registros usa una cola iterativa: errores transitorios se reencolan y las causas terminales se registran por confirmación.
+
+- `SIN_CUPO` usa `SIN_CUPO_CONFIRM_ATTEMPTS` (por defecto `1`).
+- Otras causales terminales (`NRO_SOLICITUD`, `DOC_VIGILANTE`, `HORA_NO_DISPONIBLE`) usan `TERMINAL_CONFIRM_ATTEMPTS` (por defecto `2`).
 
 ## Archivo pyc
 
