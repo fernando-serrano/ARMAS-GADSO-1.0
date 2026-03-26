@@ -180,7 +180,7 @@ El login inicial ahora usa:
 El procesamiento de registros usa una cola iterativa: errores transitorios se reencolan y las causas terminales se registran por confirmación.
 
 - `SIN_CUPO` usa `SIN_CUPO_CONFIRM_ATTEMPTS` (por defecto `1`).
-- Otras causales terminales (`NRO_SOLICITUD`, `DOC_VIGILANTE`, `HORA_NO_DISPONIBLE`) usan `TERMINAL_CONFIRM_ATTEMPTS` (por defecto `2`).
+- Otras causales terminales (`NRO_SOLICITUD`, `DOC_VIGILANTE`, `HORA_NO_DISPONIBLE`, `FECHA_NO_DISPONIBLE`) usan `TERMINAL_CONFIRM_ATTEMPTS` (por defecto `2`).
 - Los errores no mapeados tienen tope por registro con `MAX_UNMAPPED_RETRIES_PER_RECORD` para evitar ciclos infinitos de reintento.
 
 ## Archivo pyc

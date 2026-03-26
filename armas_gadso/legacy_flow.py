@@ -33,7 +33,12 @@ load_dotenv()
 
 URL_LOGIN = "https://www.sucamec.gob.pe/sel/faces/login.xhtml?faces-redirect=true"
 script_dir = os.path.dirname(os.path.abspath(__file__))
-EXCEL_PATH = os.getenv("EXCEL_PATH", os.path.join(script_dir, "data", "programaciones-armas.xlsx"))
+project_root = os.path.dirname(script_dir)
+excel_path_env = os.getenv("EXCEL_PATH", "").strip()
+if excel_path_env:
+    EXCEL_PATH = excel_path_env if os.path.isabs(excel_path_env) else os.path.join(project_root, excel_path_env)
+else:
+    EXCEL_PATH = os.path.join(project_root, "data", "programaciones-armas.xlsx")
 
 CREDENCIALES = {
     "tipo_documento_valor": os.getenv("TIPO_DOC", "RUC"),
@@ -128,6 +133,188 @@ SEL = {
 
 class SinCupoError(Exception):
     """Se lanza cuando la hora objetivo existe pero no tiene cupos libres."""
+
+
+class FechaNoDisponibleError(Exception):
+    """Se lanza cuando la fecha objetivo no aparece en el combo de fechas."""
+
+
+class TurnoDuplicadoError(Exception):
+    """Se lanza cuando SEL informa turno ya registrado para la persona/tipo de licencia."""
+
+
+def _debug_turno_duplicado_activo() -> bool:
+    return str(os.getenv("DEBUG_TURNO_DUPLICADO", "0") or "0").strip().lower() in {"1", "true", "yes", "si", "sí"}
+
+
+def _log_debug_turno_duplicado(msg: str):
+    if _debug_turno_duplicado_activo():
+        print(f"[DEBUG][TURNO_DUPLICADO] {msg}")
+
+
+def obtener_buffer_growl(page, limite: int = 8) -> list:
+    """Devuelve últimas entradas capturadas por el monitor growl (diagnóstico opcional)."""
+    try:
+        data = page.evaluate(
+            """
+            (limit) => {
+                const arr = window.__armasGrowlBuffer || [];
+                return arr.slice(-Math.max(1, Number(limit) || 8)).map(x => x && x.text ? String(x.text) : '');
+            }
+            """,
+            limite,
+        )
+        if isinstance(data, list):
+            return [str(x or "").strip() for x in data if str(x or "").strip()]
+    except Exception:
+        pass
+    return []
+
+
+def _script_monitor_growl_js() -> str:
+    return """
+    (() => {
+        if (window.__armasGrowlInstalled) return;
+        window.__armasGrowlInstalled = true;
+        window.__armasGrowlBuffer = window.__armasGrowlBuffer || [];
+
+        const pushMessage = (text) => {
+            if (!text) return;
+            const t = String(text).trim();
+            if (!t) return;
+            window.__armasGrowlBuffer.push({ text: t, ts: Date.now() });
+            if (window.__armasGrowlBuffer.length > 160) {
+                window.__armasGrowlBuffer = window.__armasGrowlBuffer.slice(-160);
+            }
+        };
+
+        const extractFromNode = (node) => {
+            if (!node) return;
+            const selectors = '.ui-growl-title, .ui-growl-message, .ui-growl-message-error, #mensajesGrowl_container .ui-growl-title, #mensajesGrowl_container .ui-growl-message';
+
+            if (typeof node.matches === 'function' && node.matches(selectors)) {
+                pushMessage(node.textContent || '');
+            }
+
+            if (typeof node.querySelectorAll === 'function') {
+                const nodes = Array.from(node.querySelectorAll(selectors));
+                for (const n of nodes) {
+                    pushMessage(n.textContent || '');
+                }
+            }
+        };
+
+        const observer = new MutationObserver((mutations) => {
+            for (const m of mutations) {
+                for (const n of m.addedNodes || []) {
+                    extractFromNode(n);
+                }
+                if (m.type === 'characterData' && m.target) {
+                    pushMessage(m.target.textContent || '');
+                }
+            }
+        });
+
+        if (document && document.body) {
+            observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+            extractFromNode(document.body);
+        }
+    })();
+    """
+
+
+def activar_monitor_growl(page):
+    """Instala un buffer JS para conservar mensajes growl aunque desaparezcan del DOM."""
+    try:
+        monitor_script = _script_monitor_growl_js()
+        page.add_init_script(script=monitor_script)
+        page.evaluate(monitor_script)
+        _log_debug_turno_duplicado("monitor growl instalado")
+    except Exception:
+        pass
+
+
+def detectar_turno_duplicado_en_growl(page, max_wait_ms: int = 0) -> str:
+    """Busca mensaje de turno duplicado en growls con espera opcional."""
+    deadline = time.time() + (max_wait_ms / 1000.0)
+    while True:
+        mensajes = []
+        instalacion_activa = False
+        try:
+            instalacion_activa = bool(page.evaluate("() => Boolean(window.__armasGrowlInstalled)"))
+        except Exception:
+            instalacion_activa = False
+
+        for selector in [
+            ".ui-growl-item .ui-growl-title",
+            ".ui-growl-item .ui-growl-message",
+            ".ui-growl-message",
+            ".ui-growl-message-error",
+            "#mensajesGrowl_container .ui-growl-title",
+            "#mensajesGrowl_container .ui-growl-message",
+        ]:
+            try:
+                loc = page.locator(selector)
+                total = min(loc.count(), 6)
+                for i in range(total):
+                    txt = (loc.nth(i).text_content() or "").strip()
+                    if txt:
+                        mensajes.append(txt)
+            except Exception:
+                pass
+
+        # Mensajes históricos capturados por monitor (aunque ya no estén visibles).
+        try:
+            buffer_msgs = page.evaluate(
+                """
+                () => (window.__armasGrowlBuffer || []).map(x => x && x.text ? String(x.text) : '')
+                """
+            )
+            if isinstance(buffer_msgs, list):
+                for txt in buffer_msgs:
+                    t = str(txt or "").strip()
+                    if t:
+                        mensajes.append(t)
+        except Exception:
+            pass
+
+        # Fallback adicional: mensaje renderizado fuera de contenedores growl estándar.
+        try:
+            body_text = (page.locator("body").text_content(timeout=400) or "").strip()
+            if body_text:
+                mensajes.append(body_text)
+        except Exception:
+            pass
+
+        # Fallback fuerte: buscar directamente en el HTML del documento (incluye nodos ocultos).
+        try:
+            html_doc = (page.content() or "").lower()
+            if (
+                "ya existe un turno registrado" in html_doc
+                or ("misma persona" in html_doc and "tipo de licencia" in html_doc)
+            ):
+                _log_debug_turno_duplicado("mensaje detectado por fallback HTML")
+                return "Ya existe un turno registrado para la misma persona y Tipo de Licencia"
+        except Exception:
+            pass
+
+        for msg in mensajes:
+            msg_low = msg.lower()
+            if (
+                "ya existe un turno registrado" in msg_low
+                or ("misma persona" in msg_low and "tipo de licencia" in msg_low)
+            ):
+                _log_debug_turno_duplicado(f"mensaje detectado: {msg[:180]}")
+                return msg
+
+        if max_wait_ms <= 0 or time.time() >= deadline:
+            if _debug_turno_duplicado_activo():
+                ultimos = obtener_buffer_growl(page, limite=8)
+                _log_debug_turno_duplicado(
+                    f"sin match. monitor_instalado={instalacion_activa} | mensajes_buffer={len(ultimos)} | ultimos={ultimos}"
+                )
+            return ""
+        page.wait_for_timeout(120)
 
 
 # ============================================================
@@ -516,7 +703,13 @@ def completar_fase_3_resumen(page):
     """Paso 3: resolver captcha del resumen y aceptar términos y condiciones."""
     print("\n Completando Fase 3 (Resumen de cita)...")
 
-    page.locator(SEL["fase3_panel"]).wait_for(state="visible", timeout=12000)
+    try:
+        page.locator(SEL["fase3_panel"]).wait_for(state="visible", timeout=12000)
+    except Exception as e:
+        msg_dup = detectar_turno_duplicado_en_growl(page, max_wait_ms=1500)
+        if msg_dup:
+            raise TurnoDuplicadoError(msg_dup) from e
+        raise
 
     captcha_text = solve_captcha_ocr_base(
         page,
@@ -588,55 +781,99 @@ def generar_cita_final_con_reintento_rapido(page, max_intentos: int = 3):
     boton_generar = page.locator(SEL["fase3_boton_generar_cita"])
     boton_generar.wait_for(state="visible", timeout=10000)
 
+    def recolectar_mensajes_ui(max_por_selector: int = 4) -> list:
+        textos = []
+        selectores = [
+            ".ui-growl-item .ui-growl-title",
+            ".ui-growl-item .ui-growl-message",
+            ".ui-growl-message-error",
+            ".ui-messages-error",
+            ".ui-message-error",
+            ".mensajeError",
+        ]
+        for selector in selectores:
+            try:
+                loc = page.locator(selector)
+                total = min(loc.count(), max_por_selector)
+                for i in range(total):
+                    txt = (loc.nth(i).inner_text() or "").strip()
+                    if txt:
+                        textos.append(txt)
+            except Exception:
+                pass
+        # Deduplicar conservando orden.
+        vistos = set()
+        unicos = []
+        for t in textos:
+            if t not in vistos:
+                vistos.add(t)
+                unicos.append(t)
+        return unicos
+
+    def detectar_error_captcha(mensajes: list) -> str:
+        for msg in mensajes:
+            if re.search(r"captcha.*incorrect|error.*captcha|captcha", msg, flags=re.IGNORECASE):
+                return msg
+        return ""
+
+    def detectar_exito_fuerte() -> bool:
+        # Éxito real: salió de la pantalla de resumen (ya no se ve botón Generar Cita)
+        # o cambió claramente de vista fuera de GestionCitas.
+        try:
+            if boton_generar.count() == 0 or not boton_generar.first.is_visible():
+                return True
+        except Exception:
+            return True
+
+        try:
+            url_actual = page.url or ""
+            if "/faces/aplicacion/" in url_actual and "GestionCitas.xhtml" not in url_actual:
+                if page.locator(SEL["fase3_boton_generar_cita"]).count() == 0:
+                    return True
+        except Exception:
+            pass
+        return False
+
     for intento in range(1, max_intentos + 1):
         inicio_validacion = time.time()
         print(f"    Intento generar cita {intento}/{max_intentos}")
         boton_generar.click(timeout=10000)
 
-        url_ok = False
-        try:
-            # Validación rápida: si avanza de vista, debe ocurrir casi inmediato.
-            page.wait_for_url("**/aplicacion/**", timeout=1000)
-            if "GestionCitas.xhtml" not in page.url:
-                url_ok = True
-        except PlaywrightTimeoutError:
-            url_ok = False
-
-        if url_ok:
-            tiempo = time.time() - inicio_validacion
-            print(f"   [INFO] Generar Cita confirmado en {tiempo:.2f}s")
-            print(f"   -> URL: {page.url}")
-            return True
-
-        mensaje_error = ""
-        for selector in [
-            ".ui-messages-error",
-            ".ui-message-error",
-            ".ui-growl-message-error",
-            "[class*='error']",
-            ".mensajeError",
-        ]:
-            try:
-                loc = page.locator(selector)
-                total = min(loc.count(), 3)
-                for i in range(total):
-                    txt = (loc.nth(i).inner_text() or "").strip()
-                    if txt:
-                        mensaje_error = txt
-                        break
-                if mensaje_error:
+        # Ventana corta de observación para capturar growl intermitente.
+        error_captcha_msg = ""
+        ultimo_error = ""
+        deadline = time.time() + 2.5
+        while time.time() < deadline:
+            mensajes = recolectar_mensajes_ui()
+            if mensajes:
+                for msg in mensajes:
+                    if not ultimo_error:
+                        ultimo_error = msg
+                candidato = detectar_error_captcha(mensajes)
+                if candidato:
+                    error_captcha_msg = candidato
                     break
-            except Exception:
-                pass
+
+            if detectar_exito_fuerte():
+                tiempo = time.time() - inicio_validacion
+                print(f"   [INFO] Generar Cita confirmado en {tiempo:.2f}s")
+                print(f"   -> URL: {page.url}")
+                return True
+
+            page.wait_for_timeout(120)
 
         tiempo = time.time() - inicio_validacion
-        if mensaje_error:
-            print(f"   [WARNING] Mensaje detectado: {mensaje_error}")
+        if error_captcha_msg:
+            print(f"   [WARNING] Mensaje captcha detectado: {error_captcha_msg}")
+        elif ultimo_error:
+            print(f"   [WARNING] Mensaje detectado: {ultimo_error}")
         print(f"    Validacin final: {tiempo:.2f}s")
 
-        error_captcha = bool(re.search(r"captcha|c[oó]digo|validaci[oó]n", mensaje_error, flags=re.IGNORECASE))
-        if not error_captcha:
-            raise Exception("No se pudo confirmar la generación de cita (sin error de captcha detectable)")
+        if not error_captcha_msg:
+            raise Exception(
+                "No se pudo confirmar la generación de cita de forma robusta "
+                "(sin seales claras de xito y sin captcha incorrecto explícito)"
+            )
 
         # Reintento rápido: resolver captcha de Fase 3 y remarcado de términos si aplica.
         nuevo_captcha = solve_captcha_ocr_base(
@@ -1429,6 +1666,43 @@ def seleccionar_en_selectonemenu(page, trigger_selector: str, panel_selector: st
     panel = page.locator(panel_selector)
     panel.wait_for(state="visible", timeout=7000)
 
+    if str(nombre_campo or "").strip().lower() == "fecha":
+        items = panel.locator("li.ui-selectonemenu-item")
+        try:
+            items.first.wait_for(state="visible", timeout=5000)
+        except Exception as e:
+            raise FechaNoDisponibleError(
+                f"No hay opciones visibles en el combo de Fecha para '{valor}'."
+            ) from e
+
+        total = items.count()
+        opciones_disponibles = []
+        opcion_objetivo = None
+        valor_norm = str(valor or "").strip().upper()
+        for i in range(total):
+            txt = (items.nth(i).inner_text() or "").strip()
+            if not txt:
+                continue
+            opciones_disponibles.append(txt)
+            if txt.upper() == valor_norm:
+                opcion_objetivo = items.nth(i)
+
+        if opcion_objetivo is None:
+            raise FechaNoDisponibleError(
+                f"Fecha '{valor}' no disponible en combo. Opciones actuales: {opciones_disponibles}"
+            )
+
+        opcion_objetivo.click()
+        page.wait_for_timeout(250)
+
+        texto_label = page.locator(label_selector).inner_text().strip()
+        if texto_label.upper() != valor_norm:
+            raise Exception(
+                f"No se confirmó la selección de {nombre_campo}. Esperado: '{valor}' | Actual: '{texto_label}'"
+            )
+        print(f"   [INFO] {nombre_campo} seleccionado: {texto_label}")
+        return
+
     opcion = panel.locator(f'li.ui-selectonemenu-item[data-label="{valor}"]')
     try:
         opcion.wait_for(state="visible", timeout=2000)
@@ -2098,10 +2372,20 @@ def completar_tabla_tipos_arma_y_avanzar(page, registro: dict):
     boton_siguiente_3.click()
     print("   [INFO] Click en botn 'Siguiente' de Fase 2 (botonSiguiente3)")
 
+    # Validación inmediata: el growl puede durar pocos segundos.
+    msg_dup = detectar_turno_duplicado_en_growl(page, max_wait_ms=1800)
+    if msg_dup:
+        raise TurnoDuplicadoError(msg_dup)
+
     try:
         page.wait_for_load_state("networkidle", timeout=7000)
     except Exception:
         pass
+
+    # Segunda validación post-wait por si el growl aparece después.
+    msg_dup = detectar_turno_duplicado_en_growl(page, max_wait_ms=2200)
+    if msg_dup:
+        raise TurnoDuplicadoError(msg_dup)
 
 
 # ============================================================
@@ -2242,6 +2526,12 @@ def llenar_login_sel():
         txt_low = txt.lower()
         if isinstance(error, SinCupoError):
             return "SIN_CUPO"
+        if isinstance(error, FechaNoDisponibleError):
+            return "FECHA_NO_DISPONIBLE"
+        if isinstance(error, TurnoDuplicadoError):
+            return "TURNO_DUPLICADO"
+        if "ya existe un turno registrado" in txt_low:
+            return "TURNO_DUPLICADO"
         if "no se encontr" in txt_low and "nro solicitud" in txt_low:
             return "NRO_SOLICITUD"
         if "no hay opciones en el combo de nro solicitud" in txt_low:
@@ -2267,11 +2557,24 @@ def llenar_login_sel():
                 "Horario no figura en la tabla de cupos: "
                 f"{registro_excel.get('hora_rango', '')}"
             )
+        if categoria == "FECHA_NO_DISPONIBLE":
+            return (
+                "Fecha no disponible en combo de Reserva de Cupos: "
+                f"{registro_excel.get('fecha', '')}"
+            )
+        if categoria == "TURNO_DUPLICADO":
+            return (
+                "Ya existe un turno registrado para la misma persona y Tipo de Licencia. "
+                f"DNI={registro_excel.get('doc_vigilante', '')} | "
+                f"TipoOperacion={registro_excel.get('tipo_operacion', '')}"
+            )
         return f"Error en procesamiento: {error}"
 
     def confirmaciones_requeridas_para_categoria(categoria: str) -> int:
         if categoria == "SIN_CUPO":
             return sin_cupo_confirmaciones_requeridas
+        if categoria == "TURNO_DUPLICADO":
+            return 1
         return terminal_confirmaciones_requeridas
 
     def observacion_error_no_mapeado(registro_excel: dict, error: BaseException, intentos: int) -> str:
@@ -2345,6 +2648,7 @@ def llenar_login_sel():
                 context = browser.new_context(viewport=None, ignore_https_errors=True)
                 page = context.new_page()
                 page.evaluate("() => { window.moveTo(0, 0); window.resizeTo(screen.width, screen.height); }")
+                activar_monitor_growl(page)
 
                 try:
                     page.goto(URL_LOGIN, wait_until="domcontentloaded", timeout=45000)
@@ -2437,6 +2741,8 @@ def llenar_login_sel():
                                 confirmaciones_terminales.pop((idx_excel, "NRO_SOLICITUD"), None)
                                 confirmaciones_terminales.pop((idx_excel, "DOC_VIGILANTE"), None)
                                 confirmaciones_terminales.pop((idx_excel, "HORA_NO_DISPONIBLE"), None)
+                                confirmaciones_terminales.pop((idx_excel, "FECHA_NO_DISPONIBLE"), None)
+                                confirmaciones_terminales.pop((idx_excel, "TURNO_DUPLICADO"), None)
                                 continue
                             raise
 
@@ -2465,6 +2771,8 @@ def llenar_login_sel():
                             confirmaciones_terminales.pop((idx_excel, "NRO_SOLICITUD"), None)
                             confirmaciones_terminales.pop((idx_excel, "DOC_VIGILANTE"), None)
                             confirmaciones_terminales.pop((idx_excel, "HORA_NO_DISPONIBLE"), None)
+                            confirmaciones_terminales.pop((idx_excel, "FECHA_NO_DISPONIBLE"), None)
+                            confirmaciones_terminales.pop((idx_excel, "TURNO_DUPLICADO"), None)
 
                         except Exception as e:
                             motivo_detencion = clasificar_motivo_detencion(e)
