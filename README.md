@@ -98,6 +98,14 @@ Comportamiento:
 
 - `run_manual.bat` -> ejecuta modo manual.
 - `run_scheduled.bat` -> ejecuta modo scheduled y redirige salida a `logs/task_scheduler_stdout.log`.
+- `run_test_hora_flexible.py` -> runner de prueba para selección horaria adaptativa y replanificación por cupos ocupados.
+- `run_test_easyocr.py` -> runner de prueba OCR con EasyOCR para captcha de login y captcha final.
+
+Para pruebas EasyOCR (opcional):
+
+```powershell
+pip install easyocr numpy pillow
+```
 
 ## Variables de entorno principales
 
@@ -121,6 +129,9 @@ Configurar en `.env`:
 - `TERMINAL_CONFIRM_ATTEMPTS` (opcional, por defecto `2`)
 - `SIN_CUPO_CONFIRM_ATTEMPTS` (opcional, por defecto `1`)
 - `MAX_UNMAPPED_RETRIES_PER_RECORD` (opcional, por defecto `4`; `0` = sin limite)
+- `ADAPTIVE_HOUR_SELECTION` (opcional, `1` activa selección flexible de horario; por defecto `0`)
+- `ADAPTIVE_HOUR_NOON_FULL_BLOCK` (opcional, por defecto `1`; si la hora está entre `11:45-13:00`, evalúa todo el bloque y elige mayor cupo)
+- `MAX_HOUR_FALLBACK_RETRIES` (opcional, por defecto `8`; reintentos máximos cuando al final aparece "cupos ocupados")
 
 ## Excel esperado
 

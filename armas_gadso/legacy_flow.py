@@ -143,8 +143,22 @@ class TurnoDuplicadoError(Exception):
     """Se lanza cuando SEL informa turno ya registrado para la persona/tipo de licencia."""
 
 
+class CuposOcupadosPostValidacionError(Exception):
+    """Se lanza cuando SEL indica que el horario ya se ocupó al generar la cita final."""
+
+
 def _debug_turno_duplicado_activo() -> bool:
     return str(os.getenv("DEBUG_TURNO_DUPLICADO", "0") or "0").strip().lower() in {"1", "true", "yes", "si", "sí"}
+
+
+def _hora_adaptativa_habilitada() -> bool:
+    """Activa selección flexible de horario con fallback por vecinos/bloques."""
+    return str(os.getenv("ADAPTIVE_HOUR_SELECTION", "0") or "0").strip().lower() in {"1", "true", "yes", "si", "sí"}
+
+
+def _hora_adaptativa_bloque_mediodia_completo() -> bool:
+    """Si está activo, en bloque 11:45-13:00 evalúa todos los slots del bloque."""
+    return str(os.getenv("ADAPTIVE_HOUR_NOON_FULL_BLOCK", "1") or "1").strip().lower() in {"1", "true", "yes", "si", "sí"}
 
 
 def _log_debug_turno_duplicado(msg: str):
@@ -801,6 +815,19 @@ def generar_cita_final_con_reintento_rapido(page, max_intentos: int = 3):
                         textos.append(txt)
             except Exception:
                 pass
+        try:
+            buffer_msgs = page.evaluate(
+                """
+                () => (window.__armasGrowlBuffer || []).slice(-20).map(x => x && x.text ? String(x.text) : '')
+                """
+            )
+            if isinstance(buffer_msgs, list):
+                for txt in buffer_msgs:
+                    t = str(txt or "").strip()
+                    if t:
+                        textos.append(t)
+        except Exception:
+            pass
         # Deduplicar conservando orden.
         vistos = set()
         unicos = []
@@ -813,6 +840,21 @@ def generar_cita_final_con_reintento_rapido(page, max_intentos: int = 3):
     def detectar_error_captcha(mensajes: list) -> str:
         for msg in mensajes:
             if re.search(r"captcha.*incorrect|error.*captcha|captcha", msg, flags=re.IGNORECASE):
+                return msg
+        return ""
+
+    def detectar_error_cupos_ocupados(mensajes: list) -> str:
+        patrones = [
+            r"cupos?.*horario.*ocupad",
+            r"cupos?.*ocupad",
+            r"escoja\s+otro\s+horario",
+            r"ya\s+han\s+sido\s+ocupados",
+        ]
+        for msg in mensajes:
+            msg_norm = normalizar_texto_comparable(msg)
+            if "CUPOS" in msg_norm and "HORARIO" in msg_norm and "OCUP" in msg_norm:
+                return msg
+            if any(re.search(p, msg, flags=re.IGNORECASE) for p in patrones):
                 return msg
         return ""
 
@@ -841,6 +883,7 @@ def generar_cita_final_con_reintento_rapido(page, max_intentos: int = 3):
 
         # Ventana corta de observación para capturar growl intermitente.
         error_captcha_msg = ""
+        error_cupos_msg = ""
         ultimo_error = ""
         deadline = time.time() + 2.5
         while time.time() < deadline:
@@ -849,6 +892,10 @@ def generar_cita_final_con_reintento_rapido(page, max_intentos: int = 3):
                 for msg in mensajes:
                     if not ultimo_error:
                         ultimo_error = msg
+                candidato_cupos = detectar_error_cupos_ocupados(mensajes)
+                if candidato_cupos:
+                    error_cupos_msg = candidato_cupos
+                    break
                 candidato = detectar_error_captcha(mensajes)
                 if candidato:
                     error_captcha_msg = candidato
@@ -863,6 +910,9 @@ def generar_cita_final_con_reintento_rapido(page, max_intentos: int = 3):
             page.wait_for_timeout(120)
 
         tiempo = time.time() - inicio_validacion
+        if error_cupos_msg:
+            print(f"   [WARNING] Mensaje de cupos detectado: {error_cupos_msg}")
+            raise CuposOcupadosPostValidacionError(error_cupos_msg)
         if error_captcha_msg:
             print(f"   [WARNING] Mensaje captcha detectado: {error_captcha_msg}")
         elif ultimo_error:
@@ -1097,6 +1147,32 @@ def normalizar_hora_rango(valor_rango: str) -> str:
     inicio = normalizar_hora_fragmento(partes[0])
     fin = normalizar_hora_fragmento(partes[1])
     return f"{inicio}-{fin}"
+
+
+def _parsear_rango_hora_a_minutos(valor_rango: str):
+    """Convierte HH:MM-HH:MM a minutos (inicio, fin). Devuelve None si no parsea."""
+    texto = normalizar_hora_rango(valor_rango)
+    m = re.match(r"^(\d{2}):(\d{2})-(\d{2}):(\d{2})$", texto)
+    if not m:
+        return None
+    ini = int(m.group(1)) * 60 + int(m.group(2))
+    fin = int(m.group(3)) * 60 + int(m.group(4))
+    return ini, fin
+
+
+def _formatear_minutos_hhmm(total_min: int) -> str:
+    hh = (int(total_min) // 60) % 24
+    mm = int(total_min) % 60
+    return f"{hh:02d}:{mm:02d}"
+
+
+def _rango_desplazado_15m(valor_rango: str, delta_slots: int) -> str:
+    parsed = _parsear_rango_hora_a_minutos(valor_rango)
+    if not parsed:
+        return ""
+    ini, fin = parsed
+    delta = int(delta_slots) * 15
+    return f"{_formatear_minutos_hhmm(ini + delta)}-{_formatear_minutos_hhmm(fin + delta)}"
 
 
 def convertir_a_entero(texto: str) -> int:
@@ -1951,6 +2027,12 @@ def seleccionar_hora_con_cupo_y_avanzar(page, registro: dict):
     fila_objetivo = None
     cupos_objetivo = 0
     resumen = []
+    horas_descartadas = {
+        normalizar_hora_rango(x)
+        for x in (registro.get("_horas_descartadas", []) or [])
+        if normalizar_hora_rango(x)
+    }
+    usar_hora_adaptativa = _hora_adaptativa_habilitada()
 
     def extraer_hora_rango_desde_texto(texto: str) -> str:
         t = str(texto or "").replace(".", ":")
@@ -1981,6 +2063,7 @@ def seleccionar_hora_con_cupo_y_avanzar(page, registro: dict):
         except Exception as e:
             raise SinCupoError(f"No se pudo accionar el botón 'Limpiar' tras detectar cupo 0: {e}")
 
+    slots = []
     for i in range(total_filas):
         fila = filas.nth(i)
         celdas = fila.locator("td")
@@ -2005,10 +2088,18 @@ def seleccionar_hora_con_cupo_y_avanzar(page, registro: dict):
         cupos = extraer_cupos_desde_celdas(textos_celdas)
         if hora_tabla:
             resumen.append(f"{hora_tabla} ({cupos})")
+            slots.append({
+                "hora": hora_tabla,
+                "cupos": cupos,
+                "fila": fila,
+                "orden": i,
+                "rango": _parsear_rango_hora_a_minutos(hora_tabla),
+            })
 
-        if hora_tabla == hora_objetivo:
-            fila_objetivo = fila
-            cupos_objetivo = cupos
+    for slot in slots:
+        if slot["hora"] == hora_objetivo:
+            fila_objetivo = slot["fila"]
+            cupos_objetivo = slot["cupos"]
             break
 
     if fila_objetivo is None:
@@ -2016,6 +2107,87 @@ def seleccionar_hora_con_cupo_y_avanzar(page, registro: dict):
             "No se encontró la hora objetivo en la tabla. "
             f"Objetivo: '{hora_objetivo}' | Disponibles: {', '.join(resumen)}"
         )
+
+    if usar_hora_adaptativa and slots:
+        slots_ordenados = sorted(
+            slots,
+            key=lambda s: (
+                s["rango"][0] if s["rango"] else 9999,
+                s["orden"],
+            ),
+        )
+        slot_objetivo = next((s for s in slots_ordenados if s["hora"] == hora_objetivo), None)
+
+        candidatos = []
+        bloque_mediodia = [
+            "11:45-12:00",
+            "12:00-12:15",
+            "12:15-12:30",
+            "12:30-12:45",
+            "12:45-13:00",
+        ]
+
+        if hora_objetivo in bloque_mediodia and _hora_adaptativa_bloque_mediodia_completo():
+            candidatos = [s for s in slots_ordenados if s["hora"] in bloque_mediodia]
+            print("   [INFO] Estrategia horario: bloque completo de mediodía (11:45-13:00)")
+        else:
+            idx_obj = next((i for i, s in enumerate(slots_ordenados) if s["hora"] == hora_objetivo), -1)
+            if idx_obj >= 0:
+                inferior = slots_ordenados[idx_obj - 1] if idx_obj - 1 >= 0 else None
+                superior = slots_ordenados[idx_obj + 1] if idx_obj + 1 < len(slots_ordenados) else None
+                if inferior and superior:
+                    candidatos = [inferior, superior]
+                elif inferior and slot_objetivo:
+                    candidatos = [inferior, slot_objetivo]
+                elif superior and slot_objetivo:
+                    candidatos = [slot_objetivo, superior]
+                elif slot_objetivo:
+                    candidatos = [slot_objetivo]
+
+            if not candidatos and slot_objetivo:
+                prev_hora = _rango_desplazado_15m(hora_objetivo, -1)
+                next_hora = _rango_desplazado_15m(hora_objetivo, 1)
+                candidatos = [
+                    s for s in slots_ordenados
+                    if s["hora"] in {prev_hora, next_hora, hora_objetivo}
+                ]
+            print("   [INFO] Estrategia horario: vecinos inmediatos (inferior/superior)")
+
+        if not candidatos and slot_objetivo:
+            candidatos = [slot_objetivo]
+
+        if horas_descartadas:
+            candidatos_filtrados = [s for s in candidatos if s["hora"] not in horas_descartadas]
+            if candidatos_filtrados:
+                candidatos = candidatos_filtrados
+
+        candidatos_disponibles = [s for s in candidatos if s["cupos"] > 0]
+
+        if candidatos_disponibles:
+            # Desempate al "extremo superior": para igual cupo, preferir el slot más tarde.
+            seleccionado = max(
+                candidatos_disponibles,
+                key=lambda s: (
+                    s["cupos"],
+                    s["rango"][0] if s["rango"] else s["orden"],
+                ),
+            )
+            fila_objetivo = seleccionado["fila"]
+            cupos_objetivo = seleccionado["cupos"]
+            if seleccionado["hora"] != hora_objetivo:
+                print(
+                    f"   [INFO] Reasignación adaptativa de hora: "
+                    f"{hora_objetivo} -> {seleccionado['hora']} (Cupos={cupos_objetivo})"
+                )
+                registro["hora_rango"] = seleccionado["hora"]
+            hora_objetivo = seleccionado["hora"]
+        else:
+            opciones_dbg = ", ".join([f"{s['hora']}({s['cupos']})" for s in candidatos])
+            click_boton_limpiar_obligatorio()
+            raise SinCupoError(
+                "No hay cupos en horarios candidatos. "
+                f"Objetivo: {hora_objetivo} | Candidatos: {opciones_dbg}"
+            )
 
     if cupos_objetivo <= 0:
         click_boton_limpiar_obligatorio()
@@ -2033,6 +2205,7 @@ def seleccionar_hora_con_cupo_y_avanzar(page, registro: dict):
     if "ui-state-active" not in clase_radio and aria_fila != "true":
         raise Exception("No se confirmó la selección del radiobutton de la hora")
 
+    registro["_hora_seleccionada_actual"] = hora_objetivo
     print(f"   [INFO] Hora seleccionada: {hora_objetivo} (Cupos Libres={cupos_objetivo})")
 
     boton_siguiente = page.locator(SEL["boton_siguiente"])
@@ -2443,6 +2616,13 @@ def llenar_login_sel():
     if max_unmapped_retries_per_record < 0:
         max_unmapped_retries_per_record = 0
 
+    try:
+        max_hora_fallback_retries = int(str(os.getenv("MAX_HOUR_FALLBACK_RETRIES", "8") or "8").strip())
+    except Exception:
+        max_hora_fallback_retries = 8
+    if max_hora_fallback_retries < 1:
+        max_hora_fallback_retries = 1
+
     inicio_total_flujo = time.time()
     duracion_total_flujo = None
 
@@ -2706,6 +2886,7 @@ def llenar_login_sel():
                     cola_trabajos = deque(trabajos_grupo)
                     intentos_por_idx = {}
                     intentos_no_mapeados_por_idx = {}
+                    intentos_replan_hora_por_idx = {}
                     confirmaciones_terminales = {}
                     iteracion = 0
 
@@ -2732,11 +2913,13 @@ def llenar_login_sel():
                                 EXCEL_PATH,
                                 indice_excel_objetivo=idx_excel,
                             )
+                            registro_excel["_horas_descartadas"] = list(trabajo.get("_horas_descartadas", []) or [])
                         except Exception as e:
                             txt_carga = str(e or "")
                             if "no est en estado Pendiente" in txt_carga or "No hay registros con estado 'Pendiente'" in txt_carga:
                                 print(f"[INFO] Registro idx={idx_excel} ya no est pendiente. Se omite.")
                                 intentos_no_mapeados_por_idx.pop(idx_excel, None)
+                                intentos_replan_hora_por_idx.pop(idx_excel, None)
                                 confirmaciones_terminales.pop((idx_excel, "SIN_CUPO"), None)
                                 confirmaciones_terminales.pop((idx_excel, "NRO_SOLICITUD"), None)
                                 confirmaciones_terminales.pop((idx_excel, "DOC_VIGILANTE"), None)
@@ -2767,6 +2950,7 @@ def llenar_login_sel():
                             limpiar_para_siguiente_registro(page, motivo="fin de flujo")
                             total_ok += 1
                             intentos_no_mapeados_por_idx.pop(idx_excel, None)
+                            intentos_replan_hora_por_idx.pop(idx_excel, None)
                             confirmaciones_terminales.pop((idx_excel, "SIN_CUPO"), None)
                             confirmaciones_terminales.pop((idx_excel, "NRO_SOLICITUD"), None)
                             confirmaciones_terminales.pop((idx_excel, "DOC_VIGILANTE"), None)
@@ -2790,11 +2974,49 @@ def llenar_login_sel():
                                 )
                                 raise Exception("RELOGIN_UI_DESYNC") from e
 
+                            if isinstance(e, CuposOcupadosPostValidacionError):
+                                hora_actual = normalizar_hora_rango(registro_excel.get("_hora_seleccionada_actual", ""))
+                                descartadas = list(trabajo.get("_horas_descartadas", []) or [])
+                                if hora_actual and hora_actual not in descartadas:
+                                    descartadas.append(hora_actual)
+                                trabajo["_horas_descartadas"] = descartadas
+
+                                hits_hora = intentos_replan_hora_por_idx.get(idx_excel, 0) + 1
+                                intentos_replan_hora_por_idx[idx_excel] = hits_hora
+
+                                if hits_hora >= max_hora_fallback_retries:
+                                    obs = (
+                                        "Cupos ocupados al confirmar cita tras "
+                                        f"{hits_hora} reintentos de horario. "
+                                        f"Última hora evaluada: {hora_actual or registro_excel.get('hora_rango', '')}"
+                                    )
+                                    registrar_sin_cupo_en_excel(EXCEL_PATH, registro_excel, obs)
+                                    total_sin_cupo += 1
+                                    print(
+                                        f"[INFO] Registro idx={idx_excel} marcado como SIN_CUPO por "
+                                        f"cupos ocupados post-validación ({hits_hora}/{max_hora_fallback_retries})."
+                                    )
+                                else:
+                                    intentos_no_mapeados_por_idx.pop(idx_excel, None)
+                                    print(
+                                        f"[INFO] Registro idx={idx_excel} con cupos ocupados post-validación. "
+                                        f"Reintentando con otro horario ({hits_hora}/{max_hora_fallback_retries})..."
+                                    )
+                                    cola_trabajos.append(trabajo)
+
+                                try:
+                                    limpiar_para_siguiente_registro(page, motivo="replanificación por cupos ocupados")
+                                except Exception:
+                                    pass
+                                time.sleep(1)
+                                continue
+
                             categoria_terminal = clasificar_error_terminal_registro(e)
                             print(f"[WARNING] Error en registro idx={idx_excel}: {e}")
 
                             if categoria_terminal:
                                 intentos_no_mapeados_por_idx.pop(idx_excel, None)
+                                intentos_replan_hora_por_idx.pop(idx_excel, None)
                                 clave_conf = (idx_excel, categoria_terminal)
                                 confirmaciones_terminales[clave_conf] = confirmaciones_terminales.get(clave_conf, 0) + 1
                                 hits = confirmaciones_terminales[clave_conf]
