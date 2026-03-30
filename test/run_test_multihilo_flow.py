@@ -44,6 +44,21 @@ def _as_bool(env_name: str, default: bool = False) -> bool:
     return raw in {"1", "true", "yes", "si", "si", "on"}
 
 
+def _detect_windows_screen_size(default_w: int = 1920, default_h: int = 1080) -> tuple[int, int]:
+    """Retorna resolución efectiva (espacio lógico) que Windows entrega a apps no DPI-aware."""
+    try:
+        import ctypes
+
+        user32 = ctypes.windll.user32
+        w = int(user32.GetSystemMetrics(0))  # SM_CXSCREEN
+        h = int(user32.GetSystemMetrics(1))  # SM_CYSCREEN
+        if w >= 800 and h >= 600:
+            return w, h
+    except Exception:
+        pass
+    return default_w, default_h
+
+
 
 def run_multihilo_flow_test() -> int:
     """
@@ -67,7 +82,8 @@ def run_multihilo_flow_test() -> int:
     redirect_prints = logging_mod.redirect_prints
 
     cfg = load_config()
-    workers = max(1, min(3, _safe_int("TEST_WORKERS", 5)))
+    screen_w_eff, screen_h_eff = _detect_windows_screen_size()
+    workers = max(1, min(4, _safe_int("TEST_WORKERS", 4)))
     max_units = _safe_int("TEST_MAX_UNITS", 0)  # 0 = todos
     keep_temp = _as_bool("TEST_KEEP_TEMP", default=True)
     worker_mode = str(os.getenv("TEST_WORKER_MODE", "sticky") or "sticky").strip().lower()
@@ -175,15 +191,20 @@ def run_multihilo_flow_test() -> int:
             # Forzar validaciones de rango/reesignación horaria en pruebas multihilo.
             env["ADAPTIVE_HOUR_SELECTION"] = "1"
             env["ADAPTIVE_HOUR_NOON_FULL_BLOCK"] = "1"
+            env["NRO_SOLICITUD_CONFIRM_ATTEMPTS"] = str(
+                _safe_int("NRO_SOLICITUD_CONFIRM_ATTEMPTS", 2)
+            )
             
             # En sticky mode: activar PERSISTENT_SESSION para evitar cerrar navegador entre grupos
             if mode == "sticky":
                 env["PERSISTENT_SESSION"] = "1"
 
-            # Ajustables para tu monitor; por defecto 1920x1080.
-            env["BROWSER_TILE_SCREEN_W"] = str(_safe_int("BROWSER_TILE_SCREEN_W", 1920))
-            env["BROWSER_TILE_SCREEN_H"] = str(_safe_int("BROWSER_TILE_SCREEN_H", 1080))
+            # Usar resolución efectiva de Windows (DPI/escala) para evitar solape entre ventanas.
+            env["BROWSER_TILE_SCREEN_W"] = str(_safe_int("BROWSER_TILE_SCREEN_W", screen_w_eff))
+            env["BROWSER_TILE_SCREEN_H"] = str(_safe_int("BROWSER_TILE_SCREEN_H", screen_h_eff))
             env["BROWSER_TILE_TOP_OFFSET"] = str(_safe_int("BROWSER_TILE_TOP_OFFSET", 0))
+            env["BROWSER_TILE_GAP"] = str(_safe_int("BROWSER_TILE_GAP", 6))
+            env["BROWSER_TILE_FRAME_PAD"] = str(_safe_int("BROWSER_TILE_FRAME_PAD", 2))
             return env
 
         def _run_unit(worker_id: int, idx_label: str, excel_worker: Path, mode: str = "sticky") -> int:

@@ -2730,6 +2730,21 @@ def llenar_login_sel():
         terminal_confirmaciones_requeridas = 1
 
     try:
+        nro_solicitud_confirmaciones_requeridas = int(
+            str(
+                os.getenv(
+                    "NRO_SOLICITUD_CONFIRM_ATTEMPTS",
+                    str(terminal_confirmaciones_requeridas),
+                )
+                or str(terminal_confirmaciones_requeridas)
+            ).strip()
+        )
+    except Exception:
+        nro_solicitud_confirmaciones_requeridas = terminal_confirmaciones_requeridas
+    if nro_solicitud_confirmaciones_requeridas < 1:
+        nro_solicitud_confirmaciones_requeridas = 1
+
+    try:
         sin_cupo_confirmaciones_requeridas = int(str(os.getenv("SIN_CUPO_CONFIRM_ATTEMPTS", "1") or "1").strip())
     except Exception:
         sin_cupo_confirmaciones_requeridas = 1
@@ -2890,6 +2905,8 @@ def llenar_login_sel():
             return sin_cupo_confirmaciones_requeridas
         if categoria == "TURNO_DUPLICADO":
             return 1
+        if categoria == "NRO_SOLICITUD":
+            return nro_solicitud_confirmaciones_requeridas
         return terminal_confirmaciones_requeridas
 
     def observacion_error_no_mapeado(registro_excel: dict, error: BaseException, intentos: int) -> str:
@@ -2963,6 +2980,7 @@ def llenar_login_sel():
                         f"--window-size={tile_w},{tile_h}",
                         f"--window-position={tile_x},{tile_y}",
                     ])
+                    print(f"[TILE] Args launch: --window-size={tile_w},{tile_h} --window-position={tile_x},{tile_y}")
                 else:
                     launch_args.extend([
                         "--start-maximized",
@@ -2973,59 +2991,39 @@ def llenar_login_sel():
                 # En persistent_session mode: reutilizar navegador existente en primer intento
                 if persistent_session and intento_global == 1 and browser is not None:
                     print("[DEBUG] PERSISTENT_SESSION: creando nuevo context/page en navegador existente")
-                    context = browser.new_context(viewport=None, ignore_https_errors=True)
+                    context = browser.new_context(no_viewport=True, ignore_https_errors=True)
                     page = context.new_page()
                 else:
+                    print(f"[TILE] Lanzando Chromium con args: {launch_args}")
                     browser = playwright.chromium.launch(
                         headless=False,
                         slow_mo=0,
                         args=launch_args,
                     )
-                    context = browser.new_context(viewport=None, ignore_https_errors=True)
+                    context = browser.new_context(no_viewport=True, ignore_https_errors=True)
                     page = context.new_page()
+                    page.wait_for_timeout(300)
 
                 if tile_enabled:
-                    pos = page.evaluate(
-                        """
-                        (cfg) => {
-                            const sw = Number(window.screen.availWidth || window.screen.width || cfg.screen_w || 1920);
-                            const sh = Number(window.screen.availHeight || window.screen.height || cfg.screen_h || 1080);
-                            const total = Math.max(1, Number(cfg.total || 1));
-                            const idx = Math.max(0, Math.min(total - 1, Number(cfg.index || 0)));
-                            const cols = total === 2 ? 2 : (total === 1 ? 1 : 2);
-                            const rows = Math.ceil(total / cols);
-                            const top = Math.max(0, Number(cfg.top || 0));
-                            const gap = Math.max(0, Number(cfg.gap || 8));
-                            const framePad = Math.max(0, Number(cfg.frame_pad || 24));
-                            const usableH = Math.max(480, sh - top);
-                            const cellW = Math.max(360, Math.floor(sw / cols));
-                            const cellH = Math.max(320, Math.floor(usableH / rows));
-                            const col = idx % cols;
-                            const row = Math.floor(idx / cols);
-                            const w = Math.max(320, cellW - (gap * 2) - framePad);
-                            const h = Math.max(260, cellH - (gap * 2));
-                            const x = (col * cellW) + gap + (col > 0 ? framePad : 0);
-                            const y = top + (row * cellH) + gap;
-                            window.moveTo(x, y);
-                            window.resizeTo(w, h);
-                            return { sw, sh, x, y, w, h, cols, rows };
+                    actual_dims = page.evaluate("""
+                        () => {
+                            return {
+                                screenW: window.screen.availWidth || window.screen.width,
+                                screenH: window.screen.availHeight || window.screen.height,
+                                outerW: window.outerWidth,
+                                outerH: window.outerHeight,
+                                innerW: window.innerWidth,
+                                innerH: window.innerHeight,
+                            };
                         }
-                        """,
-                        {
-                            "screen_w": tile_screen_w,
-                            "screen_h": tile_screen_h,
-                            "total": tile_total,
-                            "index": tile_index,
-                            "top": tile_top_offset,
-                            "gap": tile_gap,
-                            "frame_pad": tile_frame_pad,
-                        },
-                    )
+                    """)
                     print(
-                        "[INFO] Tile aplicado -> "
-                        f"screen={pos.get('sw')}x{pos.get('sh')} "
-                        f"xy=({pos.get('x')},{pos.get('y')}) "
-                        f"wh=({pos.get('w')},{pos.get('h')})"
+                        "[TILE] Geometría aplicada -> "
+                        f"xy=({tile_x},{tile_y}) "
+                        f"wh=({tile_w},{tile_h}) "
+                        f"screen_cfg={tile_screen_w}x{tile_screen_h} "
+                        f"screen_js={actual_dims.get('screenW')}x{actual_dims.get('screenH')} "
+                        f"outer_js={actual_dims.get('outerW')}x{actual_dims.get('outerH')}"
                     )
                 else:
                     page.evaluate("() => { window.moveTo(0, 0); window.resizeTo(screen.width, screen.height); }")

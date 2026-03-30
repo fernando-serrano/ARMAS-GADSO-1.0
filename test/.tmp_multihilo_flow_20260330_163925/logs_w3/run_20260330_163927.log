@@ -1,0 +1,108 @@
+2026-03-30 16:39:27,674 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-03-30 16:39:27,674 | INFO | Modo: scheduled
+2026-03-30 16:39:27,674 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\test\.tmp_multihilo_flow_20260330_163925\worker_3_batch_1_idxs_2.xlsx
+2026-03-30 16:39:37,338 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-03-30 16:39:37,339 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizará entre grupos sin cerrarse
+2026-03-30 16:39:38,608 | INFO |    -> Registros con estado 'PENDIENTE': 1
+2026-03-30 16:39:38,608 | INFO |    -> Validando fecha de hoy: 30/03/2026
+2026-03-30 16:39:38,613 | INFO |    -> Registros despus de filtrar por fecha: 1 (filtrados: 0)
+2026-03-30 16:39:38,624 | INFO |  Registros pendientes a procesar: 1
+2026-03-30 16:39:38,624 | INFO |  Procesando grupo RUC JV - Registros: 1
+2026-03-30 16:39:38,624 | INFO | [INFO] Intento login 1/12 para grupo JV
+2026-03-30 16:39:38,624 | INFO | [TILE] Args launch: --window-size=754,468 --window-position=6,486
+2026-03-30 16:39:38,625 | INFO | [TILE] Lanzando Chromium con args: ['--disable-infobars', '--window-size=754,468', '--window-position=6,486']
+2026-03-30 16:39:40,144 | INFO | [TILE] Geometría aplicada -> xy=(6,486) wh=(754,468) screen_cfg=1536x960 screen_js=1536x912 outer_js=755x470
+2026-03-30 16:39:41,319 | INFO | [INFO] Pagina de login cargada
+2026-03-30 16:39:41,694 | INFO | [INFO] Pestana 'Autenticacion Tradicional' seleccionada
+2026-03-30 16:39:44,850 | INFO | [INFO] Credenciales llenadas para grupo JV
+2026-03-30 16:39:44,850 | INFO |  OCR CAPTCHA: intento interno 1/6...
+2026-03-30 16:39:47,581 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-03-30 16:39:47,581 | ERROR |   super().__init__(loader)
+2026-03-30 16:39:49,060 | INFO |    -> Variante 0, Decoder greedy: 'HSWI D' -> 'HSWID' [INFO]
+2026-03-30 16:39:49,060 | INFO |    [INFO] CAPTCHA vlido -> Usando: HSWID
+2026-03-30 16:39:49,162 | INFO | [INFO] Captcha automatico: HSWID
+2026-03-30 16:39:49,162 | INFO | [INFO] Enviando login...
+2026-03-30 16:39:49,559 | INFO | [INFO] Validando acceso...
+2026-03-30 16:39:49,559 | INFO | [INFO] Acceso exitoso
+2026-03-30 16:39:49,559 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-03-30 16:39:49,559 | INFO | [INFO] Tiempo total login: 10.93 segundos
+2026-03-30 16:39:49,560 | INFO |  Navegando a CITAS -> RESERVAS DE CITAS...
+2026-03-30 16:39:50,960 | INFO |     Fast-path: click directo en 'RESERVAS DE CITAS' (menuid 7_1)
+2026-03-30 16:39:52,172 | INFO | [INFO] Navegacin completada (fast-path) -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-03-30 16:39:52,172 | INFO |  Seleccionando tipo de cita: EXAMEN PARA POLGONO DE TIRO...
+2026-03-30 16:39:52,770 | INFO |    [INFO] Tipo de cita seleccionado: EXAMEN PARA POLÍGONO DE TIRO
+2026-03-30 16:39:52,770 | INFO | -------- JV Registro iterativo 1 (idx=2, prioridad=normal, intento=1, en_cola=0) --------
+2026-03-30 16:39:53,699 | INFO |  Registro tomado desde Excel:
+2026-03-30 16:39:53,699 | INFO |    - id_registro: 3
+2026-03-30 16:39:53,699 | INFO |    - sede: JEFATURA ZONAL AREQUIPA (EX-INTENDENCIA III SUR)
+2026-03-30 16:39:53,699 | INFO |    - fecha: 31/03/2026
+2026-03-30 16:39:53,699 | INFO |    - hora_rango: 08:45-09:00
+2026-03-30 16:39:53,699 | INFO |    - tipo_operacion: RENOVACIÓN DE LICENCIA DE USO
+2026-03-30 16:39:53,699 | INFO |    - doc_vigilante: 09703265
+2026-03-30 16:39:53,700 | INFO |    - nro_solicitud: 075373-0
+2026-03-30 16:39:53,700 | INFO |    - fecha_programacion: 30/03/2026
+2026-03-30 16:39:53,700 | INFO |    - ruc: J & V Resguardo
+2026-03-30 16:39:53,700 | INFO |    - prioridad: normal
+2026-03-30 16:39:53,700 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-03-30 16:39:53,700 | INFO |    - indices_relacionados_excel: [2]
+2026-03-30 16:39:53,700 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-03-30 16:39:53,700 | INFO |    - arma (excel): ['PISTOLA']
+2026-03-30 16:39:53,700 | INFO |    - objetivos_arma: [('CORTA', 'PISTOLA')]
+2026-03-30 16:39:53,700 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-03-30 16:39:53,718 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-03-30 16:39:54,187 | INFO |    [INFO] Sede seleccionado: JEFATURA ZONAL AREQUIPA (EX-INTENDENCIA III SUR)
+2026-03-30 16:39:55,327 | INFO |    [INFO] Fecha seleccionado: 31/03/2026
+2026-03-30 16:39:55,327 | INFO |  Buscando hora en tabla: 08:45-09:00
+2026-03-30 16:39:55,782 | INFO |    [INFO] Estrategia horario: vecinos inmediatos (inferior/superior)
+2026-03-30 16:39:55,783 | INFO |    [INFO] Reasignación adaptativa de hora: 08:45-09:00 -> 08:30-08:45 (Cupos=2)
+2026-03-30 16:39:56,096 | INFO |    [INFO] Hora seleccionada: 08:30-08:45 (Cupos Libres=2)
+2026-03-30 16:39:56,142 | INFO |    [INFO] Click en botn 'Siguiente'
+2026-03-30 16:39:56,143 | INFO |  Completando Paso 2 con datos del Excel...
+2026-03-30 16:39:56,762 | INFO |    [INFO] Tipo Operacin seleccionado: RENOVACIÓN DE LICENCIA DE USO
+2026-03-30 16:39:58,306 | INFO |    [INFO] Documento vigilante seleccionado: 09703265
+2026-03-30 16:39:58,763 | INFO |    [INFO] Seleccione Solicitud: SI
+2026-03-30 16:40:00,597 | INFO | [WARNING] Error en registro idx=2: No se encontró Nro Solicitud con token '75373'. Opciones: ['Seleccione']
+2026-03-30 16:40:00,597 | INFO | [INFO] Registro idx=2 con causal terminal 'NRO_SOLICITUD' pendiente de confirmación (1/2). Reencolando...
+2026-03-30 16:40:00,820 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-03-30 16:40:01,821 | INFO | -------- JV Registro iterativo 2 (idx=2, prioridad=normal, intento=2, en_cola=0) --------
+2026-03-30 16:40:01,866 | INFO |  Registro tomado desde Excel:
+2026-03-30 16:40:01,866 | INFO |    - id_registro: 3
+2026-03-30 16:40:01,866 | INFO |    - sede: JEFATURA ZONAL AREQUIPA (EX-INTENDENCIA III SUR)
+2026-03-30 16:40:01,866 | INFO |    - fecha: 31/03/2026
+2026-03-30 16:40:01,866 | INFO |    - hora_rango: 08:45-09:00
+2026-03-30 16:40:01,866 | INFO |    - tipo_operacion: RENOVACIÓN DE LICENCIA DE USO
+2026-03-30 16:40:01,866 | INFO |    - doc_vigilante: 09703265
+2026-03-30 16:40:01,866 | INFO |    - nro_solicitud: 075373-0
+2026-03-30 16:40:01,866 | INFO |    - fecha_programacion: 30/03/2026
+2026-03-30 16:40:01,866 | INFO |    - ruc: J & V Resguardo
+2026-03-30 16:40:01,866 | INFO |    - prioridad: normal
+2026-03-30 16:40:01,866 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-03-30 16:40:01,866 | INFO |    - indices_relacionados_excel: [2]
+2026-03-30 16:40:01,866 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-03-30 16:40:01,866 | INFO |    - arma (excel): ['PISTOLA']
+2026-03-30 16:40:01,866 | INFO |    - objetivos_arma: [('CORTA', 'PISTOLA')]
+2026-03-30 16:40:01,867 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-03-30 16:40:01,876 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-03-30 16:40:02,278 | INFO |    [INFO] Sede seleccionado: JEFATURA ZONAL AREQUIPA (EX-INTENDENCIA III SUR)
+2026-03-30 16:40:03,368 | INFO |    [INFO] Fecha seleccionado: 31/03/2026
+2026-03-30 16:40:03,368 | INFO |  Buscando hora en tabla: 08:45-09:00
+2026-03-30 16:40:03,592 | INFO |    [INFO] Estrategia horario: vecinos inmediatos (inferior/superior)
+2026-03-30 16:40:03,593 | INFO |    [INFO] Reasignación adaptativa de hora: 08:45-09:00 -> 08:30-08:45 (Cupos=2)
+2026-03-30 16:40:03,882 | INFO |    [INFO] Hora seleccionada: 08:30-08:45 (Cupos Libres=2)
+2026-03-30 16:40:03,945 | INFO |    [INFO] Click en botn 'Siguiente'
+2026-03-30 16:40:03,945 | INFO |  Completando Paso 2 con datos del Excel...
+2026-03-30 16:40:04,557 | INFO |    [INFO] Tipo Operacin seleccionado: RENOVACIÓN DE LICENCIA DE USO
+2026-03-30 16:40:06,076 | INFO |    [INFO] Documento vigilante seleccionado: 09703265
+2026-03-30 16:40:06,595 | INFO |    [INFO] Seleccione Solicitud: SI
+2026-03-30 16:40:08,479 | INFO | [WARNING] Error en registro idx=2: No se encontró Nro Solicitud con token '75373'. Opciones: ['Seleccione']
+2026-03-30 16:40:08,500 | INFO |    📝 Excel actualizado: observaciones='No se encontró Nro Solicitud/Código de pago para token de 075373-0' en 1 fila(s)
+2026-03-30 16:40:08,500 | INFO | [INFO] Registro idx=2 marcado como terminal 'NRO_SOLICITUD' tras 2 confirmaciones
+2026-03-30 16:40:08,722 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-03-30 16:40:09,723 | INFO | [DEBUG] PERSISTENT_SESSION: cerrando contexto anterior para siguiente grupo
+2026-03-30 16:40:09,773 | INFO |  Tiempo total del flujo: 32.43 segundos
+2026-03-30 16:40:09,773 | INFO |  Resumen: OK=0 | SIN_CUPO=0 | ERROR=1
+2026-03-30 16:40:09,773 | INFO | [INFO] Flujo completado.
+2026-03-30 16:40:09,774 | INFO |     Duracin final del flujo: 32.43 segundos
+2026-03-30 16:40:10,203 | INFO | Navegador cerrado.
+2026-03-30 16:40:10,203 | INFO | Pipeline finalizado
+2026-03-30 16:40:10,203 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\test\.tmp_multihilo_flow_20260330_163925\logs_w3\run_20260330_163927.log

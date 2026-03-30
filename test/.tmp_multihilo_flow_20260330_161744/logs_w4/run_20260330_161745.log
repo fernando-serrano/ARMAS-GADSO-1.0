@@ -1,0 +1,90 @@
+2026-03-30 16:17:45,079 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-03-30 16:17:45,079 | INFO | Modo: scheduled
+2026-03-30 16:17:45,079 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\test\.tmp_multihilo_flow_20260330_161744\worker_4_batch_1_idxs_3.xlsx
+2026-03-30 16:17:53,430 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-03-30 16:17:53,430 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizará entre grupos sin cerrarse
+2026-03-30 16:17:54,717 | INFO |    -> Registros con estado 'PENDIENTE': 1
+2026-03-30 16:17:54,718 | INFO |    -> Validando fecha de hoy: 30/03/2026
+2026-03-30 16:17:54,723 | INFO |    -> Registros despus de filtrar por fecha: 1 (filtrados: 0)
+2026-03-30 16:17:54,730 | INFO |  Registros pendientes a procesar: 1
+2026-03-30 16:17:54,730 | INFO |  Procesando grupo RUC JV - Registros: 1
+2026-03-30 16:17:54,730 | INFO | [INFO] Intento login 1/12 para grupo JV
+2026-03-30 16:17:54,730 | INFO | [TILE] Args launch: --window-size=946,570 --window-position=968,623
+2026-03-30 16:17:54,730 | INFO | [TILE] Lanzando Chromium con args: ['--disable-infobars', '--window-size=946,570', '--window-position=968,623']
+2026-03-30 16:17:57,033 | INFO | [TILE] MoveWindow SUCCESS: HWND=70246 xy=(968,623) wh=(946,570)
+2026-03-30 16:17:57,107 | INFO | [TILE] Dims actuales: screen=1280x720, outer=947x572, inner=1280x720
+2026-03-30 16:17:57,126 | INFO | [TILE] Posición calculada -> screen=1280x720 xy=(648,383) wh=(626,330) grid=2x2
+2026-03-30 16:17:58,328 | INFO | [INFO] Pagina de login cargada
+2026-03-30 16:17:59,837 | INFO | [INFO] Pestana 'Autenticacion Tradicional' seleccionada
+2026-03-30 16:18:04,013 | INFO | [INFO] Credenciales llenadas para grupo JV
+2026-03-30 16:18:04,014 | INFO |  OCR CAPTCHA: intento interno 1/6...
+2026-03-30 16:18:06,497 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-03-30 16:18:06,497 | ERROR |   super().__init__(loader)
+2026-03-30 16:18:06,645 | INFO |    -> Variante 0, Decoder greedy: '67QBY' -> '67QBY' [INFO]
+2026-03-30 16:18:06,645 | INFO |    [INFO] CAPTCHA vlido -> Usando: 67QBY
+2026-03-30 16:18:06,788 | INFO | [INFO] Captcha automatico: 67QBY
+2026-03-30 16:18:06,788 | INFO | [INFO] Enviando login...
+2026-03-30 16:18:07,236 | INFO | [INFO] Validando acceso...
+2026-03-30 16:18:07,236 | INFO | [INFO] Acceso exitoso
+2026-03-30 16:18:07,236 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-03-30 16:18:07,236 | INFO | [INFO] Tiempo total login: 12.51 segundos
+2026-03-30 16:18:07,236 | INFO |  Navegando a CITAS -> RESERVAS DE CITAS...
+2026-03-30 16:18:07,866 | INFO |     Fast-path: click directo en 'RESERVAS DE CITAS' (menuid 7_1)
+2026-03-30 16:18:09,644 | INFO | [INFO] Navegacin completada (fast-path) -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-03-30 16:18:09,644 | INFO |  Seleccionando tipo de cita: EXAMEN PARA POLGONO DE TIRO...
+2026-03-30 16:18:10,200 | INFO |    [INFO] Tipo de cita seleccionado: EXAMEN PARA POLÍGONO DE TIRO
+2026-03-30 16:18:10,200 | INFO | -------- JV Registro iterativo 1 (idx=3, prioridad=normal, intento=1, en_cola=0) --------
+2026-03-30 16:18:10,521 | INFO |  Registro tomado desde Excel:
+2026-03-30 16:18:10,521 | INFO |    - id_registro: 4
+2026-03-30 16:18:10,521 | INFO |    - sede: JEFATURA ZONAL DE CAJAMARCA
+2026-03-30 16:18:10,523 | INFO |    - fecha: 31/03/2025
+2026-03-30 16:18:10,524 | INFO |    - hora_rango: 12:00-12:15
+2026-03-30 16:18:10,524 | INFO |    - tipo_operacion: RENOVACIÓN DE LICENCIA DE USO
+2026-03-30 16:18:10,524 | INFO |    - doc_vigilante: 09703265
+2026-03-30 16:18:10,530 | INFO |    - nro_solicitud: 038324-0
+2026-03-30 16:18:10,530 | INFO |    - fecha_programacion: 30/03/2026
+2026-03-30 16:18:10,530 | INFO |    - ruc: J & V Resguardo
+2026-03-30 16:18:10,530 | INFO |    - prioridad: normal
+2026-03-30 16:18:10,530 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-03-30 16:18:10,530 | INFO |    - indices_relacionados_excel: [3]
+2026-03-30 16:18:10,530 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-03-30 16:18:10,530 | INFO |    - arma (excel): ['PISTOLA']
+2026-03-30 16:18:10,531 | INFO |    - objetivos_arma: [('CORTA', 'PISTOLA')]
+2026-03-30 16:18:10,531 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-03-30 16:18:10,545 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-03-30 16:18:11,012 | INFO |    [INFO] Sede seleccionado: JEFATURA ZONAL DE CAJAMARCA
+2026-03-30 16:18:12,876 | INFO | [WARNING] Error en registro idx=3: Fecha '31/03/2025' no disponible en combo. Opciones actuales: ['Seleccione Fecha', '30/03/2026', '31/03/2026', '06/04/2026', '07/04/2026', '13/04/2026']
+2026-03-30 16:18:12,876 | INFO | [INFO] Registro idx=3 con causal terminal 'FECHA_NO_DISPONIBLE' pendiente de confirmación (1/2). Reencolando...
+2026-03-30 16:18:13,119 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-03-30 16:18:14,120 | INFO | -------- JV Registro iterativo 2 (idx=3, prioridad=normal, intento=2, en_cola=0) --------
+2026-03-30 16:18:14,193 | INFO |  Registro tomado desde Excel:
+2026-03-30 16:18:14,194 | INFO |    - id_registro: 4
+2026-03-30 16:18:14,194 | INFO |    - sede: JEFATURA ZONAL DE CAJAMARCA
+2026-03-30 16:18:14,194 | INFO |    - fecha: 31/03/2025
+2026-03-30 16:18:14,194 | INFO |    - hora_rango: 12:00-12:15
+2026-03-30 16:18:14,195 | INFO |    - tipo_operacion: RENOVACIÓN DE LICENCIA DE USO
+2026-03-30 16:18:14,195 | INFO |    - doc_vigilante: 09703265
+2026-03-30 16:18:14,195 | INFO |    - nro_solicitud: 038324-0
+2026-03-30 16:18:14,195 | INFO |    - fecha_programacion: 30/03/2026
+2026-03-30 16:18:14,195 | INFO |    - ruc: J & V Resguardo
+2026-03-30 16:18:14,195 | INFO |    - prioridad: normal
+2026-03-30 16:18:14,196 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-03-30 16:18:14,196 | INFO |    - indices_relacionados_excel: [3]
+2026-03-30 16:18:14,196 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-03-30 16:18:14,196 | INFO |    - arma (excel): ['PISTOLA']
+2026-03-30 16:18:14,197 | INFO |    - objetivos_arma: [('CORTA', 'PISTOLA')]
+2026-03-30 16:18:14,197 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-03-30 16:18:14,208 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-03-30 16:18:14,681 | INFO |    [INFO] Sede seleccionado: JEFATURA ZONAL DE CAJAMARCA
+2026-03-30 16:18:16,551 | INFO | [WARNING] Error en registro idx=3: Fecha '31/03/2025' no disponible en combo. Opciones actuales: ['Seleccione Fecha', '30/03/2026', '31/03/2026', '06/04/2026', '07/04/2026', '13/04/2026']
+2026-03-30 16:18:16,662 | INFO |    📝 Excel actualizado: observaciones='Fecha no disponible en combo de Reserva de Cupos: 31/03/2025' en 1 fila(s)
+2026-03-30 16:18:16,663 | INFO | [INFO] Registro idx=3 marcado como terminal 'FECHA_NO_DISPONIBLE' tras 2 confirmaciones
+2026-03-30 16:18:16,904 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-03-30 16:18:17,905 | INFO | [DEBUG] PERSISTENT_SESSION: cerrando contexto anterior para siguiente grupo
+2026-03-30 16:18:17,953 | INFO |  Tiempo total del flujo: 24.52 segundos
+2026-03-30 16:18:17,953 | INFO |  Resumen: OK=0 | SIN_CUPO=0 | ERROR=1
+2026-03-30 16:18:17,953 | INFO | [INFO] Flujo completado.
+2026-03-30 16:18:17,954 | INFO |     Duracin final del flujo: 24.52 segundos
+2026-03-30 16:18:18,650 | INFO | Navegador cerrado.
+2026-03-30 16:18:18,650 | INFO | Pipeline finalizado
+2026-03-30 16:18:18,650 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\test\.tmp_multihilo_flow_20260330_161744\logs_w4\run_20260330_161745.log

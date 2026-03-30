@@ -1,0 +1,110 @@
+2026-03-30 16:18:51,863 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-03-30 16:18:51,863 | INFO | Modo: scheduled
+2026-03-30 16:18:51,863 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\test\.tmp_multihilo_flow_20260330_161851\worker_2_batch_1_idxs_1.xlsx
+2026-03-30 16:19:06,300 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-03-30 16:19:06,301 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizará entre grupos sin cerrarse
+2026-03-30 16:19:07,570 | INFO |    -> Registros con estado 'PENDIENTE': 1
+2026-03-30 16:19:07,570 | INFO |    -> Validando fecha de hoy: 30/03/2026
+2026-03-30 16:19:07,574 | INFO |    -> Registros despus de filtrar por fecha: 1 (filtrados: 0)
+2026-03-30 16:19:07,585 | INFO |  Registros pendientes a procesar: 1
+2026-03-30 16:19:07,586 | INFO |  Procesando grupo RUC JV - Registros: 1
+2026-03-30 16:19:07,586 | INFO | [INFO] Intento login 1/12 para grupo JV
+2026-03-30 16:19:07,586 | INFO | [TILE] Args launch: --window-size=946,570 --window-position=968,41
+2026-03-30 16:19:07,586 | INFO | [TILE] Lanzando Chromium con args: ['--disable-infobars', '--window-size=946,570', '--window-position=968,41']
+2026-03-30 16:19:10,403 | INFO | [TILE] MoveWindow SUCCESS: HWND=3280832 xy=(968,41) wh=(946,570)
+2026-03-30 16:19:10,422 | INFO | [TILE] Dims actuales: screen=1280x720, outer=947x571, inner=1280x720
+2026-03-30 16:19:10,430 | INFO | [TILE] Posición calculada -> screen=1280x720 xy=(648,41) wh=(626,330) grid=2x2
+2026-03-30 16:19:11,050 | INFO | [INFO] Pagina de login cargada
+2026-03-30 16:19:11,644 | INFO | [INFO] Pestana 'Autenticacion Tradicional' seleccionada
+2026-03-30 16:19:15,220 | INFO | [INFO] Credenciales llenadas para grupo JV
+2026-03-30 16:19:15,220 | INFO |  OCR CAPTCHA: intento interno 1/6...
+2026-03-30 16:19:19,204 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-03-30 16:19:19,204 | ERROR |   super().__init__(loader)
+2026-03-30 16:19:19,543 | INFO |    -> Variante 0, Decoder greedy: '4SUMS' -> '4SUMS' [INFO]
+2026-03-30 16:19:19,543 | INFO |    [INFO] CAPTCHA vlido -> Usando: 4SUMS
+2026-03-30 16:19:19,733 | INFO | [INFO] Captcha automatico: 4SUMS
+2026-03-30 16:19:19,733 | INFO | [INFO] Enviando login...
+2026-03-30 16:19:20,199 | INFO | [INFO] Validando acceso...
+2026-03-30 16:19:20,199 | INFO | [INFO] Acceso exitoso
+2026-03-30 16:19:20,199 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-03-30 16:19:20,199 | INFO | [INFO] Tiempo total login: 12.61 segundos
+2026-03-30 16:19:20,199 | INFO |  Navegando a CITAS -> RESERVAS DE CITAS...
+2026-03-30 16:19:21,566 | INFO |     Fast-path: click directo en 'RESERVAS DE CITAS' (menuid 7_1)
+2026-03-30 16:19:22,864 | INFO | [INFO] Navegacin completada (fast-path) -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-03-30 16:19:22,864 | INFO |  Seleccionando tipo de cita: EXAMEN PARA POLGONO DE TIRO...
+2026-03-30 16:19:23,530 | INFO |    [INFO] Tipo de cita seleccionado: EXAMEN PARA POLÍGONO DE TIRO
+2026-03-30 16:19:23,530 | INFO | -------- JV Registro iterativo 1 (idx=1, prioridad=normal, intento=1, en_cola=0) --------
+2026-03-30 16:19:23,758 | INFO |  Registro tomado desde Excel:
+2026-03-30 16:19:23,758 | INFO |    - id_registro: 2
+2026-03-30 16:19:23,759 | INFO |    - sede: JEFATURA ZONAL DE TACNA
+2026-03-30 16:19:23,759 | INFO |    - fecha: 31/03/2026
+2026-03-30 16:19:23,759 | INFO |    - hora_rango: 12:15-12:30
+2026-03-30 16:19:23,759 | INFO |    - tipo_operacion: RENOVACIÓN DE LICENCIA DE USO
+2026-03-30 16:19:23,759 | INFO |    - doc_vigilante: 10595436
+2026-03-30 16:19:23,760 | INFO |    - nro_solicitud: 052335-0
+2026-03-30 16:19:23,760 | INFO |    - fecha_programacion: 30/03/2026
+2026-03-30 16:19:23,760 | INFO |    - ruc: J & V Resguardo
+2026-03-30 16:19:23,760 | INFO |    - prioridad: normal
+2026-03-30 16:19:23,760 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-03-30 16:19:23,761 | INFO |    - indices_relacionados_excel: [1]
+2026-03-30 16:19:23,761 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-03-30 16:19:23,761 | INFO |    - arma (excel): ['PISTOLA']
+2026-03-30 16:19:23,761 | INFO |    - objetivos_arma: [('CORTA', 'PISTOLA')]
+2026-03-30 16:19:23,761 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-03-30 16:19:23,777 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-03-30 16:19:24,286 | INFO |    [INFO] Sede seleccionado: JEFATURA ZONAL DE TACNA
+2026-03-30 16:19:25,453 | INFO |    [INFO] Fecha seleccionado: 31/03/2026
+2026-03-30 16:19:25,453 | INFO |  Buscando hora en tabla: 12:15-12:30
+2026-03-30 16:19:26,274 | INFO |    [INFO] Estrategia horario: bloque completo de mediodía (11:45-13:00)
+2026-03-30 16:19:26,274 | INFO |    [INFO] Reasignación adaptativa de hora: 12:15-12:30 -> 11:45-12:00 (Cupos=3)
+2026-03-30 16:19:26,639 | INFO |    [INFO] Hora seleccionada: 11:45-12:00 (Cupos Libres=3)
+2026-03-30 16:19:26,753 | INFO |    [INFO] Click en botn 'Siguiente'
+2026-03-30 16:19:26,753 | INFO |  Completando Paso 2 con datos del Excel...
+2026-03-30 16:19:27,449 | INFO |    [INFO] Tipo Operacin seleccionado: RENOVACIÓN DE LICENCIA DE USO
+2026-03-30 16:19:29,206 | INFO |    [INFO] Documento vigilante seleccionado: 10595436
+2026-03-30 16:19:29,740 | INFO |    [INFO] Seleccione Solicitud: SI
+2026-03-30 16:19:32,266 | INFO | [WARNING] Error en registro idx=1: No se encontró Nro Solicitud con token '52335'. Opciones: ['Seleccione', 'TUPA 2022 PA3400C730 - Nro Empoce: 53678 - Fecha registro: 10/04/2023']
+2026-03-30 16:19:32,267 | INFO | [INFO] Registro idx=1 con causal terminal 'NRO_SOLICITUD' pendiente de confirmación (1/2). Reencolando...
+2026-03-30 16:19:32,576 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-03-30 16:19:33,577 | INFO | -------- JV Registro iterativo 2 (idx=1, prioridad=normal, intento=2, en_cola=0) --------
+2026-03-30 16:19:33,655 | INFO |  Registro tomado desde Excel:
+2026-03-30 16:19:33,655 | INFO |    - id_registro: 2
+2026-03-30 16:19:33,655 | INFO |    - sede: JEFATURA ZONAL DE TACNA
+2026-03-30 16:19:33,655 | INFO |    - fecha: 31/03/2026
+2026-03-30 16:19:33,655 | INFO |    - hora_rango: 12:15-12:30
+2026-03-30 16:19:33,655 | INFO |    - tipo_operacion: RENOVACIÓN DE LICENCIA DE USO
+2026-03-30 16:19:33,655 | INFO |    - doc_vigilante: 10595436
+2026-03-30 16:19:33,655 | INFO |    - nro_solicitud: 052335-0
+2026-03-30 16:19:33,656 | INFO |    - fecha_programacion: 30/03/2026
+2026-03-30 16:19:33,656 | INFO |    - ruc: J & V Resguardo
+2026-03-30 16:19:33,656 | INFO |    - prioridad: normal
+2026-03-30 16:19:33,656 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-03-30 16:19:33,656 | INFO |    - indices_relacionados_excel: [1]
+2026-03-30 16:19:33,656 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-03-30 16:19:33,656 | INFO |    - arma (excel): ['PISTOLA']
+2026-03-30 16:19:33,656 | INFO |    - objetivos_arma: [('CORTA', 'PISTOLA')]
+2026-03-30 16:19:33,656 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-03-30 16:19:33,668 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-03-30 16:19:34,086 | INFO |    [INFO] Sede seleccionado: JEFATURA ZONAL DE TACNA
+2026-03-30 16:19:35,189 | INFO |    [INFO] Fecha seleccionado: 31/03/2026
+2026-03-30 16:19:35,189 | INFO |  Buscando hora en tabla: 12:15-12:30
+2026-03-30 16:19:35,538 | INFO |    [INFO] Estrategia horario: bloque completo de mediodía (11:45-13:00)
+2026-03-30 16:19:35,539 | INFO |    [INFO] Reasignación adaptativa de hora: 12:15-12:30 -> 11:45-12:00 (Cupos=3)
+2026-03-30 16:19:35,845 | INFO |    [INFO] Hora seleccionada: 11:45-12:00 (Cupos Libres=3)
+2026-03-30 16:19:35,894 | INFO |    [INFO] Click en botn 'Siguiente'
+2026-03-30 16:19:35,894 | INFO |  Completando Paso 2 con datos del Excel...
+2026-03-30 16:19:36,478 | INFO |    [INFO] Tipo Operacin seleccionado: RENOVACIÓN DE LICENCIA DE USO
+2026-03-30 16:19:38,028 | INFO |    [INFO] Documento vigilante seleccionado: 10595436
+2026-03-30 16:19:38,537 | INFO |    [INFO] Seleccione Solicitud: SI
+2026-03-30 16:19:40,455 | INFO | [WARNING] Error en registro idx=1: No se encontró Nro Solicitud con token '52335'. Opciones: ['Seleccione', 'TUPA 2022 PA3400C730 - Nro Empoce: 53678 - Fecha registro: 10/04/2023']
+2026-03-30 16:19:40,491 | INFO |    📝 Excel actualizado: observaciones='No se encontró Nro Solicitud/Código de pago para token de 052335-0' en 1 fila(s)
+2026-03-30 16:19:40,491 | INFO | [INFO] Registro idx=1 marcado como terminal 'NRO_SOLICITUD' tras 2 confirmaciones
+2026-03-30 16:19:40,742 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-03-30 16:19:41,743 | INFO | [DEBUG] PERSISTENT_SESSION: cerrando contexto anterior para siguiente grupo
+2026-03-30 16:19:41,773 | INFO |  Tiempo total del flujo: 35.47 segundos
+2026-03-30 16:19:41,773 | INFO |  Resumen: OK=0 | SIN_CUPO=0 | ERROR=1
+2026-03-30 16:19:41,773 | INFO | [INFO] Flujo completado.
+2026-03-30 16:19:41,774 | INFO |     Duracin final del flujo: 35.47 segundos
+2026-03-30 16:19:42,400 | INFO | Navegador cerrado.
+2026-03-30 16:19:42,401 | INFO | Pipeline finalizado
+2026-03-30 16:19:42,401 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\test\.tmp_multihilo_flow_20260330_161851\logs_w2\run_20260330_161851.log
