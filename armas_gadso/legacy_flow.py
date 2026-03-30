@@ -13,23 +13,34 @@ try:
 except ImportError:
     pd = None
 
+load_dotenv()
+
 # ====================== INTENTO DE IMPORTAR OCR (opcional) ======================
 OCR_AVAILABLE = False
+OCR_BACKEND = "manual"
+EASYOCR_READER = None
+EASYOCR_ALLOWLIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+EASYOCR_LANGS = ["en"]
+np = None
 try:
     from PIL import Image, ImageFilter, ImageEnhance, ImageOps
     from io import BytesIO
-    import pytesseract
-    # ==================== RUTA IMPORTANTE DEL TESSERACT (ajusta según tu instalación) ============================
-    pytesseract.pytesseract.tesseract_cmd = r'C:\Users\fserrano\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
-    # =============================================================================================================
-    OCR_AVAILABLE = True
-    print("[INFO] OCR (pytesseract) cargado correctamente")
-except ImportError:
-    print("[WARNING] pytesseract no esta instalado -> se usara modo MANUAL (captcha a mano)")
-except Exception as e:
-    print(f"[WARNING]  Error al cargar OCR: {e} -> modo MANUAL")
+    import numpy as np
+    import easyocr
 
-load_dotenv()
+    langs_env = str(os.getenv("EASYOCR_LANGS", "en") or "en")
+    EASYOCR_LANGS = [x.strip() for x in langs_env.split(",") if x.strip()] or ["en"]
+    EASYOCR_ALLOWLIST = str(os.getenv("EASYOCR_ALLOWLIST", EASYOCR_ALLOWLIST) or EASYOCR_ALLOWLIST).strip() or EASYOCR_ALLOWLIST
+    easyocr_use_gpu = str(os.getenv("EASYOCR_USE_GPU", "0") or "0").strip().lower() in {"1", "true", "yes", "si", "sí"}
+
+    EASYOCR_READER = easyocr.Reader(EASYOCR_LANGS, gpu=easyocr_use_gpu, verbose=False)
+    OCR_AVAILABLE = True
+    OCR_BACKEND = "easyocr"
+    print(f"[INFO] OCR (easyocr) cargado correctamente | langs={EASYOCR_LANGS} | gpu={easyocr_use_gpu}")
+except ImportError as e:
+    print(f"[WARNING] easyocr no esta instalado ({e}) -> se usara modo MANUAL (captcha a mano)")
+except Exception as e:
+    print(f"[WARNING] Error al cargar easyocr: {e} -> modo MANUAL")
 
 URL_LOGIN = "https://www.sucamec.gob.pe/sel/faces/login.xhtml?faces-redirect=true"
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -597,6 +608,40 @@ def preprocesar_imagen_captcha(img_bytes: bytes, variante: int = 0) -> 'Image':
     return img
 
 
+def _leer_texto_easyocr_desde_imagen(img: 'Image', decoder: str = "greedy") -> str:
+    """Ejecuta easyOCR sobre una imagen PIL y devuelve texto bruto."""
+    if EASYOCR_READER is None or np is None:
+        return ""
+
+    try:
+        arr = np.array(img)
+    except Exception:
+        return ""
+
+    try:
+        resultados = EASYOCR_READER.readtext(
+            arr,
+            detail=0,
+            paragraph=False,
+            allowlist=EASYOCR_ALLOWLIST,
+            decoder=decoder,
+        )
+    except TypeError:
+        # Compatibilidad con versiones que no soporten todos los kwargs.
+        resultados = EASYOCR_READER.readtext(
+            arr,
+            detail=0,
+            paragraph=False,
+            allowlist=EASYOCR_ALLOWLIST,
+        )
+    except Exception:
+        return ""
+
+    if isinstance(resultados, (list, tuple)):
+        return " ".join(str(x or "") for x in resultados).strip()
+    return str(resultados or "").strip()
+
+
 def solve_captcha_ocr_base(
     page,
     captcha_img_selector: str,
@@ -613,8 +658,8 @@ def solve_captcha_ocr_base(
     if not OCR_AVAILABLE:
         return None
 
-    PSM_MODES = [7, 8, 13]
     NUM_VARIANTES = 3
+    DECODERS = ["greedy", "beamsearch"]
 
     intento = 0
     while True:
@@ -631,20 +676,24 @@ def solve_captcha_ocr_base(
             observaciones = []
             for variante in range(NUM_VARIANTES):
                 img = preprocesar_imagen_captcha(img_bytes, variante=variante)
-                for psm in PSM_MODES:
-                    config = f'--psm {psm} --oem 3 -c tessedit_char_whitelist=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ --dpi 300'
-                    texto_raw = pytesseract.image_to_string(img, config=config, lang='eng').strip()
+                for decoder in DECODERS:
+                    texto_raw = _leer_texto_easyocr_desde_imagen(img, decoder=decoder)
                     texto = corregir_captcha_ocr(texto_raw)
                     observaciones.append(texto)
 
                     if validar_captcha_texto(texto):
-                        print(f"   -> Variante {variante}, PSM {psm}: '{texto_raw}' -> '{texto}' [INFO]")
+                        print(f"   -> Variante {variante}, Decoder {decoder}: '{texto_raw}' -> '{texto}' [INFO]")
                         mejor_texto = texto
                         break
                     else:
-                        print(f"   -> Variante {variante}, PSM {psm}: '{texto_raw}' -> '{texto}' (len={len(texto)}) [WARNING]")
+                        print(f"   -> Variante {variante}, Decoder {decoder}: '{texto_raw}' -> '{texto}' (len={len(texto)}) [WARNING]")
                 if mejor_texto:
                     break
+
+            if not mejor_texto:
+                mejor_texto = seleccionar_mejor_captcha_por_consenso(observaciones)
+                if validar_captcha_texto(mejor_texto):
+                    print(f"   [INFO] CAPTCHA por consenso -> Usando: {mejor_texto}")
 
             if mejor_texto:
                 if evitar_ambiguos:

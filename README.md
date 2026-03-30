@@ -104,9 +104,10 @@ Comportamiento:
 - `run_manual.bat` -> ejecuta modo manual.
 - `run_scheduled.bat` -> ejecuta modo scheduled y redirige salida a `logs/task_scheduler_stdout.log`.
 - `run_test_hora_flexible.py` -> runner de prueba para selección horaria adaptativa y replanificación por cupos ocupados.
-- `run_test_easyocr.py` -> runner de prueba OCR con EasyOCR para captcha de login y captcha final.
+- `run_test_easyocr_base.py` -> runner de prueba del flujo base usando OCR nativo del sistema (EasyOCR) en login y fase final.
+- `run_test_easyocr.py` -> runner de prueba con OCR nativo + captcha forzado solo en fase final para validar comportamiento del tramo previo a generar cita.
 
-Para pruebas EasyOCR (opcional):
+Dependencias OCR (requeridas por el flujo):
 
 ```powershell
 pip install easyocr numpy pillow
@@ -137,6 +138,9 @@ Configurar en `.env`:
 - `ADAPTIVE_HOUR_SELECTION` (opcional, `1` activa selección flexible de horario; por defecto `0`)
 - `ADAPTIVE_HOUR_NOON_FULL_BLOCK` (opcional, por defecto `1`; si la hora está entre `11:45-13:00`, evalúa todo el bloque y elige mayor cupo)
 - `MAX_HOUR_FALLBACK_RETRIES` (opcional, por defecto `8`; reintentos máximos cuando al final aparece "cupos ocupados")
+- `EASYOCR_LANGS` (opcional, por defecto `en`; lista separada por comas)
+- `EASYOCR_ALLOWLIST` (opcional, por defecto `A-Z0-9`)
+- `EASYOCR_USE_GPU` (opcional, por defecto `0`)
 
 ## Excel esperado
 
