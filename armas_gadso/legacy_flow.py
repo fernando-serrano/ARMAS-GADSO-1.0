@@ -342,6 +342,37 @@ def detectar_turno_duplicado_en_growl(page, max_wait_ms: int = 0) -> str:
         page.wait_for_timeout(120)
 
 
+def validar_turno_duplicado_o_lanzar(page, max_wait_ms: int = 0):
+    """Lanza TurnoDuplicadoError si detecta mensaje en growl/DOM."""
+    msg = detectar_turno_duplicado_en_growl(page, max_wait_ms=max_wait_ms)
+    if msg:
+        raise TurnoDuplicadoError(msg)
+
+
+def esperar_transicion_a_fase3_o_turno_duplicado(page, timeout_ms: int = 12000):
+    """
+    Espera robusta de transición tras 'Siguiente' en Paso 2:
+    - Si aparece mensaje de turno duplicado, lanza TurnoDuplicadoError.
+    - Si aparece panel de Fase 3, retorna OK.
+    - Si vence timeout sin ambas señales, lanza excepción de desincronización.
+    """
+    deadline = time.time() + (max(1000, int(timeout_ms)) / 1000.0)
+    while time.time() < deadline:
+        validar_turno_duplicado_o_lanzar(page, max_wait_ms=0)
+
+        try:
+            if page.locator(SEL["fase3_panel"]).is_visible(timeout=200):
+                return
+        except Exception:
+            pass
+
+        page.wait_for_timeout(180)
+
+    # Último barrido por si el growl llegó al final de la ventana de espera.
+    validar_turno_duplicado_o_lanzar(page, max_wait_ms=1200)
+    raise Exception("No se confirmó transición a Fase 3 tras 'Siguiente' de Paso 2")
+
+
 # ============================================================
 # OCR helpers  (sin cambios)
 # ============================================================
@@ -769,9 +800,10 @@ def completar_fase_3_resumen(page):
     try:
         page.locator(SEL["fase3_panel"]).wait_for(state="visible", timeout=12000)
     except Exception as e:
-        msg_dup = detectar_turno_duplicado_en_growl(page, max_wait_ms=1500)
-        if msg_dup:
-            raise TurnoDuplicadoError(msg_dup) from e
+        try:
+            validar_turno_duplicado_o_lanzar(page, max_wait_ms=4500)
+        except TurnoDuplicadoError as e_dup:
+            raise TurnoDuplicadoError(str(e_dup)) from e
         raise
 
     captcha_text = solve_captcha_ocr_base(
@@ -2594,20 +2626,8 @@ def completar_tabla_tipos_arma_y_avanzar(page, registro: dict):
     boton_siguiente_3.click()
     print("   [INFO] Click en botn 'Siguiente' de Fase 2 (botonSiguiente3)")
 
-    # Validación inmediata: el growl puede durar pocos segundos.
-    msg_dup = detectar_turno_duplicado_en_growl(page, max_wait_ms=1800)
-    if msg_dup:
-        raise TurnoDuplicadoError(msg_dup)
-
-    try:
-        page.wait_for_load_state("networkidle", timeout=7000)
-    except Exception:
-        pass
-
-    # Segunda validación post-wait por si el growl aparece después.
-    msg_dup = detectar_turno_duplicado_en_growl(page, max_wait_ms=2200)
-    if msg_dup:
-        raise TurnoDuplicadoError(msg_dup)
+    # Espera robusta del resultado de transición: Fase 3 o turno duplicado.
+    esperar_transicion_a_fase3_o_turno_duplicado(page, timeout_ms=12000)
 
 
 # ============================================================
@@ -2987,8 +3007,11 @@ def llenar_login_sel():
                             seleccionar_sede_y_fecha_desde_registro(page, registro_excel)
                             seleccionar_hora_con_cupo_y_avanzar(page, registro_excel)
                             completar_paso_2_desde_registro(page, registro_excel)
+                            validar_turno_duplicado_o_lanzar(page, max_wait_ms=900)
                             completar_tabla_tipos_arma_y_avanzar(page, registro_excel)
+                            validar_turno_duplicado_o_lanzar(page, max_wait_ms=900)
                             completar_fase_3_resumen(page)
+                            validar_turno_duplicado_o_lanzar(page, max_wait_ms=900)
 
                             # Generar la cita con reintentos si el captcha falla
                             generar_cita_final_con_reintento_rapido(page, max_intentos=5)
@@ -3059,6 +3082,14 @@ def llenar_login_sel():
                                     pass
                                 time.sleep(1)
                                 continue
+
+                            # Fallback: si llegó un error genérico pero el growl indica turno duplicado,
+                            # lo remapeamos para tratarlo como causal terminal controlada.
+                            if not isinstance(e, TurnoDuplicadoError):
+                                try:
+                                    validar_turno_duplicado_o_lanzar(page, max_wait_ms=900)
+                                except TurnoDuplicadoError as e_dup:
+                                    e = e_dup
 
                             categoria_terminal = clasificar_error_terminal_registro(e)
                             print(f"[WARNING] Error en registro idx={idx_excel}: {e}")

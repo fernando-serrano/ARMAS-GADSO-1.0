@@ -17,7 +17,7 @@ El archivo `pipeline-armas.py` puede conservarse como referencia historica, pero
 ## Estructura del proyecto
 
 ```text
-ARMAS-GADSO/
+ARMAS-GADSO-1.0/
 ├── armas_gadso/
 │   ├── __init__.py
 │   ├── config.py
