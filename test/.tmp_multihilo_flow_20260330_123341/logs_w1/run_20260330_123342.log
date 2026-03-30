@@ -1,0 +1,64 @@
+2026-03-30 12:33:42,564 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-03-30 12:33:42,564 | INFO | Modo: scheduled
+2026-03-30 12:33:42,564 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\test\.tmp_multihilo_flow_20260330_123341\worker_1_unit_1_idx_0.xlsx
+2026-03-30 12:33:47,002 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-03-30 12:33:47,606 | INFO |    -> Registros con estado 'PENDIENTE': 1
+2026-03-30 12:33:47,607 | INFO |    -> Validando fecha de hoy: 30/03/2026
+2026-03-30 12:33:47,608 | INFO |    -> Registros despus de filtrar por fecha: 1 (filtrados: 0)
+2026-03-30 12:33:47,611 | INFO |  Registros pendientes a procesar: 1
+2026-03-30 12:33:47,611 | INFO |  Procesando grupo RUC JV - Registros: 1
+2026-03-30 12:33:47,611 | INFO | [INFO] Intento login 1/12 para grupo JV
+2026-03-30 12:33:48,462 | INFO | [INFO] Tile aplicado -> screen=1280x720 xy=(8,8) wh=(600,704)
+2026-03-30 12:33:49,352 | INFO | [INFO] Pagina de login cargada
+2026-03-30 12:33:49,593 | INFO | [INFO] Pestana 'Autenticacion Tradicional' seleccionada
+2026-03-30 12:33:51,921 | INFO | [INFO] Credenciales llenadas para grupo JV
+2026-03-30 12:33:51,921 | INFO |  OCR CAPTCHA: intento interno 1/6...
+2026-03-30 12:33:53,432 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-03-30 12:33:53,432 | ERROR |   super().__init__(loader)
+2026-03-30 12:33:53,687 | INFO |    -> Variante 0, Decoder greedy: '29M8L' -> '29M8L' [INFO]
+2026-03-30 12:33:53,688 | INFO |    [INFO] CAPTCHA vlido -> Usando: 29M8L
+2026-03-30 12:33:53,964 | INFO | [INFO] Captcha automatico: 29M8L
+2026-03-30 12:33:53,965 | INFO | [INFO] Enviando login...
+2026-03-30 12:33:54,375 | INFO | [INFO] Validando acceso...
+2026-03-30 12:33:54,375 | INFO | [INFO] Acceso exitoso
+2026-03-30 12:33:54,375 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-03-30 12:33:54,375 | INFO | [INFO] Tiempo total login: 6.76 segundos
+2026-03-30 12:33:54,375 | INFO |  Navegando a CITAS -> RESERVAS DE CITAS...
+2026-03-30 12:33:54,981 | INFO |     Fast-path: click directo en 'RESERVAS DE CITAS' (menuid 7_1)
+2026-03-30 12:33:56,001 | INFO | [INFO] Navegacin completada (fast-path) -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-03-30 12:33:56,001 | INFO |  Seleccionando tipo de cita: EXAMEN PARA POLGONO DE TIRO...
+2026-03-30 12:33:56,389 | INFO |    [INFO] Tipo de cita seleccionado: EXAMEN PARA POLÍGONO DE TIRO
+2026-03-30 12:33:56,389 | INFO | -------- JV Registro iterativo 1 (idx=0, prioridad=normal, intento=1, en_cola=0) --------
+2026-03-30 12:33:56,556 | INFO |  Registro tomado desde Excel:
+2026-03-30 12:33:56,556 | INFO |    - id_registro: 1
+2026-03-30 12:33:56,556 | INFO |    - sede: JEFATURA ZONAL DE TACNA
+2026-03-30 12:33:56,556 | INFO |    - fecha: 31/03/2026
+2026-03-30 12:33:56,556 | INFO |    - hora_rango: 12:15-12:30
+2026-03-30 12:33:56,556 | INFO |    - tipo_operacion: RENOVACIÓN DE LICENCIA DE USO
+2026-03-30 12:33:56,556 | INFO |    - doc_vigilante: 10595436
+2026-03-30 12:33:56,556 | INFO |    - nro_solicitud: 052335-0
+2026-03-30 12:33:56,556 | INFO |    - fecha_programacion: 30/03/2026
+2026-03-30 12:33:56,557 | INFO |    - ruc: J & V Resguardo
+2026-03-30 12:33:56,557 | INFO |    - prioridad: normal
+2026-03-30 12:33:56,557 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-03-30 12:33:56,557 | INFO |    - indices_relacionados_excel: [0]
+2026-03-30 12:33:56,557 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-03-30 12:33:56,557 | INFO |    - arma (excel): ['PISTOLA']
+2026-03-30 12:33:56,557 | INFO |    - objetivos_arma: [('CORTA', 'PISTOLA')]
+2026-03-30 12:33:56,557 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-03-30 12:33:56,564 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-03-30 12:33:57,042 | INFO |    [INFO] Sede seleccionado: JEFATURA ZONAL DE TACNA
+2026-03-30 12:33:58,137 | INFO |    [INFO] Fecha seleccionado: 31/03/2026
+2026-03-30 12:33:58,138 | INFO |  Buscando hora en tabla: 12:15-12:30
+2026-03-30 12:33:58,829 | INFO |    [INFO] Click en botn 'Limpiar' por falta de cupos
+2026-03-30 12:33:59,837 | INFO | [WARNING] Error en registro idx=0: La hora '12:15-12:30' no tiene cupos disponibles (Cupos Libres=0)
+2026-03-30 12:33:59,859 | INFO |    📝 Excel actualizado: observaciones='No alcanzo cupo para horario 12:15-12:30' en 1 fila(s)
+2026-03-30 12:33:59,859 | INFO | [INFO] Registro idx=0 marcado como terminal 'SIN_CUPO' tras 1 confirmaciones
+2026-03-30 12:34:00,082 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-03-30 12:34:01,082 | INFO |  Tiempo total del flujo: 14.08 segundos
+2026-03-30 12:34:01,083 | INFO |  Resumen: OK=0 | SIN_CUPO=1 | ERROR=0
+2026-03-30 12:34:01,083 | INFO | [INFO] Flujo completado.
+2026-03-30 12:34:01,083 | INFO |     Duracin final del flujo: 14.08 segundos
+2026-03-30 12:34:01,494 | INFO | Navegador cerrado.
+2026-03-30 12:34:01,494 | INFO | Pipeline finalizado
+2026-03-30 12:34:01,494 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\test\.tmp_multihilo_flow_20260330_123341\logs_w1\run_20260330_123342.log

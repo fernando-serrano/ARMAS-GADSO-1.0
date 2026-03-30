@@ -1,0 +1,78 @@
+2026-03-30 14:28:51,543 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-03-30 14:28:51,543 | INFO | Modo: scheduled
+2026-03-30 14:28:51,544 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\test\.tmp_multihilo_flow_20260330_142850\worker_1_batch_1_idxs_0.xlsx
+2026-03-30 14:28:57,195 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-03-30 14:28:57,195 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizará entre grupos sin cerrarse
+2026-03-30 14:28:57,875 | INFO |    -> Registros con estado 'PENDIENTE': 1
+2026-03-30 14:28:57,875 | INFO |    -> Validando fecha de hoy: 30/03/2026
+2026-03-30 14:28:57,878 | INFO |    -> Registros despus de filtrar por fecha: 1 (filtrados: 0)
+2026-03-30 14:28:57,882 | INFO |  Registros pendientes a procesar: 1
+2026-03-30 14:28:57,882 | INFO |  Procesando grupo RUC JV - Registros: 1
+2026-03-30 14:28:57,882 | INFO | [INFO] Intento login 1/12 para grupo JV
+2026-03-30 14:28:58,509 | INFO | [INFO] Tile aplicado -> screen=1280x720 xy=(8,8) wh=(600,344)
+2026-03-30 14:29:02,727 | INFO | [INFO] Pagina de login cargada
+2026-03-30 14:29:03,247 | INFO | [INFO] Pestana 'Autenticacion Tradicional' seleccionada
+2026-03-30 14:29:05,730 | INFO | [INFO] Credenciales llenadas para grupo JV
+2026-03-30 14:29:05,730 | INFO |  OCR CAPTCHA: intento interno 1/6...
+2026-03-30 14:29:06,632 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-03-30 14:29:06,632 | ERROR |   super().__init__(loader)
+2026-03-30 14:29:06,705 | INFO |    -> Variante 0, Decoder greedy: 'P56PT' -> 'P56PT' [INFO]
+2026-03-30 14:29:06,705 | INFO |    [INFO] CAPTCHA vlido -> Usando: P56PT
+2026-03-30 14:29:06,750 | INFO | [INFO] Captcha automatico: P56PT
+2026-03-30 14:29:06,750 | INFO | [INFO] Enviando login...
+2026-03-30 14:29:07,032 | INFO | [INFO] Validando acceso...
+2026-03-30 14:29:07,032 | INFO | [INFO] Acceso exitoso
+2026-03-30 14:29:07,032 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-03-30 14:29:07,032 | INFO | [INFO] Tiempo total login: 9.15 segundos
+2026-03-30 14:29:07,032 | INFO |  Navegando a CITAS -> RESERVAS DE CITAS...
+2026-03-30 14:29:07,856 | INFO |     Fast-path: click directo en 'RESERVAS DE CITAS' (menuid 7_1)
+2026-03-30 14:29:08,619 | INFO | [INFO] Navegacin completada (fast-path) -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-03-30 14:29:08,619 | INFO |  Seleccionando tipo de cita: EXAMEN PARA POLGONO DE TIRO...
+2026-03-30 14:29:09,070 | INFO |    [INFO] Tipo de cita seleccionado: EXAMEN PARA POLÍGONO DE TIRO
+2026-03-30 14:29:09,070 | INFO | -------- JV Registro iterativo 1 (idx=0, prioridad=normal, intento=1, en_cola=0) --------
+2026-03-30 14:29:09,222 | INFO |  Registro tomado desde Excel:
+2026-03-30 14:29:09,222 | INFO |    - id_registro: 1
+2026-03-30 14:29:09,223 | INFO |    - sede: JEFATURA ZONAL DE LA LIBERTAD
+2026-03-30 14:29:09,223 | INFO |    - fecha: 09/04/2026
+2026-03-30 14:29:09,223 | INFO |    - hora_rango: 09:30-09:45
+2026-03-30 14:29:09,223 | INFO |    - tipo_operacion: INICIAL DE LICENCIA DE USO
+2026-03-30 14:29:09,223 | INFO |    - doc_vigilante: 09703265
+2026-03-30 14:29:09,223 | INFO |    - nro_solicitud: 049543-0
+2026-03-30 14:29:09,223 | INFO |    - fecha_programacion: 30/03/2026
+2026-03-30 14:29:09,223 | INFO |    - ruc: J & V Resguardo
+2026-03-30 14:29:09,223 | INFO |    - prioridad: normal
+2026-03-30 14:29:09,224 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-03-30 14:29:09,224 | INFO |    - indices_relacionados_excel: [0]
+2026-03-30 14:29:09,224 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-03-30 14:29:09,224 | INFO |    - arma (excel): ['PISTOLA']
+2026-03-30 14:29:09,224 | INFO |    - objetivos_arma: [('CORTA', 'PISTOLA')]
+2026-03-30 14:29:09,224 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-03-30 14:29:09,232 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-03-30 14:29:09,879 | INFO |    [INFO] Sede seleccionado: JEFATURA ZONAL DE LA LIBERTAD
+2026-03-30 14:29:10,952 | INFO |    [INFO] Fecha seleccionado: 09/04/2026
+2026-03-30 14:29:10,953 | INFO |  Buscando hora en tabla: 09:30-09:45
+2026-03-30 14:29:11,486 | INFO |    [INFO] Hora seleccionada: 09:30-09:45 (Cupos Libres=1)
+2026-03-30 14:29:11,557 | INFO |    [INFO] Click en botn 'Siguiente'
+2026-03-30 14:29:11,558 | INFO |  Completando Paso 2 con datos del Excel...
+2026-03-30 14:29:12,146 | INFO |    [INFO] Tipo Operacin seleccionado: INICIAL DE LICENCIA DE USO
+2026-03-30 14:29:12,146 | INFO |     Flujo INICIAL detectado: primero Tipo de Licencia, luego Documento Vigilante
+2026-03-30 14:29:12,599 | INFO |    [INFO] Tipo de Licencia: SEGURIDAD PRIVADA
+2026-03-30 14:29:14,089 | INFO |    [INFO] Documento vigilante seleccionado: 09703265
+2026-03-30 14:29:14,551 | INFO |    [INFO] Seleccione Solicitud: SI
+2026-03-30 14:29:14,552 | INFO |     Flujo INICIAL: tambin se seleccionar Nro Solicitud
+2026-03-30 14:29:15,799 | INFO |    [INFO] Nro Solicitud seleccionado: TUPA 2022 PA3400C585 - NRO EMPOCE: 49543 - FECHA REGISTRO: 02/11/2023
+2026-03-30 14:29:16,862 | INFO |  Completando tabla de tipos de arma (Fase 2)...
+2026-03-30 14:29:18,977 | INFO |    [INFO] CORTA: PISTOLA
+2026-03-30 14:29:19,000 | INFO |    [INFO] Click en botn 'Siguiente' de Fase 2 (botonSiguiente3)
+2026-03-30 14:29:23,846 | INFO | [WARNING] Error en registro idx=0: Ya existe un turno registrado para la misma persona y Tipo de Licencia
+2026-03-30 14:29:23,861 | INFO |    📝 Excel actualizado: observaciones='Ya existe un turno registrado para la misma persona y Tipo de Licencia. DNI=09703265 | TipoOperacion=INICIAL DE LICENCIA DE USO' en 1 fila(s)
+2026-03-30 14:29:23,861 | INFO | [INFO] Registro idx=0 marcado como terminal 'TURNO_DUPLICADO' tras 1 confirmaciones
+2026-03-30 14:29:24,086 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-03-30 14:29:25,087 | INFO | [DEBUG] PERSISTENT_SESSION: cerrando contexto anterior para siguiente grupo
+2026-03-30 14:29:25,113 | INFO |  Tiempo total del flujo: 27.92 segundos
+2026-03-30 14:29:25,113 | INFO |  Resumen: OK=0 | SIN_CUPO=0 | ERROR=1
+2026-03-30 14:29:25,113 | INFO | [INFO] Flujo completado.
+2026-03-30 14:29:25,113 | INFO |     Duracin final del flujo: 27.92 segundos
+2026-03-30 14:29:25,389 | INFO | Navegador cerrado.
+2026-03-30 14:29:25,389 | INFO | Pipeline finalizado
+2026-03-30 14:29:25,389 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\test\.tmp_multihilo_flow_20260330_142850\logs_w1\run_20260330_142851.log

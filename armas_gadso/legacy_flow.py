@@ -2641,6 +2641,66 @@ def llenar_login_sel():
     is_scheduled = run_mode == "scheduled"
     hold_browser_open = os.getenv("HOLD_BROWSER_OPEN", "0").strip().lower() in {"1", "true", "si", "sí", "yes"}
 
+    tile_enabled = os.getenv("BROWSER_TILE_ENABLE", "0").strip().lower() in {"1", "true", "si", "sí", "yes"}
+    try:
+        tile_total = int(str(os.getenv("BROWSER_TILE_TOTAL", "1") or "1").strip())
+    except Exception:
+        tile_total = 1
+    if tile_total < 1:
+        tile_total = 1
+    try:
+        tile_index = int(str(os.getenv("BROWSER_TILE_INDEX", "0") or "0").strip())
+    except Exception:
+        tile_index = 0
+    if tile_index < 0:
+        tile_index = 0
+    if tile_index >= tile_total:
+        tile_index = tile_total - 1
+
+    try:
+        tile_screen_w = int(str(os.getenv("BROWSER_TILE_SCREEN_W", "1920") or "1920").strip())
+    except Exception:
+        tile_screen_w = 1920
+    try:
+        tile_screen_h = int(str(os.getenv("BROWSER_TILE_SCREEN_H", "1080") or "1080").strip())
+    except Exception:
+        tile_screen_h = 1080
+    try:
+        tile_top_offset = int(str(os.getenv("BROWSER_TILE_TOP_OFFSET", "0") or "0").strip())
+    except Exception:
+        tile_top_offset = 0
+    try:
+        tile_gap = int(str(os.getenv("BROWSER_TILE_GAP", "8") or "8").strip())
+    except Exception:
+        tile_gap = 8
+    if tile_gap < 0:
+        tile_gap = 0
+    try:
+        tile_frame_pad = int(str(os.getenv("BROWSER_TILE_FRAME_PAD", "24") or "24").strip())
+    except Exception:
+        tile_frame_pad = 24
+    if tile_frame_pad < 0:
+        tile_frame_pad = 0
+
+    tile_x = 0
+    tile_y = 0
+    tile_w = 1920
+    tile_h = 1080
+    if tile_enabled:
+        cols = 2 if tile_total == 2 else (1 if tile_total == 1 else 2)
+        rows = (tile_total + cols - 1) // cols
+        usable_h = max(480, tile_screen_h - max(0, tile_top_offset))
+        cell_w = max(360, tile_screen_w // cols)
+        cell_h = max(320, usable_h // rows)
+
+        # Split sin solape: gap + compensacion de marco para Windows (DPI/bordes/titulo).
+        tile_w = max(320, cell_w - (tile_gap * 2) - tile_frame_pad)
+        tile_h = max(260, cell_h - (tile_gap * 2))
+        col = tile_index % cols
+        row = tile_index // cols
+        tile_x = col * cell_w + tile_gap + (tile_frame_pad if col > 0 else 0)
+        tile_y = max(0, tile_top_offset) + row * cell_h + tile_gap
+
     try:
         max_run_minutes = float(str(os.getenv("MAX_RUN_MINUTES", "0") or "0").strip())
     except Exception:
@@ -2692,11 +2752,17 @@ def llenar_login_sel():
     if max_hora_fallback_retries < 1:
         max_hora_fallback_retries = 1
 
+    # Flag para mantener navegador abierto entre grupos (evita cerrar/reabrirlo por cada grupo)
+    persistent_session = str(os.getenv("PERSISTENT_SESSION", "0")).strip().lower() in ("1", "true", "yes")
+    if persistent_session:
+        print("[INFO] PERSISTENT_SESSION activado - navegador se reutilizará entre grupos sin cerrarse")
+
     inicio_total_flujo = time.time()
     duracion_total_flujo = None
 
     playwright = sync_playwright().start()
     browser = None
+    context = None
     login_exitoso = False
     total_ok = 0
     total_sin_cupo = 0
@@ -2878,25 +2944,91 @@ def llenar_login_sel():
                         f"MAX_LOGIN_RETRIES_PER_GROUP alcanzado para grupo {grupo_ruc}: {max_login_retries_per_group}"
                     )
 
-                if browser is not None:
+                # En persistent_session mode: NO cerrar navegador en el primer intento (reusar del grupo anterior)
+                # En reintentos (intento_global > 1): SÍ cerrar para empezar limpio
+                debe_cerrar_navegador = True
+                if persistent_session and intento_global == 1 and browser is not None:
+                    debe_cerrar_navegador = False
+                    print("[DEBUG] PERSISTENT_SESSION: reutilizando navegador del grupo anterior")
+
+                if debe_cerrar_navegador and browser is not None:
                     try:
                         browser.close()
                     except Exception:
                         pass
 
-                browser = playwright.chromium.launch(
-                    headless=False,
-                    slow_mo=0,
-                    args=[
+                launch_args = ["--disable-infobars"]
+                if tile_enabled:
+                    launch_args.extend([
+                        f"--window-size={tile_w},{tile_h}",
+                        f"--window-position={tile_x},{tile_y}",
+                    ])
+                else:
+                    launch_args.extend([
                         "--start-maximized",
-                        "--disable-infobars",
                         "--window-size=1920,1080",
-                        "--window-position=0,0"
-                    ]
-                )
-                context = browser.new_context(viewport=None, ignore_https_errors=True)
-                page = context.new_page()
-                page.evaluate("() => { window.moveTo(0, 0); window.resizeTo(screen.width, screen.height); }")
+                        "--window-position=0,0",
+                    ])
+
+                # En persistent_session mode: reutilizar navegador existente en primer intento
+                if persistent_session and intento_global == 1 and browser is not None:
+                    print("[DEBUG] PERSISTENT_SESSION: creando nuevo context/page en navegador existente")
+                    context = browser.new_context(viewport=None, ignore_https_errors=True)
+                    page = context.new_page()
+                else:
+                    browser = playwright.chromium.launch(
+                        headless=False,
+                        slow_mo=0,
+                        args=launch_args,
+                    )
+                    context = browser.new_context(viewport=None, ignore_https_errors=True)
+                    page = context.new_page()
+
+                if tile_enabled:
+                    pos = page.evaluate(
+                        """
+                        (cfg) => {
+                            const sw = Number(window.screen.availWidth || window.screen.width || cfg.screen_w || 1920);
+                            const sh = Number(window.screen.availHeight || window.screen.height || cfg.screen_h || 1080);
+                            const total = Math.max(1, Number(cfg.total || 1));
+                            const idx = Math.max(0, Math.min(total - 1, Number(cfg.index || 0)));
+                            const cols = total === 2 ? 2 : (total === 1 ? 1 : 2);
+                            const rows = Math.ceil(total / cols);
+                            const top = Math.max(0, Number(cfg.top || 0));
+                            const gap = Math.max(0, Number(cfg.gap || 8));
+                            const framePad = Math.max(0, Number(cfg.frame_pad || 24));
+                            const usableH = Math.max(480, sh - top);
+                            const cellW = Math.max(360, Math.floor(sw / cols));
+                            const cellH = Math.max(320, Math.floor(usableH / rows));
+                            const col = idx % cols;
+                            const row = Math.floor(idx / cols);
+                            const w = Math.max(320, cellW - (gap * 2) - framePad);
+                            const h = Math.max(260, cellH - (gap * 2));
+                            const x = (col * cellW) + gap + (col > 0 ? framePad : 0);
+                            const y = top + (row * cellH) + gap;
+                            window.moveTo(x, y);
+                            window.resizeTo(w, h);
+                            return { sw, sh, x, y, w, h, cols, rows };
+                        }
+                        """,
+                        {
+                            "screen_w": tile_screen_w,
+                            "screen_h": tile_screen_h,
+                            "total": tile_total,
+                            "index": tile_index,
+                            "top": tile_top_offset,
+                            "gap": tile_gap,
+                            "frame_pad": tile_frame_pad,
+                        },
+                    )
+                    print(
+                        "[INFO] Tile aplicado -> "
+                        f"screen={pos.get('sw')}x{pos.get('sh')} "
+                        f"xy=({pos.get('x')},{pos.get('y')}) "
+                        f"wh=({pos.get('w')},{pos.get('h')})"
+                    )
+                else:
+                    page.evaluate("() => { window.moveTo(0, 0); window.resizeTo(screen.width, screen.height); }")
                 activar_monitor_growl(page)
 
                 try:
@@ -3149,6 +3281,15 @@ def llenar_login_sel():
                             continue
 
                     grupo_procesado = True
+                    
+                    # En persistent_session mode: cerrar contexto pero mantener navegador abierto
+                    if persistent_session:
+                        try:
+                            print("[DEBUG] PERSISTENT_SESSION: cerrando contexto anterior para siguiente grupo")
+                            context.close()
+                        except Exception as e_ctx:
+                            print(f"[DEBUG] Error cerrando contexto: {e_ctx}")
+
                     break
 
                 except Exception as e:
@@ -3220,6 +3361,11 @@ def llenar_login_sel():
         print(f"    Resumen parcial: OK={total_ok} | SIN_CUPO={total_sin_cupo} | ERROR={total_error}")
 
     finally:
+        try:
+            if context is not None:
+                context.close()
+        except Exception:
+            pass
         try:
             if browser is not None:
                 browser.close()
