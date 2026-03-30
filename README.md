@@ -32,6 +32,11 @@ ARMAS-GADSO/
 ├── .gitignore
 ├── README.md
 ├── requirements.txt
+├── test/
+│   ├── run_test_captcha.py
+│   ├── run_test_easyocr.py
+│   ├── run_test_easyocr_base.py
+│   └── run_test_hora_flexible.py
 ├── run_manual.bat
 ├── run_pipeline.py
 └── run_scheduled.bat
@@ -207,7 +212,7 @@ Archivos como `run_pipeline.cpython-314.pyc` son cache de bytecode Python en `__
     cmd /c .\run_scheduled.bat
 
 # ¿Cómo programo una tarea desde el cmd de Windows?
-    Para programar usa el siguiente comando: schtasks /create /tn "ARMAS-GADSO-Test" /sc once /st 13:03 /tr "cmd /c \"C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\armas-gadso-1.0\run_scheduled.bat\"" /f
+	Para programar usa el siguiente comando: schtasks /create /tn "ARMAS-GADSO-Test" /sc once /st 13:03 /tr "cmd /c \"C:\RUTA\ARMAS-GADSO-1.0\run_scheduled.bat\"" /f
 
     Para ello solo se debe cambiar el campo de la fecha
     
