@@ -1,0 +1,69 @@
+2026-03-31 15:32:08,220 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-03-31 15:32:08,220 | INFO | Modo: scheduled
+2026-03-31 15:32:08,220 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260331_153207\worker_3_batch_1_idxs_2.xlsx
+2026-03-31 15:32:15,680 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-03-31 15:32:15,680 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizará entre grupos sin cerrarse
+2026-03-31 15:32:16,688 | INFO |    -> Registros con estado 'PENDIENTE': 1
+2026-03-31 15:32:16,689 | INFO |    -> Validando fecha de hoy: 31/03/2026
+2026-03-31 15:32:16,691 | INFO |    -> Registros despus de filtrar por fecha: 1 (filtrados: 0)
+2026-03-31 15:32:16,694 | INFO |  Registros pendientes a procesar: 1
+2026-03-31 15:32:16,694 | INFO |  Procesando grupo RUC JV - Registros: 1
+2026-03-31 15:32:16,694 | INFO | [INFO] Intento login 1/12 para grupo JV
+2026-03-31 15:32:16,694 | INFO | [TILE] Args launch: --window-size=754,468 --window-position=6,486
+2026-03-31 15:32:16,694 | INFO | [TILE] Lanzando Chromium con args: ['--disable-infobars', '--window-size=754,468', '--window-position=6,486']
+2026-03-31 15:32:18,087 | INFO | [TILE] Geometría aplicada -> xy=(6,486) wh=(754,468) screen_cfg=1536x960 screen_js=1536x912 outer_js=755x470
+2026-03-31 15:32:19,738 | INFO | [INFO] Pagina de login cargada
+2026-03-31 15:32:20,201 | INFO | [INFO] Pestana 'Autenticacion Tradicional' seleccionada
+2026-03-31 15:32:22,813 | INFO | [INFO] Credenciales llenadas para grupo JV
+2026-03-31 15:32:22,816 | INFO |  OCR CAPTCHA: intento interno 1/6...
+2026-03-31 15:32:25,321 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-03-31 15:32:25,321 | ERROR |   super().__init__(loader)
+2026-03-31 15:32:25,466 | INFO |    -> Variante 0, Decoder greedy: 'Q4QLV' -> 'Q4QLV' [INFO]
+2026-03-31 15:32:25,467 | INFO |    [INFO] CAPTCHA vlido -> Usando: Q4QLV
+2026-03-31 15:32:25,598 | INFO | [INFO] Captcha automatico: Q4QLV
+2026-03-31 15:32:25,598 | INFO | [INFO] Enviando login...
+2026-03-31 15:32:26,297 | INFO | [INFO] Validando acceso...
+2026-03-31 15:32:26,298 | INFO | [INFO] Acceso exitoso
+2026-03-31 15:32:26,298 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-03-31 15:32:26,299 | INFO | [INFO] Tiempo total login: 9.60 segundos
+2026-03-31 15:32:26,299 | INFO |  Navegando a CITAS -> RESERVAS DE CITAS...
+2026-03-31 15:32:27,951 | INFO |     Fast-path: click directo en 'RESERVAS DE CITAS' (menuid 7_1)
+2026-03-31 15:32:29,719 | INFO | [INFO] Navegacin completada (fast-path) -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-03-31 15:32:29,719 | INFO |  Seleccionando tipo de cita: EXAMEN PARA POLGONO DE TIRO...
+2026-03-31 15:32:30,140 | INFO |    [INFO] Tipo de cita seleccionado: EXAMEN PARA POLÍGONO DE TIRO
+2026-03-31 15:32:30,140 | INFO | -------- JV Registro iterativo 1 (idx=2, prioridad=normal, intento=1, en_cola=0) --------
+2026-03-31 15:32:30,472 | INFO |  Registro tomado desde Excel:
+2026-03-31 15:32:30,472 | INFO |    - id_registro: 3
+2026-03-31 15:32:30,472 | INFO |    - sede: LIMA
+2026-03-31 15:32:30,472 | INFO |    - fecha: 21/04/2026
+2026-03-31 15:32:30,472 | INFO |    - hora_rango: 09:00-09:15
+2026-03-31 15:32:30,473 | INFO |    - tipo_operacion: RENOVACIÓN DE LICENCIA DE USO
+2026-03-31 15:32:30,473 | INFO |    - doc_vigilante: 15740016
+2026-03-31 15:32:30,473 | INFO |    - nro_solicitud: 043504-0
+2026-03-31 15:32:30,473 | INFO |    - fecha_programacion: 31/03/2026
+2026-03-31 15:32:30,473 | INFO |    - ruc: J & V Resguardo
+2026-03-31 15:32:30,473 | INFO |    - prioridad: normal
+2026-03-31 15:32:30,473 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-03-31 15:32:30,473 | INFO |    - indices_relacionados_excel: [2]
+2026-03-31 15:32:30,473 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-03-31 15:32:30,473 | INFO |    - arma (excel): ['PISTOLA']
+2026-03-31 15:32:30,474 | INFO |    - objetivos_arma: [('CORTA', 'PISTOLA')]
+2026-03-31 15:32:30,474 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-03-31 15:32:30,484 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-03-31 15:32:31,112 | INFO |    [INFO] Sede seleccionado: LIMA
+2026-03-31 15:32:32,290 | INFO |    [INFO] Fecha seleccionado: 21/04/2026
+2026-03-31 15:32:32,291 | INFO |  Buscando hora en tabla: 09:00-09:15
+2026-03-31 15:32:32,796 | INFO |    [INFO] Estrategia horario: vecinos inmediatos (inferior/superior)
+2026-03-31 15:32:33,177 | INFO |    [INFO] Click en botn 'Limpiar' por falta de cupos
+2026-03-31 15:32:34,219 | INFO | [WARNING] Error en registro idx=2: No hay cupos en horarios candidatos. Objetivo: 09:00-09:15 | Candidatos: 08:45-09:00(0), 09:15-09:30(0)
+2026-03-31 15:32:34,254 | INFO |    📝 Excel actualizado: observaciones='No alcanzo cupo para horario 09:00-09:15' en 1 fila(s)
+2026-03-31 15:32:34,254 | INFO | [INFO] Registro idx=2 marcado como terminal 'SIN_CUPO' tras 1 confirmaciones
+2026-03-31 15:32:34,523 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-03-31 15:32:35,523 | INFO | [DEBUG] PERSISTENT_SESSION: cerrando contexto anterior para siguiente grupo
+2026-03-31 15:32:35,588 | INFO |  Tiempo total del flujo: 19.91 segundos
+2026-03-31 15:32:35,588 | INFO |  Resumen: OK=0 | SIN_CUPO=1 | ERROR=0
+2026-03-31 15:32:35,588 | INFO | [INFO] Flujo completado.
+2026-03-31 15:32:35,588 | INFO |     Duracin final del flujo: 19.91 segundos
+2026-03-31 15:32:36,114 | INFO | Navegador cerrado.
+2026-03-31 15:32:36,114 | INFO | Pipeline finalizado
+2026-03-31 15:32:36,114 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260331_153207\logs_w3\run_20260331_153208.log
