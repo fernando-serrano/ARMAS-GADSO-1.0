@@ -1,0 +1,28 @@
+2026-04-01 00:09:12,218 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-04-01 00:09:12,218 | INFO | Modo: scheduled
+2026-04-01 00:09:12,219 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260401_000911\worker_3_batch_1_idxs_2.xlsx
+2026-04-01 00:09:18,571 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-04-01 00:09:18,572 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizará entre grupos sin cerrarse
+2026-04-01 00:09:19,393 | INFO |    -> Registros con estado 'PENDIENTE': 1
+2026-04-01 00:09:19,393 | INFO |    -> Validando fecha de hoy: 01/04/2026
+2026-04-01 00:09:19,396 | INFO |    -> Registros despus de filtrar por fecha: 1 (filtrados: 0)
+2026-04-01 00:09:19,400 | INFO |  Registros pendientes a procesar: 1
+2026-04-01 00:09:19,400 | INFO |  Procesando grupo RUC JV - Registros: 1
+2026-04-01 00:09:19,401 | INFO | [INFO] Intento login 1/12 para grupo JV
+2026-04-01 00:09:19,401 | INFO | [TILE] Args launch: --window-size=754,468 --window-position=6,486
+2026-04-01 00:09:19,401 | INFO | [TILE] Lanzando Chromium con args: ['--disable-infobars', '--window-size=754,468', '--window-position=6,486']
+2026-04-01 00:09:20,602 | INFO | [TILE] Geometría aplicada -> xy=(6,486) wh=(754,468) screen_cfg=1536x960 screen_js=1536x912 outer_js=755x470
+2026-04-01 00:09:52,150 | INFO | [INFO] Pagina de login cargada
+2026-04-01 00:10:00,157 | INFO | [ERROR] Intento login 1 para grupo JV fall: Locator.wait_for: Timeout 8000ms exceeded.
+2026-04-01 00:10:00,157 | INFO | Call log:
+2026-04-01 00:10:00,157 | INFO |   - waiting for locator("a[href=\"#tabViewLogin:j_idt33\"]") to be visible
+2026-04-01 00:10:00,157 | INFO |    Reintentando login...
+2026-04-01 00:10:02,158 | INFO | [INFO] Intento login 2/12 para grupo JV
+2026-04-01 00:10:02,469 | INFO | [TILE] Args launch: --window-size=754,468 --window-position=6,486
+2026-04-01 00:10:02,469 | INFO | [TILE] Lanzando Chromium con args: ['--disable-infobars', '--window-size=754,468', '--window-position=6,486']
+2026-04-01 00:10:03,361 | INFO | [TILE] Geometría aplicada -> xy=(6,486) wh=(754,468) screen_cfg=1536x960 screen_js=1536x912 outer_js=755x470
+2026-04-01 00:10:26,745 | INFO |  Ejecucin interrumpida.
+2026-04-01 00:10:26,746 | INFO |    -> Motivo:
+2026-04-01 00:10:26,746 | INFO |     Tiempo transcurrido: 68.17 segundos
+2026-04-01 00:10:26,747 | INFO |     Resumen parcial: OK=0 | SIN_CUPO=0 | ERROR=0
+2026-04-01 00:10:28,493 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260401_000911\logs_w3\run_20260401_000912.log

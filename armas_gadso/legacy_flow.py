@@ -73,7 +73,7 @@ CREDENCIALES_SELVA = {
 }
 
 SEL = {
-    "tab_tradicional": 'a[href="#tabViewLogin:j_idt33"]',
+    "tab_tradicional": '#tabViewLogin a[href^="#tabViewLogin:j_idt"]:has-text("Autenticación Tradicional"), #tabViewLogin a:has-text("Autenticación Tradicional"), #tabViewLogin a:has-text("Autenticacion Tradicional")',
     "tipo_doc_select": "#tabViewLogin\\:tradicionalForm\\:tipoDoc_input",
     "numero_documento": "#tabViewLogin\\:tradicionalForm\\:documento",
     "usuario": "#tabViewLogin\\:tradicionalForm\\:usuario",
@@ -1122,6 +1122,40 @@ def validar_resultado_login_por_ui(page, timeout_ms: int = 3000):
             pass
 
     return False, mensaje_error, (time.time() - inicio)
+
+
+def activar_pestana_autenticacion_tradicional(page):
+    """Activa la pestaña tradicional sin depender de ids j_idt variables."""
+    try:
+        campo_doc = page.locator(SEL["numero_documento"])
+        if campo_doc.count() > 0 and campo_doc.first.is_visible():
+            print("[INFO] Pestaña tradicional ya activa")
+            return
+    except Exception:
+        pass
+
+    candidatos = [
+        SEL["tab_tradicional"],
+        '#tabViewLogin a:has-text("Autenticación Tradicional")',
+        '#tabViewLogin a:has-text("Autenticacion Tradicional")',
+    ]
+
+    ultimo_error = None
+    for sel in candidatos:
+        try:
+            tab = page.locator(sel).first
+            tab.wait_for(state="visible", timeout=6000)
+            tab.click(timeout=6000)
+            page.locator(SEL["numero_documento"]).wait_for(state="visible", timeout=8000)
+            print("[INFO] Pestaña 'Autenticación Tradicional' seleccionada")
+            return
+        except Exception as e:
+            ultimo_error = e
+
+    raise Exception(
+        "No se pudo activar la pestaña 'Autenticación Tradicional'. "
+        f"Detalle: {ultimo_error}"
+    )
 
 
 def pagina_muestra_servicio_no_disponible(page) -> bool:
@@ -3336,10 +3370,7 @@ def llenar_login_sel():
                     esperar_hasta_servicio_disponible(page, URL_LOGIN, espera_segundos=8)
                     print("[INFO] Pagina de login cargada")
 
-                    tab = page.locator(SEL["tab_tradicional"])
-                    tab.wait_for(state="visible", timeout=8000)
-                    tab.click()
-                    print("[INFO] Pestana 'Autenticacion Tradicional' seleccionada")
+                    activar_pestana_autenticacion_tradicional(page)
 
                     page.locator(SEL["numero_documento"]).wait_for(state="visible", timeout=8000)
 
