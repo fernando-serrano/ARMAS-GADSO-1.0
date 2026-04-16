@@ -880,6 +880,20 @@ def generar_cita_final_con_reintento_rapido(page, max_intentos: int = 3):
     """
     print("\n Paso final opcional: Generar Cita (reintento rpido)")
 
+    try:
+        confirm_window_s = float(str(os.getenv("GENERAR_CITA_CONFIRM_WINDOW_S", "2.5") or "2.5").strip())
+    except Exception:
+        confirm_window_s = 2.5
+    if confirm_window_s < 1.5:
+        confirm_window_s = 1.5
+
+    try:
+        confirm_grace_s = float(str(os.getenv("GENERAR_CITA_CONFIRM_GRACE_S", "2.0") or "2.0").strip())
+    except Exception:
+        confirm_grace_s = 2.0
+    if confirm_grace_s < 0:
+        confirm_grace_s = 0.0
+
     boton_generar = page.locator(SEL["fase3_boton_generar_cita"])
     boton_generar.wait_for(state="visible", timeout=10000)
 
@@ -964,17 +978,15 @@ def generar_cita_final_con_reintento_rapido(page, max_intentos: int = 3):
             pass
         return False
 
-    for intento in range(1, max_intentos + 1):
-        inicio_validacion = time.time()
-        print(f"    Intento generar cita {intento}/{max_intentos}")
-        boton_generar.click(timeout=10000)
+    def detectar_exito_fuerte_estable() -> bool:
+        # Evita confirmar éxito por una lectura transitoria de UI.
+        if not detectar_exito_fuerte():
+            return False
+        page.wait_for_timeout(150)
+        return detectar_exito_fuerte()
 
-        # Ventana corta de observación para capturar growl intermitente.
-        error_captcha_msg = ""
-        error_cupos_msg = ""
-        ultimo_error = ""
-        deadline = time.time() + 2.5
-        while time.time() < deadline:
+    def observar_post_click_hasta(deadline_ts: float, error_captcha_msg: str, error_cupos_msg: str, ultimo_error: str):
+        while time.time() < deadline_ts:
             mensajes = recolectar_mensajes_ui()
             if mensajes:
                 for msg in mensajes:
@@ -989,13 +1001,48 @@ def generar_cita_final_con_reintento_rapido(page, max_intentos: int = 3):
                     error_captcha_msg = candidato
                     break
 
-            if detectar_exito_fuerte():
-                tiempo = time.time() - inicio_validacion
-                print(f"   [INFO] Generar Cita confirmado en {tiempo:.2f}s")
-                print(f"   -> URL: {page.url}")
-                return True
+            if detectar_exito_fuerte_estable():
+                return True, error_captcha_msg, error_cupos_msg, ultimo_error
 
             page.wait_for_timeout(120)
+
+        return False, error_captcha_msg, error_cupos_msg, ultimo_error
+
+    for intento in range(1, max_intentos + 1):
+        inicio_validacion = time.time()
+        print(f"    Intento generar cita {intento}/{max_intentos}")
+        boton_generar.click(timeout=10000)
+
+        # Ventana corta de observación para capturar growl intermitente.
+        error_captcha_msg = ""
+        error_cupos_msg = ""
+        ultimo_error = ""
+        deadline = time.time() + confirm_window_s
+        confirmado, error_captcha_msg, error_cupos_msg, ultimo_error = observar_post_click_hasta(
+            deadline,
+            error_captcha_msg,
+            error_cupos_msg,
+            ultimo_error,
+        )
+
+        if not confirmado and not error_captcha_msg and not error_cupos_msg and confirm_grace_s > 0:
+            print(
+                "   [INFO] Sin señal clara tras click en 'Generar Cita'. "
+                f"Aplicando ventana extra de confirmación ({confirm_grace_s:.2f}s)..."
+            )
+            deadline_grace = time.time() + confirm_grace_s
+            confirmado, error_captcha_msg, error_cupos_msg, ultimo_error = observar_post_click_hasta(
+                deadline_grace,
+                error_captcha_msg,
+                error_cupos_msg,
+                ultimo_error,
+            )
+
+        if confirmado:
+            tiempo = time.time() - inicio_validacion
+            print(f"   [INFO] Generar Cita confirmado en {tiempo:.2f}s")
+            print(f"   -> URL: {page.url}")
+            return True
 
         tiempo = time.time() - inicio_validacion
         if error_cupos_msg:

@@ -4,6 +4,8 @@ cd /d "%~dp0"
 if not exist logs mkdir logs
 set ADAPTIVE_HOUR_SELECTION=1
 set ADAPTIVE_HOUR_NOON_FULL_BLOCK=1
+set GENERAR_CITA_CONFIRM_WINDOW_S=3.5
+set GENERAR_CITA_CONFIRM_GRACE_S=2.5
 echo [INFO] Ejecutando pipeline en modo scheduled...
 echo [INFO] Salida detallada: logs\task_scheduler_stdout.log
 python run_pipeline.py --mode scheduled >> logs\task_scheduler_stdout.log 2>&1
