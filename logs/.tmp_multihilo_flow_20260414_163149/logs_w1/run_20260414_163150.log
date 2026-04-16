@@ -1,0 +1,6 @@
+2026-04-14 16:31:50,968 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-04-14 16:31:50,971 | INFO | Modo: scheduled
+2026-04-14 16:31:50,972 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260414_163149\worker_1_batch_1_idxs_0.xlsx
+2026-04-14 16:32:31,220 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-04-14 16:32:31,222 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizará entre grupos sin cerrarse
+2026-04-14 16:32:41,212 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260414_163149\logs_w1\run_20260414_163150.log

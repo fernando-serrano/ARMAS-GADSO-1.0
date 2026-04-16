@@ -1,0 +1,92 @@
+2026-04-15 00:00:06,854 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-04-15 00:00:06,854 | INFO | Modo: scheduled
+2026-04-15 00:00:06,854 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260415_000006\worker_2_batch_1_idxs_3.xlsx
+2026-04-15 00:00:12,289 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-04-15 00:00:12,289 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizará entre grupos sin cerrarse
+2026-04-15 00:00:16,065 | INFO |    -> Registros con estado 'PENDIENTE': 2
+2026-04-15 00:00:16,065 | INFO |    -> Validando fecha de hoy: 15/04/2026
+2026-04-15 00:00:16,067 | INFO |    -> Registros despus de filtrar por fecha: 2 (filtrados: 0)
+2026-04-15 00:00:16,070 | INFO |  Registros pendientes a procesar: 1
+2026-04-15 00:00:16,070 | INFO |  Procesando grupo RUC JV - Registros: 1
+2026-04-15 00:00:16,071 | INFO | [INFO] Intento login 1/12 para grupo JV
+2026-04-15 00:00:16,071 | INFO | [TILE] Args launch: --window-size=754,468 --window-position=776,6
+2026-04-15 00:00:16,071 | INFO | [TILE] Lanzando Chromium con args: ['--disable-infobars', '--window-size=754,468', '--window-position=776,6']
+2026-04-15 00:00:18,021 | INFO | [TILE] Geometría aplicada -> xy=(776,6) wh=(754,468) screen_cfg=1536x960 screen_js=1536x912 outer_js=755x470
+2026-04-15 00:00:20,723 | INFO | [INFO] Pagina de login cargada
+2026-04-15 00:00:21,215 | INFO | [INFO] Pestaña 'Autenticación Tradicional' seleccionada
+2026-04-15 00:00:24,808 | INFO | [INFO] Credenciales llenadas para grupo JV
+2026-04-15 00:00:24,810 | INFO |  OCR CAPTCHA: intento interno 1/6...
+2026-04-15 00:00:29,772 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-04-15 00:00:29,772 | ERROR |   super().__init__(loader)
+2026-04-15 00:00:30,783 | INFO |    -> Variante 0, Decoder greedy: 'VBXGP' -> 'VBXGP' [INFO]
+2026-04-15 00:00:30,783 | INFO |    [INFO] CAPTCHA vlido -> Usando: VBXGP
+2026-04-15 00:00:30,983 | INFO | [INFO] Captcha automatico: VBXGP
+2026-04-15 00:00:30,983 | INFO | [INFO] Enviando login...
+2026-04-15 00:00:31,679 | INFO | [INFO] Validando acceso...
+2026-04-15 00:00:31,680 | INFO | [INFO] Acceso exitoso
+2026-04-15 00:00:31,680 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-04-15 00:00:31,681 | INFO | [INFO] Tiempo total login: 15.61 segundos
+2026-04-15 00:00:31,682 | INFO |  Navegando a CITAS -> RESERVAS DE CITAS...
+2026-04-15 00:00:33,611 | INFO |     Fast-path: click directo en 'RESERVAS DE CITAS' (menuid 7_1)
+2026-04-15 00:00:35,450 | INFO | [INFO] Navegacin completada (fast-path) -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-04-15 00:00:35,450 | INFO |  Seleccionando tipo de cita: EXAMEN PARA POLGONO DE TIRO...
+2026-04-15 00:00:35,800 | INFO |    [INFO] Tipo de cita seleccionado: EXAMEN PARA POLÍGONO DE TIRO
+2026-04-15 00:00:35,803 | INFO | -------- JV Registro iterativo 1 (idx=3, prioridad=alta, intento=1, en_cola=0) --------
+2026-04-15 00:00:37,397 | INFO |  Registro tomado desde Excel:
+2026-04-15 00:00:37,397 | INFO |    - id_registro: 4
+2026-04-15 00:00:37,397 | INFO |    - sede: LIMA
+2026-04-15 00:00:37,397 | INFO |    - fecha: 06/05/2026
+2026-04-15 00:00:37,397 | INFO |    - hora_rango: 12:15-12:30
+2026-04-15 00:00:37,397 | INFO |    - tipo_operacion: INICIAL DE LICENCIA DE USO
+2026-04-15 00:00:37,397 | INFO |    - doc_vigilante: 47535091
+2026-04-15 00:00:37,398 | INFO |    - nro_solicitud: 100153-0
+2026-04-15 00:00:37,398 | INFO |    - fecha_programacion: 15/04/2026
+2026-04-15 00:00:37,398 | INFO |    - ruc: J & V Resguardo
+2026-04-15 00:00:37,398 | INFO |    - prioridad: alta
+2026-04-15 00:00:37,398 | INFO |    - siguiente_mismo_doc_y_fecha: True
+2026-04-15 00:00:37,398 | INFO |    - indices_relacionados_excel: [3, 4]
+2026-04-15 00:00:37,398 | INFO |    - tipo_arma (excel): ['CORTA', 'LARGA']
+2026-04-15 00:00:37,398 | INFO |    - arma (excel): ['REVOLVER', 'ESCOPETA']
+2026-04-15 00:00:37,398 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER'), ('LARGA', 'ESCOPETA')]
+2026-04-15 00:00:37,398 | INFO |    - tipos_arma_objetivo: ['CORTA', 'LARGA']
+2026-04-15 00:00:37,405 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-15 00:00:37,784 | INFO |    [INFO] Sede seleccionado: LIMA
+2026-04-15 00:00:39,019 | INFO |    [INFO] Fecha seleccionado: 06/05/2026
+2026-04-15 00:00:39,020 | INFO |  Buscando hora en tabla: 12:15-12:30
+2026-04-15 00:00:40,859 | INFO |    [INFO] Estrategia horario: prioridad a hora exacta del Excel
+2026-04-15 00:00:41,159 | INFO |    [INFO] Hora seleccionada: 12:15-12:30 (Cupos Libres=3)
+2026-04-15 00:00:41,294 | INFO |    [INFO] Click en botn 'Siguiente'
+2026-04-15 00:00:41,294 | INFO |  Completando Paso 2 con datos del Excel...
+2026-04-15 00:00:42,501 | INFO |    [INFO] Tipo Operacin seleccionado: INICIAL DE LICENCIA DE USO
+2026-04-15 00:00:42,501 | INFO |     Flujo INICIAL detectado: primero Tipo de Licencia, luego Documento Vigilante
+2026-04-15 00:00:43,209 | INFO |    [INFO] Tipo de Licencia: SEGURIDAD PRIVADA
+2026-04-15 00:00:45,505 | INFO |    [INFO] Documento vigilante seleccionado: 47535091
+2026-04-15 00:00:46,157 | INFO |    [INFO] Seleccione Solicitud: SI
+2026-04-15 00:00:46,157 | INFO |     Flujo INICIAL: tambin se seleccionar Nro Solicitud
+2026-04-15 00:00:49,551 | INFO |    [INFO] Nro Solicitud seleccionado: TUPA 2022 PA3400C585 - NRO EMPOCE: 100153 - FECHA REGISTRO: 31/03/2026
+2026-04-15 00:00:50,460 | INFO |  Completando tabla de tipos de arma (Fase 2)...
+2026-04-15 00:00:54,669 | INFO |    [INFO] CORTA: REVOLVER
+2026-04-15 00:00:55,319 | INFO |    [INFO] LARGA: ESCOPETA
+2026-04-15 00:00:55,390 | INFO |    [INFO] Click en botn 'Siguiente' de Fase 2 (botonSiguiente3)
+2026-04-15 00:01:03,010 | INFO |  Completando Fase 3 (Resumen de cita)...
+2026-04-15 00:01:03,056 | INFO |  OCR CAPTCHA Fase 3: intento interno 1/∞...
+2026-04-15 00:01:05,235 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-04-15 00:01:05,235 | ERROR |   super().__init__(loader)
+2026-04-15 00:01:05,316 | INFO |    -> Variante 0, Decoder greedy: 'UJJ4S' -> 'UJJ4S' [INFO]
+2026-04-15 00:01:05,316 | INFO |    [INFO] CAPTCHA vlido -> Usando: UJJ4S
+2026-04-15 00:01:05,387 | INFO |    [INFO] CAPTCHA Fase 3 escrito: UJJ4S
+2026-04-15 00:01:05,632 | INFO |    [INFO] Trminos y condiciones marcados
+2026-04-15 00:01:06,705 | INFO |  Paso final opcional: Generar Cita (reintento rpido)
+2026-04-15 00:01:06,715 | INFO |     Intento generar cita 1/5
+2026-04-15 00:01:07,599 | INFO |    [INFO] Generar Cita confirmado en 0.88s
+2026-04-15 00:01:07,599 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-04-15 00:01:07,662 | INFO |    [INFO] Excel actualizado: estado='Cita Programada' en 2 fila(s)
+2026-04-15 00:01:07,899 | INFO |    [INFO] Click en 'Limpiar' (fin de flujo)
+2026-04-15 00:01:07,900 | INFO | [DEBUG] PERSISTENT_SESSION: cerrando contexto anterior para siguiente grupo
+2026-04-15 00:01:07,936 | INFO |  Tiempo total del flujo: 55.65 segundos
+2026-04-15 00:01:07,936 | INFO |  Resumen: OK=1 | SIN_CUPO=0 | ERROR=0
+2026-04-15 00:01:07,936 | INFO | [INFO] Flujo completado.
+2026-04-15 00:01:07,936 | INFO |     Duracin final del flujo: 55.65 segundos
+2026-04-15 00:01:08,429 | INFO | Navegador cerrado.
+2026-04-15 00:01:08,429 | INFO | Pipeline finalizado
+2026-04-15 00:01:08,429 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260415_000006\logs_w2\run_20260415_000006.log
