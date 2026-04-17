@@ -145,7 +145,7 @@ SEL = {
     "fase3_boton_refresh": '#tabGestion\\:creaCitaPolJurForm\\:botonCaptcha',
     "fase3_terminos_box": '#tabGestion\\:creaCitaPolJurForm\\:terminos .ui-chkbox-box',
     "fase3_terminos_input": '#tabGestion\\:creaCitaPolJurForm\\:terminos_input',
-    "fase3_boton_generar_cita": '#tabGestion\\:creaCitaPolJurForm\\:j_idt561',
+    "fase3_boton_generar_cita": '#tabGestion\\:creaCitaPolJurForm button.ui-button:has-text("Generar Cita")',
 }
 
 

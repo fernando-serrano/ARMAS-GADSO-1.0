@@ -1,0 +1,158 @@
+2026-04-17 00:00:05,874 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-04-17 00:00:05,874 | INFO | Modo: scheduled
+2026-04-17 00:00:05,874 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260417_000005\worker_1_batch_1_idxs_0.xlsx
+2026-04-17 00:00:11,082 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-04-17 00:00:11,083 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizará entre grupos sin cerrarse
+2026-04-17 00:00:13,422 | INFO |    -> Registros con estado 'PENDIENTE': 1
+2026-04-17 00:00:13,423 | INFO |    -> Validando fecha de hoy: 17/04/2026
+2026-04-17 00:00:13,426 | INFO |    -> Registros despus de filtrar por fecha: 1 (filtrados: 0)
+2026-04-17 00:00:13,430 | INFO |  Registros pendientes a procesar: 1
+2026-04-17 00:00:13,430 | INFO |  Procesando grupo RUC JV - Registros: 1
+2026-04-17 00:00:13,430 | INFO | [INFO] Intento login 1/12 para grupo JV
+2026-04-17 00:00:13,430 | INFO | [TILE] Args launch: --window-size=754,468 --window-position=6,6
+2026-04-17 00:00:13,430 | INFO | [TILE] Lanzando Chromium con args: ['--disable-infobars', '--window-size=754,468', '--window-position=6,6']
+2026-04-17 00:00:15,785 | INFO | [TILE] Geometría aplicada -> xy=(6,6) wh=(754,468) screen_cfg=1536x960 screen_js=1536x912 outer_js=755x470
+2026-04-17 00:00:17,454 | INFO | [INFO] Pagina de login cargada
+2026-04-17 00:00:17,867 | INFO | [INFO] Pestaña 'Autenticación Tradicional' seleccionada
+2026-04-17 00:00:20,537 | INFO | [INFO] Credenciales llenadas para grupo JV
+2026-04-17 00:00:20,537 | INFO |  OCR CAPTCHA: intento interno 1/6...
+2026-04-17 00:00:21,723 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-04-17 00:00:21,724 | ERROR |   super().__init__(loader)
+2026-04-17 00:00:21,815 | INFO |    -> Variante 0, Decoder greedy: 'W8QUK' -> 'W8QUK' [INFO]
+2026-04-17 00:00:21,815 | INFO |    [INFO] CAPTCHA vlido -> Usando: W8QUK
+2026-04-17 00:00:21,991 | INFO | [INFO] Captcha automatico: W8QUK
+2026-04-17 00:00:21,991 | INFO | [INFO] Enviando login...
+2026-04-17 00:00:22,956 | INFO | [INFO] Validando acceso...
+2026-04-17 00:00:22,957 | INFO | [INFO] Acceso exitoso
+2026-04-17 00:00:22,957 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-04-17 00:00:22,957 | INFO | [INFO] Tiempo total login: 9.53 segundos
+2026-04-17 00:00:22,957 | INFO |  Navegando a CITAS -> RESERVAS DE CITAS...
+2026-04-17 00:00:24,214 | INFO |     Fast-path: click directo en 'RESERVAS DE CITAS' (menuid 7_1)
+2026-04-17 00:00:26,563 | INFO | [INFO] Navegacin completada (fast-path) -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-04-17 00:00:26,563 | INFO |  Seleccionando tipo de cita: EXAMEN PARA POLGONO DE TIRO...
+2026-04-17 00:00:26,954 | INFO |    [INFO] Tipo de cita seleccionado: EXAMEN PARA POLÍGONO DE TIRO
+2026-04-17 00:00:26,954 | INFO | -------- JV Registro iterativo 1 (idx=0, prioridad=alta, intento=1, en_cola=0) --------
+2026-04-17 00:00:27,842 | INFO |  Registro tomado desde Excel:
+2026-04-17 00:00:27,842 | INFO |    - id_registro: 1
+2026-04-17 00:00:27,842 | INFO |    - sede: LIMA
+2026-04-17 00:00:27,842 | INFO |    - fecha: 08/05/2026
+2026-04-17 00:00:27,842 | INFO |    - hora_rango: 12:00-12:15
+2026-04-17 00:00:27,842 | INFO |    - tipo_operacion: INICIAL DE LICENCIA DE USO
+2026-04-17 00:00:27,842 | INFO |    - doc_vigilante: 76023039
+2026-04-17 00:00:27,842 | INFO |    - nro_solicitud: 043793-0
+2026-04-17 00:00:27,842 | INFO |    - fecha_programacion: 17/04/2026
+2026-04-17 00:00:27,842 | INFO |    - ruc: J & V Resguardo
+2026-04-17 00:00:27,842 | INFO |    - prioridad: alta
+2026-04-17 00:00:27,842 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-17 00:00:27,842 | INFO |    - indices_relacionados_excel: [0]
+2026-04-17 00:00:27,842 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-17 00:00:27,842 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-17 00:00:27,842 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-17 00:00:27,842 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-17 00:00:27,851 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-17 00:00:28,251 | INFO |    [INFO] Sede seleccionado: LIMA
+2026-04-17 00:00:29,366 | INFO |    [INFO] Fecha seleccionado: 08/05/2026
+2026-04-17 00:00:29,366 | INFO |  Buscando hora en tabla: 12:00-12:15
+2026-04-17 00:00:30,111 | INFO |    [INFO] Estrategia horario: prioridad a hora exacta del Excel
+2026-04-17 00:00:30,416 | INFO |    [INFO] Hora seleccionada: 12:00-12:15 (Cupos Libres=3)
+2026-04-17 00:00:30,465 | INFO |    [INFO] Click en botn 'Siguiente'
+2026-04-17 00:00:30,465 | INFO |  Completando Paso 2 con datos del Excel...
+2026-04-17 00:00:31,154 | INFO |    [INFO] Tipo Operacin seleccionado: INICIAL DE LICENCIA DE USO
+2026-04-17 00:00:31,154 | INFO |     Flujo INICIAL detectado: primero Tipo de Licencia, luego Documento Vigilante
+2026-04-17 00:00:31,608 | INFO |    [INFO] Tipo de Licencia: SEGURIDAD PRIVADA
+2026-04-17 00:00:36,445 | INFO | [WARNING] Error en registro idx=0: No se confirmó el documento vigilante. Esperado contiene '76023039' | Actual ''
+2026-04-17 00:00:36,445 | INFO | [INFO] Registro idx=0 con causal terminal 'DOC_VIGILANTE' pendiente de confirmación (1/2). Reencolando...
+2026-04-17 00:00:36,667 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-04-17 00:00:37,668 | INFO | -------- JV Registro iterativo 2 (idx=0, prioridad=alta, intento=2, en_cola=0) --------
+2026-04-17 00:00:37,706 | INFO |  Registro tomado desde Excel:
+2026-04-17 00:00:37,706 | INFO |    - id_registro: 1
+2026-04-17 00:00:37,706 | INFO |    - sede: LIMA
+2026-04-17 00:00:37,706 | INFO |    - fecha: 08/05/2026
+2026-04-17 00:00:37,706 | INFO |    - hora_rango: 12:00-12:15
+2026-04-17 00:00:37,706 | INFO |    - tipo_operacion: INICIAL DE LICENCIA DE USO
+2026-04-17 00:00:37,706 | INFO |    - doc_vigilante: 76023039
+2026-04-17 00:00:37,706 | INFO |    - nro_solicitud: 043793-0
+2026-04-17 00:00:37,706 | INFO |    - fecha_programacion: 17/04/2026
+2026-04-17 00:00:37,706 | INFO |    - ruc: J & V Resguardo
+2026-04-17 00:00:37,706 | INFO |    - prioridad: alta
+2026-04-17 00:00:37,706 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-17 00:00:37,706 | INFO |    - indices_relacionados_excel: [0]
+2026-04-17 00:00:37,706 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-17 00:00:37,706 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-17 00:00:37,706 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-17 00:00:37,706 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-17 00:00:37,712 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-17 00:00:38,075 | INFO |    [INFO] Sede seleccionado: LIMA
+2026-04-17 00:00:39,155 | INFO |    [INFO] Fecha seleccionado: 08/05/2026
+2026-04-17 00:00:39,155 | INFO |  Buscando hora en tabla: 12:00-12:15
+2026-04-17 00:00:40,786 | INFO |    [INFO] Estrategia horario: prioridad a hora exacta del Excel
+2026-04-17 00:00:41,077 | INFO |    [INFO] Hora seleccionada: 12:00-12:15 (Cupos Libres=3)
+2026-04-17 00:00:41,209 | INFO |    [INFO] Click en botn 'Siguiente'
+2026-04-17 00:00:41,209 | INFO |  Completando Paso 2 con datos del Excel...
+2026-04-17 00:00:42,425 | INFO |    [INFO] Tipo Operacin seleccionado: INICIAL DE LICENCIA DE USO
+2026-04-17 00:00:42,425 | INFO |     Flujo INICIAL detectado: primero Tipo de Licencia, luego Documento Vigilante
+2026-04-17 00:00:43,685 | INFO |    [INFO] Tipo de Licencia: SEGURIDAD PRIVADA
+2026-04-17 00:00:45,982 | INFO |    [INFO] Documento vigilante seleccionado: 76023039
+2026-04-17 00:00:46,781 | INFO |    [INFO] Seleccione Solicitud: SI
+2026-04-17 00:00:46,781 | INFO |     Flujo INICIAL: tambin se seleccionar Nro Solicitud
+2026-04-17 00:00:49,082 | INFO |    [INFO] Nro Solicitud seleccionado: TUPA 2022 PA3400C585 - NRO EMPOCE: 43793 - FECHA REGISTRO: 31/03/2026
+2026-04-17 00:00:50,100 | INFO |  Completando tabla de tipos de arma (Fase 2)...
+2026-04-17 00:00:55,929 | INFO |    [INFO] CORTA: REVOLVER
+2026-04-17 00:00:56,201 | INFO |    [INFO] Click en botn 'Siguiente' de Fase 2 (botonSiguiente3)
+2026-04-17 00:01:06,492 | INFO |  Completando Fase 3 (Resumen de cita)...
+2026-04-17 00:01:06,498 | INFO |  OCR CAPTCHA Fase 3: intento interno 1/∞...
+2026-04-17 00:01:07,635 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-04-17 00:01:07,635 | ERROR |   super().__init__(loader)
+2026-04-17 00:01:07,677 | INFO |    -> Variante 0, Decoder greedy: '57QPN' -> '57QPN' [INFO]
+2026-04-17 00:01:07,677 | INFO |    [INFO] CAPTCHA vlido -> Usando: 57QPN
+2026-04-17 00:01:07,719 | INFO |    [INFO] CAPTCHA Fase 3 escrito: 57QPN
+2026-04-17 00:01:07,967 | INFO |    [INFO] Trminos y condiciones marcados
+2026-04-17 00:01:08,887 | INFO |  Paso final opcional: Generar Cita (reintento rpido)
+2026-04-17 00:01:08,891 | INFO |     Intento generar cita 1/5
+2026-04-17 00:01:12,557 | INFO |    [INFO] Sin señal clara tras click en 'Generar Cita'. Aplicando ventana extra de confirmación (2.50s)...
+2026-04-17 00:01:15,094 | INFO |    [WARNING] Mensaje detectado: La persona con documento 76023039 debe tener una cuenta SEL activa. Los administrados involucrados en un procedimiento administrativo tramitado ante la SUCAMEC deben cumplir con dicho requerimiento según la DIRECTIVA Nº 21-2017-SUCAMEC
+2026-04-17 00:01:15,095 | INFO |     Validacin final: 6.20s
+2026-04-17 00:01:16,023 | INFO | [WARNING] Error en registro idx=0: No se pudo confirmar la generación de cita de forma robusta (sin seales claras de xito y sin captcha incorrecto explícito)
+2026-04-17 00:01:16,023 | INFO | [INFO] Error transitorio/no clasificado en idx=0. Reencolando (1/4)...
+2026-04-17 00:01:16,263 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-04-17 00:01:17,264 | INFO | -------- JV Registro iterativo 3 (idx=0, prioridad=alta, intento=3, en_cola=0) --------
+2026-04-17 00:01:17,408 | INFO |  Registro tomado desde Excel:
+2026-04-17 00:01:17,408 | INFO |    - id_registro: 1
+2026-04-17 00:01:17,408 | INFO |    - sede: LIMA
+2026-04-17 00:01:17,408 | INFO |    - fecha: 08/05/2026
+2026-04-17 00:01:17,408 | INFO |    - hora_rango: 12:00-12:15
+2026-04-17 00:01:17,408 | INFO |    - tipo_operacion: INICIAL DE LICENCIA DE USO
+2026-04-17 00:01:17,408 | INFO |    - doc_vigilante: 76023039
+2026-04-17 00:01:17,408 | INFO |    - nro_solicitud: 043793-0
+2026-04-17 00:01:17,408 | INFO |    - fecha_programacion: 17/04/2026
+2026-04-17 00:01:17,408 | INFO |    - ruc: J & V Resguardo
+2026-04-17 00:01:17,408 | INFO |    - prioridad: alta
+2026-04-17 00:01:17,408 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-17 00:01:17,408 | INFO |    - indices_relacionados_excel: [0]
+2026-04-17 00:01:17,408 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-17 00:01:17,408 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-17 00:01:17,408 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-17 00:01:17,408 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-17 00:01:17,414 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-17 00:01:17,781 | INFO |    [INFO] Sede seleccionado: LIMA
+2026-04-17 00:01:18,917 | INFO |    [INFO] Fecha seleccionado: 08/05/2026
+2026-04-17 00:01:18,918 | INFO |  Buscando hora en tabla: 12:00-12:15
+2026-04-17 00:01:20,239 | INFO |    [INFO] Estrategia horario: prioridad a hora exacta del Excel
+2026-04-17 00:01:20,541 | INFO |    [INFO] Hora seleccionada: 12:00-12:15 (Cupos Libres=2)
+2026-04-17 00:01:20,812 | INFO |    [INFO] Click en botn 'Siguiente'
+2026-04-17 00:01:20,813 | INFO |  Completando Paso 2 con datos del Excel...
+2026-04-17 00:01:21,551 | INFO |    [INFO] Tipo Operacin seleccionado: INICIAL DE LICENCIA DE USO
+2026-04-17 00:01:21,551 | INFO |     Flujo INICIAL detectado: primero Tipo de Licencia, luego Documento Vigilante
+2026-04-17 00:01:22,309 | INFO |    [INFO] Tipo de Licencia: SEGURIDAD PRIVADA
+2026-04-17 00:01:26,859 | INFO | [WARNING] Error en registro idx=0: No se confirmó el documento vigilante. Esperado contiene '76023039' | Actual ''
+2026-04-17 00:01:26,890 | INFO |    📝 Excel actualizado: observaciones='Documento vigilante no disponible para esta razón social/RUC. DNI=76023039 | RUC=J & V Resguardo' en 1 fila(s)
+2026-04-17 00:01:26,893 | INFO | [INFO] Registro idx=0 marcado como terminal 'DOC_VIGILANTE' tras 2 confirmaciones
+2026-04-17 00:01:27,115 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-04-17 00:01:28,116 | INFO | [DEBUG] PERSISTENT_SESSION: cerrando contexto anterior para siguiente grupo
+2026-04-17 00:01:28,144 | INFO |  Tiempo total del flujo: 77.06 segundos
+2026-04-17 00:01:28,144 | INFO |  Resumen: OK=0 | SIN_CUPO=0 | ERROR=1
+2026-04-17 00:01:28,144 | INFO | [INFO] Flujo completado.
+2026-04-17 00:01:28,145 | INFO |     Duracin final del flujo: 77.06 segundos
+2026-04-17 00:01:28,452 | INFO | Navegador cerrado.
+2026-04-17 00:01:28,452 | INFO | Pipeline finalizado
+2026-04-17 00:01:28,452 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260417_000005\logs_w1\run_20260417_000005.log
