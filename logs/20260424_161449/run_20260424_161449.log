@@ -1,0 +1,37 @@
+2026-04-24 16:14:49,531 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-04-24 16:14:49,531 | INFO | Modo: scheduled
+2026-04-24 16:14:49,531 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\data\programaciones-armas.xlsx
+2026-04-24 16:14:49,531 | INFO | Screenshots: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\screenshots\20260424_161449
+2026-04-24 16:14:53,967 | INFO | [INFO] OCR (easyocr) cargado correctamente | langs=['en'] | gpu=False
+2026-04-24 16:14:53,983 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-04-24 16:14:53,983 | INFO | [INFO] SCHEDULED_MULTIWORKER activado | workers=4 | mode=sticky
+2026-04-24 16:14:53,985 | INFO | [INFO] Excel origen multihilo: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\data\programaciones-armas.xlsx
+2026-04-24 16:14:54,121 | INFO |    -> Registros con estado 'PENDIENTE': 1
+2026-04-24 16:14:54,121 | INFO |    -> Validando fecha de hoy: 24/04/2026
+2026-04-24 16:14:54,122 | INFO |    -> Registros despues de filtrar por fecha: 1 (filtrados: 0)
+2026-04-24 16:14:54,141 | INFO |  Registro tomado desde Excel:
+2026-04-24 16:14:54,141 | INFO |    - id_registro: 1
+2026-04-24 16:14:54,141 | INFO |    - sede: JEFATURA ZONAL DE JUNIN
+2026-04-24 16:14:54,141 | INFO |    - fecha: 30/04/2026
+2026-04-24 16:14:54,141 | INFO |    - hora_rango: 10:00-10:15
+2026-04-24 16:14:54,141 | INFO |    - tipo_operacion: INICIAL DE LICENCIA DE USO
+2026-04-24 16:14:54,141 | INFO |    - doc_vigilante: 74474128
+2026-04-24 16:14:54,141 | INFO |    - nro_solicitud: 085093-0
+2026-04-24 16:14:54,141 | INFO |    - fecha_programacion: 24/04/2026
+2026-04-24 16:14:54,141 | INFO |    - ruc: J & V Resguardo
+2026-04-24 16:14:54,142 | INFO |    - prioridad: alta
+2026-04-24 16:14:54,142 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-24 16:14:54,142 | INFO |    - indices_relacionados_excel: [0]
+2026-04-24 16:14:54,142 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-24 16:14:54,142 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-24 16:14:54,142 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-24 16:14:54,142 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-24 16:14:54,142 | INFO | [INFO] Unidades multihilo a procesar: 1
+2026-04-24 16:14:54,143 | INFO | [INFO][W1] Lote asignado idx=[0]
+2026-04-24 16:15:52,596 | INFO | [INFO][W1] Lote idx=[0] finalizo OK en 58.43s
+2026-04-24 16:15:52,598 | INFO | [INFO] Conteo por worker: [1, 0, 0, 0]
+2026-04-24 16:15:52,598 | INFO | [INFO] Unidades procesadas: 1/1
+2026-04-24 16:15:52,598 | INFO | [INFO] Tiempo total multihilo: 58.46s
+2026-04-24 16:15:52,598 | INFO | [OK] Flujo multihilo scheduled finalizado sin fallos de proceso
+2026-04-24 16:15:52,598 | INFO | Pipeline finalizado
+2026-04-24 16:15:52,598 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\20260424_161449\run_20260424_161449.log

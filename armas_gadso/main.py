@@ -6,7 +6,8 @@ import traceback
 from pathlib import Path
 
 from .config import load_config
-from .logging_utils import build_logger, prepare_run_artifact_dir, redirect_prints
+from .flows.logging_flow import build_logger, prepare_run_artifact_dir, redirect_prints
+from .flows.orchestration_flow import ejecutar_flujo_principal
 
 
 def parse_args() -> argparse.Namespace:
@@ -46,10 +47,8 @@ def main() -> int:
     logger.info("Screenshots: %s", screenshot_dir)
 
     try:
-        from . import legacy_flow
-
         with redirect_prints(logger):
-            legacy_flow.llenar_login_sel()
+            ejecutar_flujo_principal()
         logger.info("Pipeline finalizado")
         return 0
     except Exception as exc:

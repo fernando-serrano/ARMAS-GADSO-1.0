@@ -1,0 +1,35 @@
+"""Selectores del Paso 2: tramite, solicitud y tabla de armas."""
+
+SELECTORS = {
+    "panel_candidates": [
+        '#tabGestion\\:creaCitaPolJurForm\\:panelPaso3_content',
+        '#tabGestion\\:creaCitaPolJurForm',
+        '#tabGestion\\:tab2',
+    ],
+    "overlay_candidates": [
+        '#tabGestion\\:creaCitaPolJurForm\\:nroSolicitud_panel',
+        '#tabGestion\\:creaCitaPolJurForm\\:nroDocVig_panel',
+    ],
+    "tipo_operacion_trigger": '#tabGestion\\:creaCitaPolJurForm\\:tipoOpe .ui-selectonemenu-trigger',
+    "tipo_operacion_panel": '#tabGestion\\:creaCitaPolJurForm\\:tipoOpe_panel',
+    "tipo_operacion_items": '#tabGestion\\:creaCitaPolJurForm\\:tipoOpe_panel li.ui-selectonemenu-item',
+    "tipo_operacion_label": '#tabGestion\\:creaCitaPolJurForm\\:tipoOpe_label',
+    "tipo_tramite_trigger": '#tabGestion\\:creaCitaPolJurForm\\:tipoTramite .ui-selectonemenu-trigger',
+    "tipo_tramite_panel": '#tabGestion\\:creaCitaPolJurForm\\:tipoTramite_panel',
+    "tipo_tramite_label": '#tabGestion\\:creaCitaPolJurForm\\:tipoTramite_label',
+    "tipo_tramite_seg_priv": '#tabGestion\\:creaCitaPolJurForm\\:tipoTramite_panel li[data-label="SEGURIDAD PRIVADA"]',
+    "doc_vig_input": '#tabGestion\\:creaCitaPolJurForm\\:nroDocVig_input',
+    "doc_vig_panel": '#tabGestion\\:creaCitaPolJurForm\\:nroDocVig_panel',
+    "doc_vig_items": '#tabGestion\\:creaCitaPolJurForm\\:nroDocVig_panel li.ui-autocomplete-item',
+    "seleccione_solicitud_trigger": '#tabGestion\\:creaCitaPolJurForm\\:seleccioneSolicitud .ui-selectonemenu-trigger',
+    "seleccione_solicitud_panel": '#tabGestion\\:creaCitaPolJurForm\\:seleccioneSolicitud_panel',
+    "seleccione_solicitud_si": '#tabGestion\\:creaCitaPolJurForm\\:seleccioneSolicitud_panel li[id$="_1"]',
+    "seleccione_solicitud_label": '#tabGestion\\:creaCitaPolJurForm\\:seleccioneSolicitud_label',
+    "nro_solicitud_trigger": '#tabGestion\\:creaCitaPolJurForm\\:nroSolicitud .ui-selectonemenu-trigger',
+    "nro_solicitud_panel": '#tabGestion\\:creaCitaPolJurForm\\:nroSolicitud_panel',
+    "nro_solicitud_items": '#tabGestion\\:creaCitaPolJurForm\\:nroSolicitud_panel li.ui-selectonemenu-item',
+    "nro_solicitud_label": '#tabGestion\\:creaCitaPolJurForm\\:nroSolicitud_label',
+    "dt_tipo_lic_rows": '#tabGestion\\:creaCitaPolJurForm\\:dtTipoLic tbody tr',
+    "dt_tipo_lic_rows_fallback": 'table[id^="tabGestion:creaCitaPolJurForm:dtTipoLic"] tbody tr',
+    "boton_siguiente_3": '#tabGestion\\:creaCitaPolJurForm\\:botonSiguiente3',
+}

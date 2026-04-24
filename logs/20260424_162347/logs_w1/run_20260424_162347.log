@@ -1,0 +1,116 @@
+2026-04-24 16:23:54,743 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-04-24 16:23:54,743 | INFO | Modo: scheduled
+2026-04-24 16:23:54,743 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\20260424_162347\worker_1_batch_1_idxs_0.xlsx
+2026-04-24 16:23:54,744 | INFO | Screenshots: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\screenshots\20260424_162347\screenshots_w1
+2026-04-24 16:24:00,467 | INFO | [INFO] OCR (easyocr) cargado correctamente | langs=['en'] | gpu=False
+2026-04-24 16:24:00,485 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-04-24 16:24:00,485 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizara entre grupos sin cerrarse
+2026-04-24 16:24:01,127 | INFO |    -> Registros con estado 'PENDIENTE': 1
+2026-04-24 16:24:01,128 | INFO |    -> Validando fecha de hoy: 24/04/2026
+2026-04-24 16:24:01,128 | INFO |    -> Registros despues de filtrar por fecha: 1 (filtrados: 0)
+2026-04-24 16:24:01,131 | INFO |  Registros pendientes a procesar: 1
+2026-04-24 16:24:01,131 | INFO |  Procesando grupo RUC JV - Registros: 1
+2026-04-24 16:24:01,131 | INFO | [INFO] Intento login 1/12 para grupo JV
+2026-04-24 16:24:01,131 | INFO | [TILE] Lanzando Chromium con args: ['--disable-infobars', '--start-maximized', '--window-size=1920,1080', '--window-position=0,0']
+2026-04-24 16:24:03,027 | INFO | [INFO] Pagina de login cargada
+2026-04-24 16:24:03,333 | INFO | [INFO] Pestaña 'Autenticación Tradicional' seleccionada
+2026-04-24 16:24:05,482 | INFO | [INFO] Credenciales llenadas para grupo JV
+2026-04-24 16:24:05,482 | INFO |  OCR CAPTCHA: intento interno 1/6...
+2026-04-24 16:24:06,635 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-04-24 16:24:06,636 | ERROR |   super().__init__(loader)
+2026-04-24 16:24:06,733 | INFO |    -> Variante 0, Decoder greedy: '9LNU8' -> '9LNU8' [INFO]
+2026-04-24 16:24:06,733 | INFO |    [INFO] CAPTCHA valido -> Usando: 9LNU8
+2026-04-24 16:24:06,803 | INFO | [INFO] Captcha automatico: 9LNU8
+2026-04-24 16:24:06,803 | INFO | [INFO] Enviando login...
+2026-04-24 16:24:07,196 | INFO | [INFO] Validando acceso...
+2026-04-24 16:24:07,196 | INFO | [INFO] Acceso exitoso
+2026-04-24 16:24:07,196 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-04-24 16:24:07,196 | INFO | [INFO] Tiempo total login: 4.17 segundos
+2026-04-24 16:24:07,197 | INFO |  Navegando a RESERVAS DE CITAS...
+2026-04-24 16:24:08,081 | INFO |    [INFO] Menu CITAS expandido
+2026-04-24 16:24:09,388 | INFO |    [INFO] Click en 'RESERVAS DE CITAS'
+2026-04-24 16:24:09,389 | INFO |  Seleccionando tipo de cita: EXAMEN PARA POLIGONO DE TIRO
+2026-04-24 16:24:09,894 | INFO |    [INFO] Tipo de cita seleccionado: EXAMEN PARA POLÍGONO DE TIRO
+2026-04-24 16:24:09,894 | INFO | -------- JV Registro iterativo 1 (idx=0, prioridad=alta, intento=1, en_cola=0) --------
+2026-04-24 16:24:10,168 | INFO |  Registro tomado desde Excel:
+2026-04-24 16:24:10,168 | INFO |    - id_registro: 1
+2026-04-24 16:24:10,168 | INFO |    - sede: JEFATURA ZONAL DE JUNIN
+2026-04-24 16:24:10,168 | INFO |    - fecha: 30/04/2026
+2026-04-24 16:24:10,168 | INFO |    - hora_rango: 10:00-10:15
+2026-04-24 16:24:10,168 | INFO |    - tipo_operacion: INICIAL DE LICENCIA DE USO
+2026-04-24 16:24:10,168 | INFO |    - doc_vigilante: 74474128
+2026-04-24 16:24:10,168 | INFO |    - nro_solicitud: 085093-0
+2026-04-24 16:24:10,168 | INFO |    - fecha_programacion: 24/04/2026
+2026-04-24 16:24:10,168 | INFO |    - ruc: J & V Resguardo
+2026-04-24 16:24:10,168 | INFO |    - prioridad: alta
+2026-04-24 16:24:10,168 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-24 16:24:10,168 | INFO |    - indices_relacionados_excel: [0]
+2026-04-24 16:24:10,168 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-24 16:24:10,169 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-24 16:24:10,169 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-24 16:24:10,169 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-24 16:24:10,176 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-24 16:24:10,644 | INFO |    [INFO] Sede seleccionado: JEFATURA ZONAL DE JUNIN
+2026-04-24 16:24:11,766 | INFO |    [INFO] Fecha seleccionado: 30/04/2026
+2026-04-24 16:24:11,775 | INFO |  Buscando hora en tabla: 10:00-10:15
+2026-04-24 16:24:12,120 | INFO |    [INFO] Screenshot tabla cupos: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\screenshots\20260424_162347\screenshots_w1\step_1_reserva_cupos\20260424_162411_tabla_inicial_i1_h10_00-10_15.png
+2026-04-24 16:24:12,565 | INFO |    [INFO] Estrategia horario: prioridad a hora exacta del Excel
+2026-04-24 16:24:12,869 | INFO |    [INFO] Hora seleccionada: 10:00-10:15 (Cupos Libres=1)
+2026-04-24 16:24:12,900 | INFO |    [INFO] Click en boton 'Siguiente'
+2026-04-24 16:24:12,900 | INFO |  Completando Paso 2 con datos del Excel...
+2026-04-24 16:24:13,572 | INFO |    [INFO] Tipo Operacion seleccionado: INICIAL DE LICENCIA DE USO
+2026-04-24 16:24:13,572 | INFO |     Flujo INICIAL detectado: primero Tipo de Licencia, luego Documento Vigilante
+2026-04-24 16:24:14,050 | INFO |    [INFO] Tipo de Licencia: SEGURIDAD PRIVADA
+2026-04-24 16:24:15,572 | INFO |    [INFO] Documento vigilante seleccionado: 74474128
+2026-04-24 16:24:15,994 | INFO |    [INFO] Seleccione Solicitud: SI
+2026-04-24 16:24:15,994 | INFO |     Flujo INICIAL: tambien se seleccionara Nro Solicitud
+2026-04-24 16:24:18,271 | INFO |    [INFO] Screenshot paso 2: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\screenshots\20260424_162347\screenshots_w1\step_2_datos_tramite\20260424_162416_nro_solicitud_i1_h10_00-10_15.png
+2026-04-24 16:24:19,307 | INFO | [WARNING] Error en registro idx=0: No se encontro Nro Solicitud con token '85093'. Opciones: ['Seleccione']
+2026-04-24 16:24:19,307 | INFO | [INFO] Registro idx=0 con causal terminal 'NRO_SOLICITUD' pendiente de confirmacion (1/2). Reencolando...
+2026-04-24 16:24:20,140 | INFO | [INFO] Wizard limpiado para siguiente registro (recuperacion por error)
+2026-04-24 16:24:21,141 | INFO | -------- JV Registro iterativo 2 (idx=0, prioridad=alta, intento=2, en_cola=0) --------
+2026-04-24 16:24:21,181 | INFO |  Registro tomado desde Excel:
+2026-04-24 16:24:21,181 | INFO |    - id_registro: 1
+2026-04-24 16:24:21,181 | INFO |    - sede: JEFATURA ZONAL DE JUNIN
+2026-04-24 16:24:21,182 | INFO |    - fecha: 30/04/2026
+2026-04-24 16:24:21,182 | INFO |    - hora_rango: 10:00-10:15
+2026-04-24 16:24:21,182 | INFO |    - tipo_operacion: INICIAL DE LICENCIA DE USO
+2026-04-24 16:24:21,182 | INFO |    - doc_vigilante: 74474128
+2026-04-24 16:24:21,182 | INFO |    - nro_solicitud: 085093-0
+2026-04-24 16:24:21,182 | INFO |    - fecha_programacion: 24/04/2026
+2026-04-24 16:24:21,182 | INFO |    - ruc: J & V Resguardo
+2026-04-24 16:24:21,182 | INFO |    - prioridad: alta
+2026-04-24 16:24:21,182 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-24 16:24:21,182 | INFO |    - indices_relacionados_excel: [0]
+2026-04-24 16:24:21,182 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-24 16:24:21,182 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-24 16:24:21,182 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-24 16:24:21,182 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-24 16:24:21,189 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-24 16:24:21,530 | INFO |    [INFO] Sede seleccionado: JEFATURA ZONAL DE JUNIN
+2026-04-24 16:24:22,660 | INFO |    [INFO] Fecha seleccionado: 30/04/2026
+2026-04-24 16:24:22,660 | INFO |  Buscando hora en tabla: 10:00-10:15
+2026-04-24 16:24:23,012 | INFO |    [INFO] Screenshot tabla cupos: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\screenshots\20260424_162347\screenshots_w1\step_1_reserva_cupos\20260424_162422_tabla_inicial_i1_h10_00-10_15.png
+2026-04-24 16:24:23,388 | INFO |    [INFO] Estrategia horario: prioridad a hora exacta del Excel
+2026-04-24 16:24:23,700 | INFO |    [INFO] Hora seleccionada: 10:00-10:15 (Cupos Libres=1)
+2026-04-24 16:24:23,733 | INFO |    [INFO] Click en boton 'Siguiente'
+2026-04-24 16:24:23,733 | INFO |  Completando Paso 2 con datos del Excel...
+2026-04-24 16:24:24,419 | INFO |    [INFO] Tipo Operacion seleccionado: INICIAL DE LICENCIA DE USO
+2026-04-24 16:24:24,419 | INFO |     Flujo INICIAL detectado: primero Tipo de Licencia, luego Documento Vigilante
+2026-04-24 16:24:24,869 | INFO |    [INFO] Tipo de Licencia: SEGURIDAD PRIVADA
+2026-04-24 16:24:26,374 | INFO |    [INFO] Documento vigilante seleccionado: 74474128
+2026-04-24 16:24:26,813 | INFO |    [INFO] Seleccione Solicitud: SI
+2026-04-24 16:24:26,813 | INFO |     Flujo INICIAL: tambien se seleccionara Nro Solicitud
+2026-04-24 16:24:28,548 | INFO |    [INFO] Screenshot paso 2: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\screenshots\20260424_162347\screenshots_w1\step_2_datos_tramite\20260424_162427_nro_solicitud_i1_h10_00-10_15.png
+2026-04-24 16:24:29,553 | INFO | [WARNING] Error en registro idx=0: No se encontro Nro Solicitud con token '85093'. Opciones: ['Seleccione']
+2026-04-24 16:24:29,586 | INFO |    [INFO] Excel actualizado: observaciones='No se encontró Nro Solicitud/Código de pago para token de 085093-0' en 1 fila(s)
+2026-04-24 16:24:29,586 | INFO | [INFO] Registro idx=0 marcado como terminal 'NRO_SOLICITUD' tras 2 confirmaciones
+2026-04-24 16:24:30,236 | INFO | [INFO] Wizard limpiado para siguiente registro (recuperacion por error)
+2026-04-24 16:24:31,237 | INFO | [DEBUG] PERSISTENT_SESSION: cerrando contexto anterior para siguiente grupo
+2026-04-24 16:24:31,283 | INFO |  Tiempo total del flujo: 30.80 segundos
+2026-04-24 16:24:31,283 | INFO |  Resumen: OK=0 | SIN_CUPO=0 | ERROR=1
+2026-04-24 16:24:31,283 | INFO | [INFO] Flujo completado.
+2026-04-24 16:24:31,284 | INFO |     Duracin final del flujo: 30.80 segundos
+2026-04-24 16:24:31,705 | INFO | Navegador cerrado.
+2026-04-24 16:24:31,706 | INFO | Pipeline finalizado
+2026-04-24 16:24:31,706 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\20260424_162347\logs_w1\run_20260424_162347.log

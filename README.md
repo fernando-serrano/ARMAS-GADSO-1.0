@@ -1,44 +1,67 @@
-# ARMAS-GADSO
+﻿# ARMAS-GADSO
 
 ## Resumen
 
 Automatizacion Playwright para programar citas en SEL-SUCAMEC usando un Excel como fuente.
 
-El flujo productivo esta centralizado en `armas_gadso/legacy_flow.py` y se ejecuta desde `run_pipeline.py`.
+El flujo productivo se ejecuta desde `run_pipeline.py`, entra por `armas_gadso/main.py` y orquesta el pipeline actual desde `armas_gadso/flows/orchestration_flow/`.
 
 ## Arquitectura
 
 - Entrada de ejecucion: `run_pipeline.py`
 - Orquestacion de modo: `armas_gadso/main.py`
 - Configuracion y rutas: `armas_gadso/config.py`
-- Logica funcional de negocio: `armas_gadso/legacy_flow.py`
-- Logging y redireccion de `print`: `armas_gadso/logging_utils.py`
+- Dominio compartido: `armas_gadso/exceptions.py`, `armas_gadso/utils.py`, `armas_gadso/excel.py`
+- Flujos refactorizados por dominio: `armas_gadso/flows/`
+- Orquestacion principal: `armas_gadso/flows/orchestration_flow/`
+- Logging y redireccion de `print`: `armas_gadso/flows/logging_flow/`
+- Compatibilidad legacy: `armas_gadso/legacy_flow.py`, `armas_gadso/logging_utils.py`
 
 ## Estructura del proyecto
 
 ```text
 ARMAS-GADSO-1.0/
-├── armas_gadso/
-│   ├── __init__.py
-│   ├── config.py
-│   ├── legacy_flow.py
-│   ├── logging_utils.py
-│   └── main.py
-├── data/
-│   └── programaciones-armas.xlsx
-├── logs/
-├── screenshots/
-├── test/
-├── run_pipeline.py
-├── run_manual.bat
-├── run_scheduled.bat
-├── requirements.txt
-└── README.md
++-- armas_gadso/
+|   +-- __init__.py
+|   +-- config.py
+|   +-- excel.py
+|   +-- exceptions.py
+|   +-- legacy_flow.py
+|   +-- logging_utils.py
+|   +-- main.py
+|   +-- utils.py
+|   +-- flows/
+|       +-- captcha_flow/
+|       +-- cita_flow/
+|       |   +-- step_1_reserva_cupos/
+|       |   +-- step_2_datos_tramite/
+|       |   +-- step_3_validacion_final/
+|       |   +-- step_4_confirmacion/
+|       +-- evidence_flow/
+|       +-- logging_flow/
+|       +-- login_flow/
+|       +-- orchestration_flow/
+|           +-- group_runner.py
+|           +-- legacy_pipeline.py
+|           +-- monitoring.py
+|           +-- navigation.py
+|           +-- pipeline.py
+|           +-- runtime.py
+|           +-- workers.py
++-- data/
++-- logs/
++-- screenshots/
++-- test/
++-- run_pipeline.py
++-- run_manual.bat
++-- run_scheduled.bat
++-- requirements.txt
++-- README.md
 ```
 
-## Flujo funcional (negocio)
+## Flujo funcional
 
-`armas_gadso/legacy_flow.py` conserva y ejecuta la logica principal:
+`armas_gadso/flows/orchestration_flow/legacy_pipeline.py` conserva y ejecuta la logica principal actual. `armas_gadso/legacy_flow.py` se mantiene solo como wrapper de compatibilidad para tests o imports antiguos.
 
 1. Lee pendientes desde Excel.
 2. Ordena por grupo (`ruc`) y prioridad.
@@ -60,9 +83,7 @@ La seleccion de hora respeta primero el valor de `hora_rango` del Excel.
 - Si la hora exacta tiene cupo: se programa esa hora.
 - Si la hora exacta no tiene cupo: recien se activa la logica adaptativa (vecinos y bloque de mediodia, segun configuracion).
 
-Esto evita programar en extremos cuando la hora solicitada si estaba disponible.
-
-## Modo scheduled (produccion)
+## Modo scheduled
 
 En `scheduled` se aplica orquestacion multihilo a nivel de workers, manteniendo intacto el flujo base por registro.
 
@@ -85,34 +106,19 @@ En `scheduled` se aplica orquestacion multihilo a nivel de workers, manteniendo 
 python run_pipeline.py --mode manual --hold-browser-open
 ```
 
-- Permite interaccion humana cuando OCR no resuelve captcha.
-- Puede mantener navegador abierto al finalizar.
-
 ### Scheduled
 
 ```powershell
 python run_pipeline.py --mode scheduled
 ```
 
-- Diseñado para Task Scheduler.
-- Sin espera interactiva al cierre.
-- Finaliza automaticamente con codigo de salida.
-
-## Scripts BAT
-
-- `run_manual.bat`: ejecuta modo manual.
-- `run_scheduled.bat`: ejecuta modo scheduled y redirige salida a la carpeta de la corrida.
-
 ## Logging
-
-Salidas principales:
 
 Cada ejecucion crea una carpeta con formato `aaaammdd_hhmmss` dentro de `logs/`.
 
-1. Log de corrida: `logs/aaaammdd_hhmmss/run_aaaammdd_hhmmss.log`
-2. Salida scheduler: `logs/aaaammdd_hhmmss/task_scheduler_stdout.log`
-
-En scheduled multihilo, los artefactos temporales y logs por worker se guardan dentro de la misma carpeta de corrida, por ejemplo `logs/aaaammdd_hhmmss/logs_w1/`.
+- Log de corrida: `logs/aaaammdd_hhmmss/run_aaaammdd_hhmmss.log`
+- Salida scheduler: `logs/aaaammdd_hhmmss/task_scheduler_stdout.log`
+- En scheduled multihilo: `logs/aaaammdd_hhmmss/logs_w1/`, `logs/aaaammdd_hhmmss/logs_w2/`, etc.
 
 La carpeta `logs/` conserva como maximo 10 carpetas de corrida; al generarse una nueva, se elimina la mas antigua.
 
@@ -120,8 +126,8 @@ La carpeta `logs/` conserva como maximo 10 carpetas de corrida; al generarse una
 
 Cada ejecucion crea tambien una carpeta con el mismo formato dentro de `screenshots/`.
 
-1. Evidencias de corrida: `screenshots/aaaammdd_hhmmss/`
-2. En scheduled multihilo: `screenshots/aaaammdd_hhmmss/screenshots_w1/`, `screenshots/aaaammdd_hhmmss/screenshots_w2/`, etc.
+- Evidencias de corrida: `screenshots/aaaammdd_hhmmss/`
+- En scheduled multihilo: `screenshots/aaaammdd_hhmmss/screenshots_w1/`, `screenshots/aaaammdd_hhmmss/screenshots_w2/`, etc.
 
 Cuando no hay cupos disponibles, el flujo toma una captura de la tabla de programacion antes de limpiar el formulario.
 
@@ -171,7 +177,7 @@ pip install -r requirements.txt
 python -m playwright install chromium
 ```
 
-Dependencias OCR (si no vinieron por `requirements.txt`):
+Dependencias OCR adicionales:
 
 ```powershell
 pip install easyocr numpy pillow
@@ -179,25 +185,8 @@ pip install easyocr numpy pillow
 
 ## Ejecucion rapida
 
-Desde terminal en la raiz del proyecto:
-
 ```powershell
 cmd /c .\run_scheduled.bat
-```
-
-## Programador de tareas (Windows)
-
-Configuracion recomendada:
-
-- Programa/script: `C:\Windows\System32\cmd.exe`
-- Argumentos: `/c "C:\RUTA\ARMAS-GADSO-1.0\run_scheduled.bat"`
-- Iniciar en: `C:\RUTA\ARMAS-GADSO-1.0`
-- Ejecutar con privilegios altos: recomendado
-
-Ejemplo por linea de comandos:
-
-```powershell
-schtasks /create /tn "ARMAS-GADSO-Test" /sc once /st 11:10 /tr "cmd /c \"C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\run_scheduled.bat\"" /f
 ```
 
 ## Notas operativas
