@@ -2,11 +2,16 @@ from __future__ import annotations
 
 import io
 import logging
+import os
+import shutil
 import sys
 import threading
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
+
+
+MAX_RUN_ARTIFACT_DIRS = 10
 
 
 class StreamToLogger(io.TextIOBase):
@@ -84,9 +89,62 @@ class SafeStreamHandler(logging.StreamHandler):
             pass
 
 
+def _run_stamp() -> str:
+    stamp = os.getenv("LOG_RUN_STAMP", "").strip()
+    if stamp:
+        return stamp
+    return datetime.now().strftime("%Y%m%d_%H%M%S")
+
+
+def _is_run_dir_name(path: Path) -> bool:
+    name = path.name
+    if len(name) != 15 or name[8] != "_":
+        return False
+    return name[:8].isdigit() and name[9:].isdigit()
+
+
+def _cleanup_old_run_dirs(base_dir: Path, current_run_dir: Path) -> None:
+    try:
+        run_dirs = [
+            p
+            for p in base_dir.iterdir()
+            if p.is_dir() and _is_run_dir_name(p)
+        ]
+        run_dirs.sort(key=lambda p: (p.stat().st_mtime, p.name), reverse=True)
+        protected = current_run_dir.resolve()
+        removable = [p for p in run_dirs if p.resolve() != protected]
+        keep_slots = max(0, MAX_RUN_ARTIFACT_DIRS - 1)
+        for old_dir in removable[keep_slots:]:
+            shutil.rmtree(old_dir, ignore_errors=True)
+    except Exception:
+        pass
+
+
+def prepare_run_artifact_dir(base_dir: Path, run_dir_env: str, is_run_dir_env: str) -> Path:
+    base_dir.mkdir(parents=True, exist_ok=True)
+    stamp = _run_stamp()
+    if os.getenv(is_run_dir_env, "").strip() == "1":
+        run_dir = base_dir
+    else:
+        run_dir = base_dir / stamp
+        run_dir.mkdir(parents=True, exist_ok=True)
+        os.environ[run_dir_env] = str(run_dir)
+        _cleanup_old_run_dirs(base_dir, run_dir)
+
+    run_dir.mkdir(parents=True, exist_ok=True)
+    os.environ["LOG_RUN_STAMP"] = stamp
+    return run_dir
+
+
+def _prepare_log_path(log_dir: Path) -> Path:
+    stamp = _run_stamp()
+    run_dir = prepare_run_artifact_dir(log_dir, "LOG_RUN_DIR", "LOG_DIR_IS_RUN_DIR")
+    return run_dir / f"run_{stamp}.log"
+
+
 def build_logger(log_dir: Path) -> tuple[logging.Logger, Path]:
     log_dir.mkdir(parents=True, exist_ok=True)
-    log_path = log_dir / f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+    log_path = _prepare_log_path(log_dir)
     logger = logging.getLogger(f"armas_gadso.{log_path.stem}")
     logger.setLevel(logging.INFO)
     logger.handlers.clear()

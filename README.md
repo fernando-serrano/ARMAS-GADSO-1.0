@@ -101,16 +101,31 @@ python run_pipeline.py --mode scheduled
 ## Scripts BAT
 
 - `run_manual.bat`: ejecuta modo manual.
-- `run_scheduled.bat`: ejecuta modo scheduled y redirige salida a `logs/task_scheduler_stdout.log`.
+- `run_scheduled.bat`: ejecuta modo scheduled y redirige salida a la carpeta de la corrida.
 
 ## Logging
 
 Salidas principales:
 
-1. Log de corrida: `logs/run_YYYYMMDD_HHMMSS.log`
-2. Salida scheduler: `logs/task_scheduler_stdout.log`
+Cada ejecucion crea una carpeta con formato `aaaammdd_hhmmss` dentro de `logs/`.
 
-En scheduled multihilo, los artefactos temporales y logs por worker se guardan bajo `logs/.tmp_multihilo_flow_...`.
+1. Log de corrida: `logs/aaaammdd_hhmmss/run_aaaammdd_hhmmss.log`
+2. Salida scheduler: `logs/aaaammdd_hhmmss/task_scheduler_stdout.log`
+
+En scheduled multihilo, los artefactos temporales y logs por worker se guardan dentro de la misma carpeta de corrida, por ejemplo `logs/aaaammdd_hhmmss/logs_w1/`.
+
+La carpeta `logs/` conserva como maximo 10 carpetas de corrida; al generarse una nueva, se elimina la mas antigua.
+
+## Screenshots
+
+Cada ejecucion crea tambien una carpeta con el mismo formato dentro de `screenshots/`.
+
+1. Evidencias de corrida: `screenshots/aaaammdd_hhmmss/`
+2. En scheduled multihilo: `screenshots/aaaammdd_hhmmss/screenshots_w1/`, `screenshots/aaaammdd_hhmmss/screenshots_w2/`, etc.
+
+Cuando no hay cupos disponibles, el flujo toma una captura de la tabla de programacion antes de limpiar el formulario.
+
+La carpeta `screenshots/` conserva como maximo 10 carpetas de corrida; al generarse una nueva, se elimina la mas antigua.
 
 ## Archivo Excel esperado
 

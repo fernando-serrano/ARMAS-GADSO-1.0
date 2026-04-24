@@ -1,7 +1,0 @@
-2026-04-14 16:31:50,918 | INFO | Iniciando pipeline ARMAS-GADSO
-2026-04-14 16:31:50,919 | INFO | Modo: scheduled
-2026-04-14 16:31:50,921 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260414_163149\worker_2_batch_1_idxs_2.xlsx
-2026-04-14 16:32:31,210 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
-2026-04-14 16:32:31,217 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizará entre grupos sin cerrarse
-2026-04-14 16:32:41,195 | ERROR | Pipeline finalizado con error: 'PlaywrightContextManager' object has no attribute '_playwright'
-2026-04-14 16:32:41,205 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260414_163149\logs_w2\run_20260414_163150.log

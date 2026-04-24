@@ -1,0 +1,171 @@
+2026-04-22 00:02:06,794 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-04-22 00:02:06,795 | INFO | Modo: scheduled
+2026-04-22 00:02:06,795 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260422_000206\worker_3_batch_1_idxs_2.xlsx
+2026-04-22 00:02:13,099 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-04-22 00:02:13,099 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizará entre grupos sin cerrarse
+2026-04-22 00:02:13,821 | INFO |    -> Registros con estado 'PENDIENTE': 1
+2026-04-22 00:02:13,821 | INFO |    -> Validando fecha de hoy: 22/04/2026
+2026-04-22 00:02:13,824 | INFO |    -> Registros despus de filtrar por fecha: 1 (filtrados: 0)
+2026-04-22 00:02:13,833 | INFO |  Registros pendientes a procesar: 1
+2026-04-22 00:02:13,833 | INFO |  Procesando grupo RUC JV - Registros: 1
+2026-04-22 00:02:13,833 | INFO | [INFO] Intento login 1/12 para grupo JV
+2026-04-22 00:02:13,833 | INFO | [TILE] Args launch: --window-size=754,468 --window-position=6,486
+2026-04-22 00:02:13,834 | INFO | [TILE] Lanzando Chromium con args: ['--disable-infobars', '--window-size=754,468', '--window-position=6,486']
+2026-04-22 00:02:15,209 | INFO | [TILE] Geometría aplicada -> xy=(6,486) wh=(754,468) screen_cfg=1536x960 screen_js=1536x912 outer_js=755x470
+2026-04-22 00:02:16,433 | INFO | [INFO] Pagina de login cargada
+2026-04-22 00:02:16,677 | INFO | [INFO] Pestaña 'Autenticación Tradicional' seleccionada
+2026-04-22 00:02:19,214 | INFO | [INFO] Credenciales llenadas para grupo JV
+2026-04-22 00:02:19,215 | INFO |  OCR CAPTCHA: intento interno 1/6...
+2026-04-22 00:02:21,101 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-04-22 00:02:21,101 | ERROR |   super().__init__(loader)
+2026-04-22 00:02:21,186 | INFO |    -> Variante 0, Decoder greedy: 'QKJHT' -> 'QKJHT' [INFO]
+2026-04-22 00:02:21,186 | INFO |    [INFO] CAPTCHA vlido -> Usando: QKJHT
+2026-04-22 00:02:21,284 | INFO | [INFO] Captcha automatico: QKJHT
+2026-04-22 00:02:21,284 | INFO | [INFO] Enviando login...
+2026-04-22 00:02:21,870 | INFO | [INFO] Validando acceso...
+2026-04-22 00:02:21,870 | INFO | [INFO] Acceso exitoso
+2026-04-22 00:02:21,870 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-04-22 00:02:21,870 | INFO | [INFO] Tiempo total login: 8.04 segundos
+2026-04-22 00:02:21,870 | INFO |  Navegando a CITAS -> RESERVAS DE CITAS...
+2026-04-22 00:02:23,360 | INFO |     Fast-path: click directo en 'RESERVAS DE CITAS' (menuid 7_1)
+2026-04-22 00:02:25,277 | INFO | [INFO] Navegacin completada (fast-path) -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-04-22 00:02:25,277 | INFO |  Seleccionando tipo de cita: EXAMEN PARA POLGONO DE TIRO...
+2026-04-22 00:02:25,691 | INFO |    [INFO] Tipo de cita seleccionado: EXAMEN PARA POLÍGONO DE TIRO
+2026-04-22 00:02:25,691 | INFO | -------- JV Registro iterativo 1 (idx=2, prioridad=alta, intento=1, en_cola=0) --------
+2026-04-22 00:02:27,077 | INFO |  Registro tomado desde Excel:
+2026-04-22 00:02:27,077 | INFO |    - id_registro: 3
+2026-04-22 00:02:27,077 | INFO |    - sede: LIMA
+2026-04-22 00:02:27,077 | INFO |    - fecha: 13/05/2026
+2026-04-22 00:02:27,077 | INFO |    - hora_rango: 12:00-12:15
+2026-04-22 00:02:27,077 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-22 00:02:27,077 | INFO |    - doc_vigilante: 76980518
+2026-04-22 00:02:27,078 | INFO |    - nro_solicitud: 064139-0
+2026-04-22 00:02:27,078 | INFO |    - fecha_programacion: 22/04/2026
+2026-04-22 00:02:27,078 | INFO |    - ruc: J & V Resguardo
+2026-04-22 00:02:27,078 | INFO |    - prioridad: alta
+2026-04-22 00:02:27,078 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-22 00:02:27,078 | INFO |    - indices_relacionados_excel: [2]
+2026-04-22 00:02:27,078 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-22 00:02:27,078 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-22 00:02:27,078 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-22 00:02:27,078 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-22 00:02:27,086 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-22 00:02:27,447 | INFO |    [INFO] Sede seleccionado: LIMA
+2026-04-22 00:02:28,588 | INFO |    [INFO] Fecha seleccionado: 13/05/2026
+2026-04-22 00:02:28,588 | INFO |  Buscando hora en tabla: 12:00-12:15
+2026-04-22 00:02:29,259 | INFO |    [INFO] Estrategia horario: bloque completo de mediodía (11:45-13:00)
+2026-04-22 00:02:29,259 | INFO |    [INFO] Reasignación adaptativa de hora: 12:00-12:15 -> 12:15-12:30 (Cupos=2)
+2026-04-22 00:02:29,568 | INFO |    [INFO] Hora seleccionada: 12:15-12:30 (Cupos Libres=2)
+2026-04-22 00:02:29,691 | INFO |    [INFO] Click en botn 'Siguiente'
+2026-04-22 00:02:29,691 | INFO |  Completando Paso 2 con datos del Excel...
+2026-04-22 00:02:30,865 | INFO |    [INFO] Tipo Operacin seleccionado: RENOVACIÓN DE LICENCIA DE USO
+2026-04-22 00:02:32,459 | INFO |    [INFO] Documento vigilante seleccionado: 76980518
+2026-04-22 00:02:32,956 | INFO |    [INFO] Seleccione Solicitud: SI
+2026-04-22 00:02:35,404 | INFO | [WARNING] Error en registro idx=2: No se encontró Nro Solicitud con token '64139'. Opciones: ['Seleccione', 'TUPA 2022 PA3400C730 - Nro Empoce: 99007 - Fecha registro: 21/04/2026', 'TUPA 2022 PA3400C730 - Nro Empoce: 43503 - Fecha registro: 21/04/2026', 'TUPA 2022 PA3400C730 - Nro Empoce: 64138 - Fecha registro: 20/04/2026', 'TUPA 2022 PA3400C730 - Nro Empoce: 90090 - Fecha registro: 06/04/2026', 'TUPA 2022 PA3400C730 - Nro Empoce: 36850 - Fecha registro: 23/03/2026', 'TUPA 2022 PA3400C730 - Nro Empoce: 31885 - Fecha registro: 26/08/2025', 'TUPA 2022 PA3400C730 - Nro Empoce: 16387 - Fecha registro: 14/07/2025', 'TUPA 2022 PA3400C730 - Nro Empoce: 31822 - Fecha registro: 28/04/2025', 'TUPA 2022 PA3400C730 - Nro Empoce: 46248 - Fecha registro: 20/03/2025']
+2026-04-22 00:02:35,404 | INFO | [INFO] Registro idx=2 con causal terminal 'NRO_SOLICITUD' pendiente de confirmación (1/2). Reencolando...
+2026-04-22 00:02:44,421 | INFO | -------- JV Registro iterativo 2 (idx=2, prioridad=alta, intento=2, en_cola=0) --------
+2026-04-22 00:02:44,475 | INFO |  Registro tomado desde Excel:
+2026-04-22 00:02:44,475 | INFO |    - id_registro: 3
+2026-04-22 00:02:44,475 | INFO |    - sede: LIMA
+2026-04-22 00:02:44,475 | INFO |    - fecha: 13/05/2026
+2026-04-22 00:02:44,475 | INFO |    - hora_rango: 12:00-12:15
+2026-04-22 00:02:44,475 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-22 00:02:44,475 | INFO |    - doc_vigilante: 76980518
+2026-04-22 00:02:44,475 | INFO |    - nro_solicitud: 064139-0
+2026-04-22 00:02:44,475 | INFO |    - fecha_programacion: 22/04/2026
+2026-04-22 00:02:44,475 | INFO |    - ruc: J & V Resguardo
+2026-04-22 00:02:44,476 | INFO |    - prioridad: alta
+2026-04-22 00:02:44,476 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-22 00:02:44,476 | INFO |    - indices_relacionados_excel: [2]
+2026-04-22 00:02:44,476 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-22 00:02:44,476 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-22 00:02:44,476 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-22 00:02:44,476 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-22 00:02:44,484 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-22 00:02:57,461 | INFO | [WARNING] Error en registro idx=2: Locator.wait_for: Timeout 12000ms exceeded.
+2026-04-22 00:02:57,461 | INFO | Call log:
+2026-04-22 00:02:57,461 | INFO |   - waiting for locator("#tabGestion\\:creaCitaPolJurForm\\:sedeId .ui-selectonemenu-trigger") to be visible
+2026-04-22 00:02:57,461 | INFO | [INFO] Error transitorio/no clasificado en idx=2. Reencolando (1/4)...
+2026-04-22 00:03:06,471 | INFO | -------- JV Registro iterativo 3 (idx=2, prioridad=alta, intento=3, en_cola=0) --------
+2026-04-22 00:03:06,502 | INFO |  Registro tomado desde Excel:
+2026-04-22 00:03:06,502 | INFO |    - id_registro: 3
+2026-04-22 00:03:06,502 | INFO |    - sede: LIMA
+2026-04-22 00:03:06,502 | INFO |    - fecha: 13/05/2026
+2026-04-22 00:03:06,502 | INFO |    - hora_rango: 12:00-12:15
+2026-04-22 00:03:06,502 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-22 00:03:06,502 | INFO |    - doc_vigilante: 76980518
+2026-04-22 00:03:06,502 | INFO |    - nro_solicitud: 064139-0
+2026-04-22 00:03:06,502 | INFO |    - fecha_programacion: 22/04/2026
+2026-04-22 00:03:06,502 | INFO |    - ruc: J & V Resguardo
+2026-04-22 00:03:06,502 | INFO |    - prioridad: alta
+2026-04-22 00:03:06,502 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-22 00:03:06,502 | INFO |    - indices_relacionados_excel: [2]
+2026-04-22 00:03:06,502 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-22 00:03:06,502 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-22 00:03:06,503 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-22 00:03:06,503 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-22 00:03:06,507 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-22 00:03:19,476 | INFO | [WARNING] Error en registro idx=2: Locator.wait_for: Timeout 12000ms exceeded.
+2026-04-22 00:03:19,477 | INFO | Call log:
+2026-04-22 00:03:19,477 | INFO |   - waiting for locator("#tabGestion\\:creaCitaPolJurForm\\:sedeId .ui-selectonemenu-trigger") to be visible
+2026-04-22 00:03:19,477 | INFO | [INFO] Error transitorio/no clasificado en idx=2. Reencolando (2/4)...
+2026-04-22 00:03:28,495 | INFO | -------- JV Registro iterativo 4 (idx=2, prioridad=alta, intento=4, en_cola=0) --------
+2026-04-22 00:03:28,527 | INFO |  Registro tomado desde Excel:
+2026-04-22 00:03:28,527 | INFO |    - id_registro: 3
+2026-04-22 00:03:28,527 | INFO |    - sede: LIMA
+2026-04-22 00:03:28,527 | INFO |    - fecha: 13/05/2026
+2026-04-22 00:03:28,527 | INFO |    - hora_rango: 12:00-12:15
+2026-04-22 00:03:28,527 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-22 00:03:28,527 | INFO |    - doc_vigilante: 76980518
+2026-04-22 00:03:28,527 | INFO |    - nro_solicitud: 064139-0
+2026-04-22 00:03:28,527 | INFO |    - fecha_programacion: 22/04/2026
+2026-04-22 00:03:28,527 | INFO |    - ruc: J & V Resguardo
+2026-04-22 00:03:28,527 | INFO |    - prioridad: alta
+2026-04-22 00:03:28,527 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-22 00:03:28,527 | INFO |    - indices_relacionados_excel: [2]
+2026-04-22 00:03:28,527 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-22 00:03:28,527 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-22 00:03:28,527 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-22 00:03:28,527 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-22 00:03:28,532 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-22 00:03:41,522 | INFO | [WARNING] Error en registro idx=2: Locator.wait_for: Timeout 12000ms exceeded.
+2026-04-22 00:03:41,522 | INFO | Call log:
+2026-04-22 00:03:41,522 | INFO |   - waiting for locator("#tabGestion\\:creaCitaPolJurForm\\:sedeId .ui-selectonemenu-trigger") to be visible
+2026-04-22 00:03:41,522 | INFO | [INFO] Error transitorio/no clasificado en idx=2. Reencolando (3/4)...
+2026-04-22 00:03:48,360 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-04-22 00:03:49,361 | INFO | -------- JV Registro iterativo 5 (idx=2, prioridad=alta, intento=5, en_cola=0) --------
+2026-04-22 00:03:49,447 | INFO |  Registro tomado desde Excel:
+2026-04-22 00:03:49,447 | INFO |    - id_registro: 3
+2026-04-22 00:03:49,447 | INFO |    - sede: LIMA
+2026-04-22 00:03:49,447 | INFO |    - fecha: 13/05/2026
+2026-04-22 00:03:49,447 | INFO |    - hora_rango: 12:00-12:15
+2026-04-22 00:03:49,447 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-22 00:03:49,447 | INFO |    - doc_vigilante: 76980518
+2026-04-22 00:03:49,447 | INFO |    - nro_solicitud: 064139-0
+2026-04-22 00:03:49,448 | INFO |    - fecha_programacion: 22/04/2026
+2026-04-22 00:03:49,448 | INFO |    - ruc: J & V Resguardo
+2026-04-22 00:03:49,448 | INFO |    - prioridad: alta
+2026-04-22 00:03:49,448 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-22 00:03:49,448 | INFO |    - indices_relacionados_excel: [2]
+2026-04-22 00:03:49,448 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-22 00:03:49,448 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-22 00:03:49,448 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-22 00:03:49,448 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-22 00:03:49,455 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-22 00:03:49,804 | INFO |    [INFO] Sede seleccionado: LIMA
+2026-04-22 00:03:50,889 | INFO |    [INFO] Fecha seleccionado: 13/05/2026
+2026-04-22 00:03:50,889 | INFO |  Buscando hora en tabla: 12:00-12:15
+2026-04-22 00:03:51,403 | INFO |    [INFO] Estrategia horario: bloque completo de mediodía (11:45-13:00)
+2026-04-22 00:03:51,800 | INFO |    [INFO] Click en botn 'Limpiar' por falta de cupos
+2026-04-22 00:03:52,774 | INFO | [WARNING] Error en registro idx=2: No hay cupos en horarios candidatos. Objetivo: 12:00-12:15 | Candidatos: 11:45-12:00(0), 12:00-12:15(0), 12:15-12:30(0), 12:30-12:45(0), 12:45-13:00(0)
+2026-04-22 00:03:52,787 | INFO |    📝 Excel actualizado: observaciones='No alcanzo cupo para horario 12:00-12:15' en 1 fila(s)
+2026-04-22 00:03:52,787 | INFO | [INFO] Registro idx=2 marcado como terminal 'SIN_CUPO' tras 1 confirmaciones
+2026-04-22 00:03:53,014 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-04-22 00:03:54,014 | INFO | [DEBUG] PERSISTENT_SESSION: cerrando contexto anterior para siguiente grupo
+2026-04-22 00:03:54,032 | INFO |  Tiempo total del flujo: 100.93 segundos
+2026-04-22 00:03:54,033 | INFO |  Resumen: OK=0 | SIN_CUPO=1 | ERROR=0
+2026-04-22 00:03:54,033 | INFO | [INFO] Flujo completado.
+2026-04-22 00:03:54,033 | INFO |     Duracin final del flujo: 100.93 segundos
+2026-04-22 00:03:54,285 | INFO | Navegador cerrado.
+2026-04-22 00:03:54,285 | INFO | Pipeline finalizado
+2026-04-22 00:03:54,285 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260422_000206\logs_w3\run_20260422_000206.log

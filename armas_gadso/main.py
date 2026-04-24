@@ -6,7 +6,7 @@ import traceback
 from pathlib import Path
 
 from .config import load_config
-from .logging_utils import build_logger, redirect_prints
+from .logging_utils import build_logger, prepare_run_artifact_dir, redirect_prints
 
 
 def parse_args() -> argparse.Namespace:
@@ -38,9 +38,12 @@ def main() -> int:
     os.environ["HOLD_BROWSER_OPEN"] = "1" if config.hold_browser_open else "0"
 
     logger, log_path = build_logger(config.log_dir)
+    screenshot_dir = prepare_run_artifact_dir(config.screenshot_dir, "SCREENSHOT_RUN_DIR", "SCREENSHOT_DIR_IS_RUN_DIR")
+    os.environ["SCREENSHOT_DIR"] = str(screenshot_dir)
     logger.info("Iniciando pipeline ARMAS-GADSO")
     logger.info("Modo: %s", config.run_mode)
     logger.info("Excel: %s", config.excel_path)
+    logger.info("Screenshots: %s", screenshot_dir)
 
     try:
         from . import legacy_flow

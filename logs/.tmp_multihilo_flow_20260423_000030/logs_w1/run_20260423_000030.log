@@ -1,0 +1,217 @@
+2026-04-23 00:00:30,843 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-04-23 00:00:30,843 | INFO | Modo: scheduled
+2026-04-23 00:00:30,844 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260423_000030\worker_1_batch_2_idxs_0_4.xlsx
+2026-04-23 00:00:37,295 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-04-23 00:00:37,295 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizará entre grupos sin cerrarse
+2026-04-23 00:00:39,514 | INFO |    -> Registros con estado 'PENDIENTE': 2
+2026-04-23 00:00:39,514 | INFO |    -> Validando fecha de hoy: 23/04/2026
+2026-04-23 00:00:39,519 | INFO |    -> Registros despus de filtrar por fecha: 2 (filtrados: 0)
+2026-04-23 00:00:39,524 | INFO |  Registros pendientes a procesar: 2
+2026-04-23 00:00:39,525 | INFO |  Procesando grupo RUC JV - Registros: 2
+2026-04-23 00:00:39,525 | INFO | [INFO] Intento login 1/12 para grupo JV
+2026-04-23 00:00:39,525 | INFO | [TILE] Args launch: --window-size=754,468 --window-position=6,6
+2026-04-23 00:00:39,525 | INFO | [TILE] Lanzando Chromium con args: ['--disable-infobars', '--window-size=754,468', '--window-position=6,6']
+2026-04-23 00:00:42,037 | INFO | [TILE] Geometría aplicada -> xy=(6,6) wh=(754,468) screen_cfg=1536x960 screen_js=1536x912 outer_js=755x470
+2026-04-23 00:00:44,273 | INFO | [INFO] Pagina de login cargada
+2026-04-23 00:00:44,839 | INFO | [INFO] Pestaña 'Autenticación Tradicional' seleccionada
+2026-04-23 00:00:47,480 | INFO | [INFO] Credenciales llenadas para grupo JV
+2026-04-23 00:00:47,482 | INFO |  OCR CAPTCHA: intento interno 1/6...
+2026-04-23 00:00:49,809 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-04-23 00:00:49,809 | ERROR |   super().__init__(loader)
+2026-04-23 00:00:49,969 | INFO |    -> Variante 0, Decoder greedy: 'KVBNA' -> 'KVBNA' [INFO]
+2026-04-23 00:00:49,969 | INFO |    [INFO] CAPTCHA vlido -> Usando: KVBNA
+2026-04-23 00:00:50,271 | INFO | [INFO] Captcha automatico: KVBNA
+2026-04-23 00:00:50,272 | INFO | [INFO] Enviando login...
+2026-04-23 00:00:51,546 | INFO | [INFO] Validando acceso...
+2026-04-23 00:00:51,547 | INFO | [INFO] Acceso exitoso
+2026-04-23 00:00:51,547 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-04-23 00:00:51,547 | INFO | [INFO] Tiempo total login: 12.02 segundos
+2026-04-23 00:00:51,547 | INFO |  Navegando a CITAS -> RESERVAS DE CITAS...
+2026-04-23 00:00:53,203 | INFO |     Fast-path: click directo en 'RESERVAS DE CITAS' (menuid 7_1)
+2026-04-23 00:00:55,361 | INFO | [INFO] Navegacin completada (fast-path) -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-04-23 00:00:55,361 | INFO |  Seleccionando tipo de cita: EXAMEN PARA POLGONO DE TIRO...
+2026-04-23 00:00:55,771 | INFO |    [INFO] Tipo de cita seleccionado: EXAMEN PARA POLÍGONO DE TIRO
+2026-04-23 00:00:55,771 | INFO | -------- JV Registro iterativo 1 (idx=0, prioridad=alta, intento=1, en_cola=1) --------
+2026-04-23 00:00:59,222 | INFO |  Registro tomado desde Excel:
+2026-04-23 00:00:59,222 | INFO |    - id_registro: 1
+2026-04-23 00:00:59,222 | INFO |    - sede: LIMA
+2026-04-23 00:00:59,222 | INFO |    - fecha: 14/05/2026
+2026-04-23 00:00:59,222 | INFO |    - hora_rango: 11:45-12:00
+2026-04-23 00:00:59,222 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-23 00:00:59,222 | INFO |    - doc_vigilante: 08666044
+2026-04-23 00:00:59,222 | INFO |    - nro_solicitud: 043503-0
+2026-04-23 00:00:59,222 | INFO |    - fecha_programacion: 23/04/2026
+2026-04-23 00:00:59,222 | INFO |    - ruc: J & V Resguardo
+2026-04-23 00:00:59,222 | INFO |    - prioridad: alta
+2026-04-23 00:00:59,222 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-23 00:00:59,222 | INFO |    - indices_relacionados_excel: [0]
+2026-04-23 00:00:59,222 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-23 00:00:59,222 | INFO |    - arma (excel): ['PISTOLA']
+2026-04-23 00:00:59,223 | INFO |    - objetivos_arma: [('CORTA', 'PISTOLA')]
+2026-04-23 00:00:59,223 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-23 00:00:59,231 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-23 00:00:59,648 | INFO |    [INFO] Sede seleccionado: LIMA
+2026-04-23 00:01:01,605 | INFO |    [INFO] Fecha seleccionado: 14/05/2026
+2026-04-23 00:01:01,605 | INFO |  Buscando hora en tabla: 11:45-12:00
+2026-04-23 00:01:02,764 | INFO |    [INFO] Estrategia horario: prioridad a hora exacta del Excel
+2026-04-23 00:01:03,057 | INFO |    [INFO] Hora seleccionada: 11:45-12:00 (Cupos Libres=3)
+2026-04-23 00:01:03,454 | INFO |    [INFO] Click en botn 'Siguiente'
+2026-04-23 00:01:03,454 | INFO |  Completando Paso 2 con datos del Excel...
+2026-04-23 00:01:04,655 | INFO |    [INFO] Tipo Operacin seleccionado: RENOVACIÓN DE LICENCIA DE USO
+2026-04-23 00:01:06,856 | INFO |    [INFO] Documento vigilante seleccionado: 08666044
+2026-04-23 00:01:07,383 | INFO |    [INFO] Seleccione Solicitud: SI
+2026-04-23 00:01:10,674 | INFO |    [INFO] Nro Solicitud seleccionado: TUPA 2022 PA3400C730 - NRO EMPOCE: 43503 - FECHA REGISTRO: 21/04/2026
+2026-04-23 00:01:11,679 | INFO |  Completando tabla de tipos de arma (Fase 2)...
+2026-04-23 00:01:17,485 | INFO |    [INFO] CORTA: PISTOLA
+2026-04-23 00:01:17,718 | INFO |    [INFO] Click en botn 'Siguiente' de Fase 2 (botonSiguiente3)
+2026-04-23 00:01:28,505 | INFO |  Completando Fase 3 (Resumen de cita)...
+2026-04-23 00:01:28,510 | INFO |  OCR CAPTCHA Fase 3: intento interno 1/∞...
+2026-04-23 00:01:29,713 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-04-23 00:01:29,713 | ERROR |   super().__init__(loader)
+2026-04-23 00:01:29,757 | INFO |    -> Variante 0, Decoder greedy: '2FEF9' -> '2FEF9' [INFO]
+2026-04-23 00:01:29,757 | INFO |    [INFO] CAPTCHA vlido -> Usando: 2FEF9
+2026-04-23 00:01:29,817 | INFO |    [INFO] CAPTCHA Fase 3 escrito: 2FEF9
+2026-04-23 00:01:30,071 | INFO |    [INFO] Trminos y condiciones marcados
+2026-04-23 00:01:31,017 | INFO |  Paso final opcional: Generar Cita (reintento rpido)
+2026-04-23 00:01:31,024 | INFO |     Intento generar cita 1/5
+2026-04-23 00:01:32,638 | INFO |    [INFO] Generar Cita confirmado en 1.61s
+2026-04-23 00:01:32,638 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-04-23 00:01:32,671 | INFO |    [INFO] Excel actualizado: estado='Cita Programada' en 1 fila(s)
+2026-04-23 00:01:32,902 | INFO |    [INFO] Click en 'Limpiar' (fin de flujo)
+2026-04-23 00:01:32,902 | INFO | -------- JV Registro iterativo 2 (idx=4, prioridad=alta, intento=1, en_cola=0) --------
+2026-04-23 00:01:32,950 | INFO |  Registro tomado desde Excel:
+2026-04-23 00:01:32,950 | INFO |    - id_registro: 5
+2026-04-23 00:01:32,950 | INFO |    - sede: LIMA
+2026-04-23 00:01:32,950 | INFO |    - fecha: 14/05/2026
+2026-04-23 00:01:32,950 | INFO |    - hora_rango: 08:15-08:30
+2026-04-23 00:01:32,950 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-23 00:01:32,950 | INFO |    - doc_vigilante: 10078665
+2026-04-23 00:01:32,950 | INFO |    - nro_solicitud: 042845-0
+2026-04-23 00:01:32,950 | INFO |    - fecha_programacion: 23/04/2026
+2026-04-23 00:01:32,950 | INFO |    - ruc: J & V Resguardo
+2026-04-23 00:01:32,950 | INFO |    - prioridad: alta
+2026-04-23 00:01:32,950 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-23 00:01:32,950 | INFO |    - indices_relacionados_excel: [4]
+2026-04-23 00:01:32,951 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-23 00:01:32,951 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-23 00:01:32,951 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-23 00:01:32,951 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-23 00:01:32,955 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-23 00:01:34,452 | INFO |    [INFO] Sede seleccionado: LIMA
+2026-04-23 00:01:35,661 | INFO |    [INFO] Fecha seleccionado: 14/05/2026
+2026-04-23 00:01:35,662 | INFO |  Buscando hora en tabla: 08:15-08:30
+2026-04-23 00:01:36,572 | INFO |    [INFO] Estrategia horario: prioridad a hora exacta del Excel
+2026-04-23 00:01:36,882 | INFO |    [INFO] Hora seleccionada: 08:15-08:30 (Cupos Libres=3)
+2026-04-23 00:01:36,973 | INFO |    [INFO] Click en botn 'Siguiente'
+2026-04-23 00:01:36,974 | INFO |  Completando Paso 2 con datos del Excel...
+2026-04-23 00:01:38,147 | INFO |    [INFO] Tipo Operacin seleccionado: RENOVACIÓN DE LICENCIA DE USO
+2026-04-23 00:01:39,735 | INFO |    [INFO] Documento vigilante seleccionado: 10078665
+2026-04-23 00:01:40,407 | INFO |    [INFO] Seleccione Solicitud: SI
+2026-04-23 00:01:42,126 | INFO |    [INFO] Nro Solicitud seleccionado: TUPA 2022 PA3400C730 - NRO EMPOCE: 42845 - FECHA REGISTRO: 22/04/2026
+2026-04-23 00:01:43,069 | INFO |  Completando tabla de tipos de arma (Fase 2)...
+2026-04-23 00:01:45,669 | INFO |    [INFO] CORTA: REVOLVER
+2026-04-23 00:01:45,717 | INFO |    [INFO] Click en botn 'Siguiente' de Fase 2 (botonSiguiente3)
+2026-04-23 00:01:51,942 | INFO |  Completando Fase 3 (Resumen de cita)...
+2026-04-23 00:01:51,945 | INFO |  OCR CAPTCHA Fase 3: intento interno 1/∞...
+2026-04-23 00:01:52,952 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-04-23 00:01:52,953 | ERROR |   super().__init__(loader)
+2026-04-23 00:01:53,013 | INFO |    -> Variante 0, Decoder greedy: 'P7 U1 2' -> 'P7U12' [INFO]
+2026-04-23 00:01:53,013 | INFO |    [INFO] CAPTCHA vlido -> Usando: P7U12
+2026-04-23 00:01:53,072 | INFO |    [INFO] CAPTCHA Fase 3 escrito: P7U12
+2026-04-23 00:01:53,308 | INFO |    [INFO] Trminos y condiciones marcados
+2026-04-23 00:01:54,288 | INFO |  Paso final opcional: Generar Cita (reintento rpido)
+2026-04-23 00:01:54,295 | INFO |     Intento generar cita 1/5
+2026-04-23 00:01:54,815 | INFO |    [WARNING] Mensaje captcha detectado: Error el captcha es incorrecto
+2026-04-23 00:01:54,816 | INFO |     Validacin final: 0.52s
+2026-04-23 00:01:54,816 | INFO |  OCR CAPTCHA Fase 3 (reintento final): intento interno 1/3...
+2026-04-23 00:01:55,865 | INFO |    -> Variante 0, Decoder greedy: '3ED87' -> '3ED87' [INFO]
+2026-04-23 00:01:55,865 | INFO |    [INFO] CAPTCHA vlido -> Usando: 3ED87
+2026-04-23 00:01:55,922 | INFO |    [INFO] CAPTCHA reintento escrito: 3ED87
+2026-04-23 00:01:55,926 | INFO |     Intento generar cita 2/5
+2026-04-23 00:01:55,988 | INFO |    [WARNING] Mensaje captcha detectado: Error el captcha es incorrecto
+2026-04-23 00:01:55,988 | INFO |     Validacin final: 0.06s
+2026-04-23 00:01:55,988 | INFO |  OCR CAPTCHA Fase 3 (reintento final): intento interno 1/3...
+2026-04-23 00:01:57,093 | INFO |    -> Variante 0, Decoder greedy: '3ED877' -> '3ED877' (len=6) [WARNING]
+2026-04-23 00:01:57,881 | INFO |    -> Variante 0, Decoder beamsearch: '3ED877' -> '3ED877' (len=6) [WARNING]
+2026-04-23 00:01:58,322 | INFO |    -> Variante 1, Decoder greedy: '' -> '' (len=0) [WARNING]
+2026-04-23 00:01:58,744 | INFO |    -> Variante 1, Decoder beamsearch: '' -> '' (len=0) [WARNING]
+2026-04-23 00:01:59,984 | INFO |    -> Variante 2, Decoder greedy: '1 3ED87' -> '13ED87' (len=6) [WARNING]
+2026-04-23 00:02:01,179 | INFO |    -> Variante 2, Decoder beamsearch: '1 3ED87' -> '13ED87' (len=6) [WARNING]
+2026-04-23 00:02:01,197 | INFO |    [INFO] CAPTCHA por consenso -> Usando: 3ED8T
+2026-04-23 00:02:01,197 | INFO |    [INFO] CAPTCHA vlido -> Usando: 3ED8T
+2026-04-23 00:02:12,176 | INFO | [WARNING] Error en registro idx=4: Locator.wait_for: Timeout 10000ms exceeded.
+2026-04-23 00:02:12,176 | INFO | Call log:
+2026-04-23 00:02:12,176 | INFO |   - waiting for locator("#tabGestion\\:creaCitaPolJurForm\\:textoCaptcha") to be visible
+2026-04-23 00:02:12,176 | INFO | [INFO] Error transitorio/no clasificado en idx=4. Reencolando (1/4)...
+2026-04-23 00:02:12,385 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-04-23 00:02:13,385 | INFO | -------- JV Registro iterativo 3 (idx=4, prioridad=alta, intento=2, en_cola=0) --------
+2026-04-23 00:02:13,431 | INFO |  Registro tomado desde Excel:
+2026-04-23 00:02:13,431 | INFO |    - id_registro: 5
+2026-04-23 00:02:13,431 | INFO |    - sede: LIMA
+2026-04-23 00:02:13,431 | INFO |    - fecha: 14/05/2026
+2026-04-23 00:02:13,431 | INFO |    - hora_rango: 08:15-08:30
+2026-04-23 00:02:13,431 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-23 00:02:13,431 | INFO |    - doc_vigilante: 10078665
+2026-04-23 00:02:13,431 | INFO |    - nro_solicitud: 042845-0
+2026-04-23 00:02:13,431 | INFO |    - fecha_programacion: 23/04/2026
+2026-04-23 00:02:13,431 | INFO |    - ruc: J & V Resguardo
+2026-04-23 00:02:13,432 | INFO |    - prioridad: alta
+2026-04-23 00:02:13,432 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-23 00:02:13,432 | INFO |    - indices_relacionados_excel: [4]
+2026-04-23 00:02:13,432 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-23 00:02:13,432 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-23 00:02:13,432 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-23 00:02:13,432 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-23 00:02:13,437 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-23 00:02:13,795 | INFO |    [INFO] Sede seleccionado: LIMA
+2026-04-23 00:02:14,900 | INFO |    [INFO] Fecha seleccionado: 14/05/2026
+2026-04-23 00:02:14,900 | INFO |  Buscando hora en tabla: 08:15-08:30
+2026-04-23 00:02:15,439 | INFO |    [INFO] Estrategia horario: vecinos inmediatos (inferior/superior)
+2026-04-23 00:02:15,439 | INFO |    [INFO] Reasignación adaptativa de hora: 08:15-08:30 -> 08:30-08:45 (Cupos=1)
+2026-04-23 00:02:15,733 | INFO |    [INFO] Hora seleccionada: 08:30-08:45 (Cupos Libres=1)
+2026-04-23 00:02:15,783 | INFO |    [INFO] Click en botn 'Siguiente'
+2026-04-23 00:02:15,783 | INFO |  Completando Paso 2 con datos del Excel...
+2026-04-23 00:02:16,963 | INFO |    [INFO] Tipo Operacin seleccionado: RENOVACIÓN DE LICENCIA DE USO
+2026-04-23 00:02:21,536 | INFO | [WARNING] Error en registro idx=4: No se confirmó el documento vigilante. Esperado contiene '10078665' | Actual ''
+2026-04-23 00:02:21,536 | INFO | [INFO] Registro idx=4 con causal terminal 'DOC_VIGILANTE' pendiente de confirmación (1/2). Reencolando...
+2026-04-23 00:02:21,760 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-04-23 00:02:22,760 | INFO | -------- JV Registro iterativo 4 (idx=4, prioridad=alta, intento=3, en_cola=0) --------
+2026-04-23 00:02:22,792 | INFO |  Registro tomado desde Excel:
+2026-04-23 00:02:22,792 | INFO |    - id_registro: 5
+2026-04-23 00:02:22,792 | INFO |    - sede: LIMA
+2026-04-23 00:02:22,792 | INFO |    - fecha: 14/05/2026
+2026-04-23 00:02:22,792 | INFO |    - hora_rango: 08:15-08:30
+2026-04-23 00:02:22,792 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-23 00:02:22,792 | INFO |    - doc_vigilante: 10078665
+2026-04-23 00:02:22,792 | INFO |    - nro_solicitud: 042845-0
+2026-04-23 00:02:22,792 | INFO |    - fecha_programacion: 23/04/2026
+2026-04-23 00:02:22,792 | INFO |    - ruc: J & V Resguardo
+2026-04-23 00:02:22,792 | INFO |    - prioridad: alta
+2026-04-23 00:02:22,792 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-23 00:02:22,792 | INFO |    - indices_relacionados_excel: [4]
+2026-04-23 00:02:22,792 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-23 00:02:22,792 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-23 00:02:22,793 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-23 00:02:22,793 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-23 00:02:22,798 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-23 00:02:23,151 | INFO |    [INFO] Sede seleccionado: LIMA
+2026-04-23 00:02:24,274 | INFO |    [INFO] Fecha seleccionado: 14/05/2026
+2026-04-23 00:02:24,274 | INFO |  Buscando hora en tabla: 08:15-08:30
+2026-04-23 00:02:25,328 | INFO |    [INFO] Estrategia horario: vecinos inmediatos (inferior/superior)
+2026-04-23 00:02:25,328 | INFO |    [INFO] Reasignación adaptativa de hora: 08:15-08:30 -> 08:30-08:45 (Cupos=1)
+2026-04-23 00:02:25,617 | INFO |    [INFO] Hora seleccionada: 08:30-08:45 (Cupos Libres=1)
+2026-04-23 00:02:25,665 | INFO |    [INFO] Click en botn 'Siguiente'
+2026-04-23 00:02:25,665 | INFO |  Completando Paso 2 con datos del Excel...
+2026-04-23 00:02:26,841 | INFO |    [INFO] Tipo Operacin seleccionado: RENOVACIÓN DE LICENCIA DE USO
+2026-04-23 00:02:31,361 | INFO | [WARNING] Error en registro idx=4: No se confirmó el documento vigilante. Esperado contiene '10078665' | Actual ''
+2026-04-23 00:02:31,375 | INFO |    📝 Excel actualizado: observaciones='Documento vigilante no disponible para esta razón social/RUC. DNI=10078665 | RUC=J & V Resguardo' en 1 fila(s)
+2026-04-23 00:02:31,378 | INFO | [INFO] Registro idx=4 marcado como terminal 'DOC_VIGILANTE' tras 2 confirmaciones
+2026-04-23 00:02:31,600 | INFO |    [INFO] Click en 'Limpiar' (recuperación por error)
+2026-04-23 00:02:32,601 | INFO | [DEBUG] PERSISTENT_SESSION: cerrando contexto anterior para siguiente grupo
+2026-04-23 00:02:32,628 | INFO |  Tiempo total del flujo: 115.33 segundos
+2026-04-23 00:02:32,628 | INFO |  Resumen: OK=1 | SIN_CUPO=0 | ERROR=1
+2026-04-23 00:02:32,628 | INFO | [INFO] Flujo completado.
+2026-04-23 00:02:32,628 | INFO |     Duracin final del flujo: 115.33 segundos
+2026-04-23 00:02:32,872 | INFO | Navegador cerrado.
+2026-04-23 00:02:32,872 | INFO | Pipeline finalizado
+2026-04-23 00:02:32,872 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\.tmp_multihilo_flow_20260423_000030\logs_w1\run_20260423_000030.log

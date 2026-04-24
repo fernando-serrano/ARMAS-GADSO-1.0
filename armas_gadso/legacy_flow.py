@@ -58,6 +58,12 @@ if excel_path_env:
 else:
     EXCEL_PATH = os.path.join(project_root, "data", "programaciones-armas.xlsx")
 
+screenshot_path_env = os.getenv("SCREENSHOT_DIR", "").strip()
+if screenshot_path_env:
+    SCREENSHOT_DIR = screenshot_path_env if os.path.isabs(screenshot_path_env) else os.path.join(project_root, screenshot_path_env)
+else:
+    SCREENSHOT_DIR = os.path.join(project_root, "screenshots")
+
 CREDENCIALES = {
     "tipo_documento_valor": os.getenv("TIPO_DOC", "RUC"),
     "numero_documento": os.getenv("NUMERO_DOCUMENTO", ""),
@@ -2170,6 +2176,34 @@ def seleccionar_sede_y_fecha_desde_registro(page, registro: dict):
     )
 
 
+def _nombre_archivo_seguro(valor: str, fallback: str = "sin_valor") -> str:
+    texto = str(valor or "").strip()
+    texto = re.sub(r"[^A-Za-z0-9._-]+", "_", texto)
+    texto = texto.strip("._-")
+    return texto[:80] or fallback
+
+
+def capturar_tabla_sin_cupo(page, registro: dict, hora_objetivo: str, motivo: str):
+    try:
+        os.makedirs(SCREENSHOT_DIR, exist_ok=True)
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        idx = _nombre_archivo_seguro(str(registro.get("_excel_index", registro.get("id_registro", ""))), "idx")
+        doc = _nombre_archivo_seguro(str(registro.get("doc_vigilante", "")), "doc")
+        hora = _nombre_archivo_seguro(str(hora_objetivo or registro.get("hora_rango", "")), "hora")
+        motivo_seguro = _nombre_archivo_seguro(motivo, "sin_cupo")
+        destino = os.path.join(
+            SCREENSHOT_DIR,
+            f"{stamp}_sin_cupo_idx_{idx}_doc_{doc}_{hora}_{motivo_seguro}.png",
+        )
+
+        tabla = page.locator(SEL["tabla_programacion"])
+        tabla.wait_for(state="visible", timeout=5000)
+        tabla.screenshot(path=destino)
+        print(f"   [INFO] Screenshot tabla sin cupo: {destino}")
+    except Exception as e:
+        print(f"   [WARNING] No se pudo capturar screenshot de tabla sin cupo: {e}")
+
+
 def seleccionar_hora_con_cupo_y_avanzar(page, registro: dict):
     """
     Busca la hora del Excel en la tabla de cupos, valida cupos > 0,
@@ -2356,6 +2390,7 @@ def seleccionar_hora_con_cupo_y_avanzar(page, registro: dict):
             hora_objetivo = seleccionado["hora"]
         else:
             opciones_dbg = ", ".join([f"{s['hora']}({s['cupos']})" for s in candidatos])
+            capturar_tabla_sin_cupo(page, registro, hora_objetivo, "candidatos_0")
             click_boton_limpiar_obligatorio()
             raise SinCupoError(
                 "No hay cupos en horarios candidatos. "
@@ -2363,6 +2398,7 @@ def seleccionar_hora_con_cupo_y_avanzar(page, registro: dict):
             )
 
     if cupos_objetivo <= 0:
+        capturar_tabla_sin_cupo(page, registro, hora_objetivo, "hora_0")
         click_boton_limpiar_obligatorio()
         raise SinCupoError(f"La hora '{hora_objetivo}' no tiene cupos disponibles (Cupos Libres={cupos_objetivo})")
 
@@ -2812,8 +2848,8 @@ def _ejecutar_scheduled_multihilo_orquestador():
 
     print(f"[INFO] Unidades multihilo a procesar: {len(unidades)}")
 
-    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    temp_root = os.path.join(project_root, "logs", f".tmp_multihilo_flow_{stamp}")
+    stamp = os.getenv("LOG_RUN_STAMP", "").strip() or datetime.now().strftime("%Y%m%d_%H%M%S")
+    temp_root = os.getenv("LOG_RUN_DIR", "").strip() or os.path.join(project_root, "logs", stamp)
     os.makedirs(temp_root, exist_ok=True)
 
     lock_results = threading.Lock()
@@ -2850,6 +2886,11 @@ def _ejecutar_scheduled_multihilo_orquestador():
         env["MULTIWORKER_CHILD"] = "1"
 
         env["LOG_DIR"] = os.path.join(temp_root, f"logs_w{worker_id}")
+        env["LOG_DIR_IS_RUN_DIR"] = "1"
+        env["LOG_RUN_STAMP"] = stamp
+        screenshot_root = os.getenv("SCREENSHOT_RUN_DIR", "").strip() or os.path.join(project_root, "screenshots", stamp)
+        env["SCREENSHOT_DIR"] = os.path.join(screenshot_root, f"screenshots_w{worker_id}")
+        env["SCREENSHOT_DIR_IS_RUN_DIR"] = "1"
         env["BROWSER_TILE_ENABLE"] = "1"
         env["BROWSER_TILE_TOTAL"] = str(workers)
         env["BROWSER_TILE_INDEX"] = str(worker_id - 1)
