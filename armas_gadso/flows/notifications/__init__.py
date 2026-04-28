@@ -1,3 +1,3 @@
-from .graph_mail import notify_step_1_table_capture
+from .graph_mail import register_step_1_capture, send_multirun_step_1_summary
 
-__all__ = ["notify_step_1_table_capture"]
+__all__ = ["register_step_1_capture", "send_multirun_step_1_summary"]

@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-from ..notifications import notify_step_1_table_capture
+from ..notifications import register_step_1_capture
 
 
 def _safe_filename_part(value: object, fallback: str = "sin_valor") -> str:
@@ -54,6 +54,29 @@ def capture_locator(locator, destination: Path, timeout_ms: int = 5000) -> bool:
     return True
 
 
+def capture_locator_via_clip(page, selector: str, destination: Path, timeout_ms: int = 2500) -> bool:
+    """
+    Captura un recorte del area visible del locator usando bounding box.
+    Esta via evita algunos bloqueos de locator.screenshot() al esperar fuentes.
+    """
+    locator = page.locator(selector).first
+    locator.wait_for(state="visible", timeout=timeout_ms)
+    locator.scroll_into_view_if_needed(timeout=timeout_ms)
+
+    box = locator.bounding_box(timeout=timeout_ms)
+    if not box:
+        raise Exception(f"No se pudo calcular bounding box para selector: {selector}")
+
+    clip = {
+        "x": max(0, box["x"]),
+        "y": max(0, box["y"]),
+        "width": max(1, box["width"]),
+        "height": max(1, box["height"]),
+    }
+    page.screenshot(path=str(destination), clip=clip, scale=screenshot_scale())
+    return True
+
+
 def capture_page(page, destination: Path, timeout_ms: int = 5000) -> bool:
     page.wait_for_timeout(max(0, timeout_ms))
     page.screenshot(path=str(destination), full_page=False, scale=screenshot_scale())
@@ -83,11 +106,16 @@ def capture_step_1_no_cupos(page, registro: dict, table_selector: str, hora_obje
             f"sin_cupo_{reason}",
             hora=hora_objetivo,
         )
-        capture_locator(page.locator(table_selector), destination)
+        try:
+            capture_locator_via_clip(page, table_selector, destination, timeout_ms=2500)
+        except Exception:
+            capture_locator(page.locator(table_selector), destination, timeout_ms=2500)
         print(f"   [INFO] Screenshot tabla sin cupo: {destination}")
+        register_step_1_capture(registro, destination, hora_objetivo, f"sin_cupo_{reason}")
         return destination
     except Exception as exc:
         print(f"   [WARNING] No se pudo capturar screenshot de tabla sin cupo: {exc}")
+        register_step_1_capture(registro, None, hora_objetivo, f"sin_cupo_{reason}")
         return None
 
 
@@ -98,12 +126,16 @@ def capture_step_1_tabla(page, registro: dict, table_selector: str, hora_objetiv
             reason,
             hora=hora_objetivo,
         )
-        capture_locator(page.locator(table_selector), destination)
+        try:
+            capture_locator_via_clip(page, table_selector, destination, timeout_ms=2500)
+        except Exception:
+            capture_locator(page.locator(table_selector), destination, timeout_ms=2500)
         print(f"   [INFO] Screenshot tabla cupos: {destination}")
-        notify_step_1_table_capture(registro, destination, hora_objetivo, reason)
+        register_step_1_capture(registro, destination, hora_objetivo, reason)
         return destination
     except Exception as exc:
         print(f"   [WARNING] No se pudo capturar screenshot de tabla cupos: {exc}")
+        register_step_1_capture(registro, None, hora_objetivo, reason)
         return None
 
 

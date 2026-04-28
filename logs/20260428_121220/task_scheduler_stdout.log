@@ -1,0 +1,58 @@
+2026-04-28 12:12:20,713 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-04-28 12:12:20,713 | INFO | Modo: scheduled
+2026-04-28 12:12:20,713 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\data\programaciones-armas.xlsx
+2026-04-28 12:12:20,713 | INFO | Screenshots: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\screenshots\20260428_121220
+2026-04-28 12:12:25,679 | INFO | [INFO] OCR (easyocr) cargado correctamente | langs=['en'] | gpu=False
+2026-04-28 12:12:25,714 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-04-28 12:12:25,714 | INFO | [INFO] SCHEDULED_MULTIWORKER activado | workers=4 | mode=sticky
+2026-04-28 12:12:25,715 | INFO | [INFO] Excel origen multihilo: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\data\programaciones-armas.xlsx
+2026-04-28 12:12:25,908 | INFO |    -> Registros con estado 'PENDIENTE': 2
+2026-04-28 12:12:25,908 | INFO |    -> Validando fecha de hoy: 28/04/2026
+2026-04-28 12:12:25,909 | INFO |    -> Registros despues de filtrar por fecha: 2 (filtrados: 0)
+2026-04-28 12:12:25,930 | INFO |  Registro tomado desde Excel:
+2026-04-28 12:12:25,930 | INFO |    - id_registro: 1
+2026-04-28 12:12:25,930 | INFO |    - sede: LIMA
+2026-04-28 12:12:25,930 | INFO |    - fecha: 19/05/2026
+2026-04-28 12:12:25,930 | INFO |    - hora_rango: 12:00-12:15
+2026-04-28 12:12:25,930 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-28 12:12:25,931 | INFO |    - doc_vigilante: 40598949
+2026-04-28 12:12:25,931 | INFO |    - nro_solicitud: 052333-0
+2026-04-28 12:12:25,931 | INFO |    - fecha_programacion: 28/04/2026
+2026-04-28 12:12:25,931 | INFO |    - ruc: J & V Resguardo
+2026-04-28 12:12:25,931 | INFO |    - prioridad: alta
+2026-04-28 12:12:25,931 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-28 12:12:25,931 | INFO |    - indices_relacionados_excel: [0]
+2026-04-28 12:12:25,932 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-28 12:12:25,932 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-28 12:12:25,932 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-28 12:12:25,932 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-28 12:12:25,949 | INFO |  Registro tomado desde Excel:
+2026-04-28 12:12:25,949 | INFO |    - id_registro: 2
+2026-04-28 12:12:25,949 | INFO |    - sede: LIMA
+2026-04-28 12:12:25,949 | INFO |    - fecha: 19/05/2026
+2026-04-28 12:12:25,950 | INFO |    - hora_rango: 12:00-12:15
+2026-04-28 12:12:25,950 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-28 12:12:25,950 | INFO |    - doc_vigilante: 73799884
+2026-04-28 12:12:25,950 | INFO |    - nro_solicitud: 037411-0
+2026-04-28 12:12:25,950 | INFO |    - fecha_programacion: 28/04/2026
+2026-04-28 12:12:25,950 | INFO |    - ruc: J & V Resguardo
+2026-04-28 12:12:25,950 | INFO |    - prioridad: alta
+2026-04-28 12:12:25,950 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-28 12:12:25,950 | INFO |    - indices_relacionados_excel: [1]
+2026-04-28 12:12:25,950 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-28 12:12:25,950 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-28 12:12:25,950 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-28 12:12:25,950 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-28 12:12:25,950 | INFO | [INFO] Unidades multihilo a procesar: 2
+2026-04-28 12:12:25,951 | INFO | [INFO][W1] Lote asignado idx=[0]
+2026-04-28 12:12:25,952 | INFO | [INFO][W2] Lote asignado idx=[1]
+2026-04-28 12:12:52,659 | INFO | [INFO][W1] Lote idx=[0] finalizo OK en 26.65s
+2026-04-28 12:13:26,039 | INFO | [INFO][W2] Lote idx=[1] finalizo OK en 60.03s
+2026-04-28 12:13:26,040 | INFO | [INFO] Conteo por worker: [1, 1, 0, 0]
+2026-04-28 12:13:26,041 | INFO | [INFO] Unidades procesadas: 2/2
+2026-04-28 12:13:26,041 | INFO | [INFO] Tiempo total multihilo: 60.09s
+2026-04-28 12:13:26,042 | INFO | [INFO] Correo Graph consolidado preparado | sender=tramite.licencias@liderman.com.pe | to=fserrano@liderman.com.pe | cc=fserrano@liderman.com.pe | attachments=20260428_121248_sin_cupo_candidatos_0_i1_h12_00-12_15.png, 20260428_121318_sin_cupo_candidatos_0_i1_h12_00-12_15.png | casos=2 | client_id=d7a40f3a-d0c0-4360-9c49-f4ffe160badb | tenant_id=93649bc8-8277-40ea-ad16-e299bc964aa9 | secret=U6Y8...xcS3
+2026-04-28 12:13:28,298 | INFO | [INFO] Correo Graph consolidado enviado [SEND_OK] | sender=tramite.licencias@liderman.com.pe | to=fserrano@liderman.com.pe | cc=fserrano@liderman.com.pe | attachments=20260428_121248_sin_cupo_candidatos_0_i1_h12_00-12_15.png, 20260428_121318_sin_cupo_candidatos_0_i1_h12_00-12_15.png | casos=2
+2026-04-28 12:13:28,299 | INFO | [OK] Flujo multihilo scheduled finalizado sin fallos de proceso
+2026-04-28 12:13:28,299 | INFO | Pipeline finalizado
+2026-04-28 12:13:28,299 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\20260428_121220\run_20260428_121220.log
