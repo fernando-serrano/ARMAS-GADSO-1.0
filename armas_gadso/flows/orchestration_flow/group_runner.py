@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 from collections import deque
+from pathlib import Path
 
 
 def agrupar_trabajos_por_grupo(trabajos_pendientes: list, grupos_ordenados: list[str]) -> dict:
@@ -63,6 +64,7 @@ def procesar_grupo_ruc(
     confirmaciones_requeridas_para_categoria = deps["confirmaciones_requeridas_para_categoria"]
     observacion_terminal_por_categoria = deps["observacion_terminal_por_categoria"]
     observacion_error_no_mapeado = deps["observacion_error_no_mapeado"]
+    register_nro_solicitud_terminal = deps["register_nro_solicitud_terminal"]
     selectors = deps["selectors"]
     url_login = deps["url_login"]
     excel_path = deps["excel_path"]
@@ -337,6 +339,14 @@ def procesar_grupo_ruc(
                         if hits >= requeridas:
                             obs = observacion_terminal_por_categoria(categoria_terminal, registro_excel, e)
                             registrar_sin_cupo_en_excel(excel_path, registro_excel, obs)
+                            if categoria_terminal == "NRO_SOLICITUD":
+                                screenshot_raw = str(registro_excel.get("_step2_error_screenshot_path", "") or "").strip()
+                                screenshot_path = Path(screenshot_raw) if screenshot_raw else None
+                                register_nro_solicitud_terminal(
+                                    registro_excel,
+                                    screenshot_path if screenshot_path and screenshot_path.exists() else None,
+                                    str(registro_excel.get("_hora_seleccionada_actual", registro_excel.get("hora_rango", "")) or "").strip(),
+                                )
                             if categoria_terminal == "SIN_CUPO":
                                 state["total_sin_cupo"] += 1
                             else:

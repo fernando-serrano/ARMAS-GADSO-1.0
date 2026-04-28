@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-from ..notifications import register_step_1_capture
+from ..notifications import register_confirmation_capture, register_step_1_capture
 
 
 def _safe_filename_part(value: object, fallback: str = "sin_valor") -> str:
@@ -148,9 +148,19 @@ def capture_step_4_confirmacion(page, registro: dict, panel_selectors: list[str]
         )
         capture_first_visible(page, panel_selectors, destination)
         print(f"   [INFO] Screenshot confirmacion cita: {destination}")
+        register_confirmation_capture(
+            registro,
+            destination,
+            str(registro.get("_hora_seleccionada_actual", registro.get("hora_rango", "")) or "").strip(),
+        )
         return destination
     except Exception as exc:
         print(f"   [WARNING] No se pudo capturar screenshot de confirmacion: {exc}")
+        register_confirmation_capture(
+            registro,
+            None,
+            str(registro.get("_hora_seleccionada_actual", registro.get("hora_rango", "")) or "").strip(),
+        )
         return None
 
 
@@ -204,8 +214,12 @@ def capture_step_2_tramite_error(
             capture_page(page, destination, timeout_ms=0)
         else:
             capture_first_visible(page, panel_selectors, destination)
+        registro["_step2_error_screenshot_path"] = str(destination)
+        registro["_step2_error_reason"] = str(reason or "").strip()
         print(f"   [INFO] Screenshot paso 2: {destination}")
         return destination
     except Exception as exc:
         print(f"   [WARNING] No se pudo capturar screenshot del paso 2: {exc}")
+        registro["_step2_error_screenshot_path"] = ""
+        registro["_step2_error_reason"] = str(reason or "").strip()
         return None

@@ -51,6 +51,7 @@ from ..login_flow.auth import realizar_login_sel
 from ..login_flow.browser import escribir_input_rapido
 from ..login_flow.config import URL_LOGIN, resolver_credenciales_por_grupo_ruc
 from ..login_flow.selectors import LOGIN_SELECTORS
+from ..notifications import register_nro_solicitud_terminal
 
 load_dotenv()
 
@@ -405,6 +406,7 @@ def llenar_login_sel():
             ),
             "observacion_terminal_por_categoria": observacion_terminal_por_categoria,
             "observacion_error_no_mapeado": observacion_error_no_mapeado,
+            "register_nro_solicitud_terminal": register_nro_solicitud_terminal,
             "activar_monitor_growl": activar_monitor_growl,
             "selectors": SEL,
             "url_login": URL_LOGIN,

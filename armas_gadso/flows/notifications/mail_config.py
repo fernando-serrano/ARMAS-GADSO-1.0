@@ -25,6 +25,14 @@ def step_1_mail_enabled() -> bool:
     return env_bool("MS_GRAPH_MAIL_STEP1_ENABLED", default=False)
 
 
+def confirmation_mail_enabled() -> bool:
+    return env_bool("MS_GRAPH_MAIL_CONFIRMATION_ENABLED", default=False)
+
+
+def nro_solicitud_mail_enabled() -> bool:
+    return env_bool("MS_GRAPH_MAIL_NRO_SOLICITUD_ENABLED", default=False)
+
+
 def is_multiworker_child() -> bool:
     return env_bool("MULTIWORKER_CHILD", default=False)
 

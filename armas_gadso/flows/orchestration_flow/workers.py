@@ -20,7 +20,11 @@ from ...excel import (
     cargar_primer_registro_pendiente_desde_excel,
     obtener_trabajos_pendientes_excel,
 )
-from ..notifications import send_multirun_step_1_summary
+from ..notifications import (
+    send_multirun_confirmation_summary,
+    send_multirun_nro_solicitud_summary,
+    send_multirun_step_1_summary,
+)
 
 
 def _safe_int_env(name: str, default: int) -> int:
@@ -119,7 +123,18 @@ def ejecutar_scheduled_multihilo_orquestador(excel_path: str, project_root: str)
 
     lock_results = threading.Lock()
     results = []
-    manifest_paths: list[str] = []
+    manifest_paths: list[str] = [
+        os.path.join(temp_root, f"graph_step1_worker_{worker_id}.jsonl")
+        for worker_id in range(1, workers + 1)
+    ]
+    confirmation_manifest_paths: list[str] = [
+        os.path.join(temp_root, f"graph_confirmation_worker_{worker_id}.jsonl")
+        for worker_id in range(1, workers + 1)
+    ]
+    nro_solicitud_manifest_paths: list[str] = [
+        os.path.join(temp_root, f"graph_nro_solicitud_worker_{worker_id}.jsonl")
+        for worker_id in range(1, workers + 1)
+    ]
     base_cmd = [sys.executable, os.path.join(project_root, "run_pipeline.py"), "--mode", "scheduled"]
 
     def make_worker_excel(worker_id: int, target_indices: set, tag: str) -> str:
@@ -157,6 +172,8 @@ def ejecutar_scheduled_multihilo_orquestador(excel_path: str, project_root: str)
         env["SCREENSHOT_DIR"] = os.path.join(screenshot_root, f"screenshots_w{worker_id}")
         env["SCREENSHOT_DIR_IS_RUN_DIR"] = "1"
         env["GRAPH_STEP1_MANIFEST_PATH"] = os.path.join(temp_root, f"graph_step1_worker_{worker_id}.jsonl")
+        env["GRAPH_CONFIRMATION_MANIFEST_PATH"] = os.path.join(temp_root, f"graph_confirmation_worker_{worker_id}.jsonl")
+        env["GRAPH_NRO_SOLICITUD_MANIFEST_PATH"] = os.path.join(temp_root, f"graph_nro_solicitud_worker_{worker_id}.jsonl")
         env["BROWSER_TILE_ENABLE"] = "1" if _as_bool_env("BROWSER_TILE_ENABLE", default=True) else "0"
         env["BROWSER_TILE_TOTAL"] = str(workers)
         env["BROWSER_TILE_INDEX"] = str(worker_id - 1)
@@ -261,7 +278,6 @@ def ejecutar_scheduled_multihilo_orquestador(excel_path: str, project_root: str)
                 target_indices,
                 f"batch_{len(assigned_units)}_idxs_{'_'.join(str(x) for x in assigned_idx)}",
             )
-            manifest_paths.append(os.path.join(temp_root, f"graph_step1_worker_{worker_id}.jsonl"))
             run_unit(worker_id, f"Lote idx={assigned_idx}", excel_worker, worker_mode)
         except Exception as e:
             with lock_results:
@@ -316,4 +332,6 @@ def ejecutar_scheduled_multihilo_orquestador(excel_path: str, project_root: str)
         raise Exception(f"Flujo multihilo finalizo con {len(failed)} fallos")
 
     send_multirun_step_1_summary(manifest_paths)
+    send_multirun_confirmation_summary(confirmation_manifest_paths)
+    send_multirun_nro_solicitud_summary(nro_solicitud_manifest_paths)
     print("[OK] Flujo multihilo scheduled finalizado sin fallos de proceso")

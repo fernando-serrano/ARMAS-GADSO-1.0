@@ -5,13 +5,13 @@ import os
 from pathlib import Path
 
 
-def manifest_path() -> Path | None:
-    raw = str(os.getenv("GRAPH_STEP1_MANIFEST_PATH", "") or "").strip()
+def manifest_path(env_name: str = "GRAPH_STEP1_MANIFEST_PATH") -> Path | None:
+    raw = str(os.getenv(env_name, "") or "").strip()
     return Path(raw) if raw else None
 
 
-def write_manifest_event(event: dict) -> None:
-    target = manifest_path()
+def write_manifest_event(event: dict, env_name: str = "GRAPH_STEP1_MANIFEST_PATH") -> None:
+    target = manifest_path(env_name)
     if target is None:
         return
     target.parent.mkdir(parents=True, exist_ok=True)
