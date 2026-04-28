@@ -1,0 +1,73 @@
+2026-04-28 10:35:52,488 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-04-28 10:35:52,488 | INFO | Modo: scheduled
+2026-04-28 10:35:52,489 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\20260428_103547\worker_1_batch_1_idxs_0.xlsx
+2026-04-28 10:35:52,489 | INFO | Screenshots: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\screenshots\20260428_103547\screenshots_w1
+2026-04-28 10:35:57,516 | INFO | [INFO] OCR (easyocr) cargado correctamente | langs=['en'] | gpu=False
+2026-04-28 10:35:57,543 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-04-28 10:35:57,543 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizara entre grupos sin cerrarse
+2026-04-28 10:35:58,229 | INFO |    -> Registros con estado 'PENDIENTE': 1
+2026-04-28 10:35:58,229 | INFO |    -> Validando fecha de hoy: 28/04/2026
+2026-04-28 10:35:58,230 | INFO |    -> Registros despues de filtrar por fecha: 1 (filtrados: 0)
+2026-04-28 10:35:58,235 | INFO |  Registros pendientes a procesar: 1
+2026-04-28 10:35:58,235 | INFO |  Procesando grupo RUC JV - Registros: 1
+2026-04-28 10:35:58,235 | INFO | [INFO] Intento login 1/12 para grupo JV
+2026-04-28 10:35:58,235 | INFO | [TILE] Lanzando Chromium con args: ['--disable-infobars', '--window-size=1366,900', '--window-position=0,0']
+2026-04-28 10:36:00,218 | INFO | [INFO] Pagina de login cargada
+2026-04-28 10:36:00,525 | INFO | [INFO] Pestaña 'Autenticación Tradicional' seleccionada
+2026-04-28 10:36:02,518 | INFO | [INFO] Credenciales llenadas para grupo JV
+2026-04-28 10:36:02,518 | INFO |  OCR CAPTCHA: intento interno 1/6...
+2026-04-28 10:36:03,512 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-04-28 10:36:03,512 | ERROR |   super().__init__(loader)
+2026-04-28 10:36:03,546 | INFO |    -> Variante 0, Decoder greedy: 'KYFC1' -> 'KYFC1' [INFO]
+2026-04-28 10:36:03,546 | INFO |    [INFO] CAPTCHA valido -> Usando: KYFC1
+2026-04-28 10:36:03,614 | INFO | [INFO] Captcha automatico: KYFC1
+2026-04-28 10:36:03,614 | INFO | [INFO] Enviando login...
+2026-04-28 10:36:04,090 | INFO | [INFO] Validando acceso...
+2026-04-28 10:36:04,090 | INFO | [INFO] Acceso exitoso
+2026-04-28 10:36:04,090 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-04-28 10:36:04,090 | INFO | [INFO] Tiempo total login: 3.87 segundos
+2026-04-28 10:36:04,090 | INFO |  Navegando a RESERVAS DE CITAS...
+2026-04-28 10:36:07,559 | INFO |    [INFO] Menu CITAS expandido
+2026-04-28 10:36:08,882 | INFO |    [INFO] Click en 'RESERVAS DE CITAS'
+2026-04-28 10:36:08,882 | INFO |  Seleccionando tipo de cita: EXAMEN PARA POLIGONO DE TIRO
+2026-04-28 10:36:11,740 | INFO |    [INFO] Tipo de cita seleccionado: EXAMEN PARA POLÍGONO DE TIRO
+2026-04-28 10:36:11,740 | INFO | -------- JV Registro iterativo 1 (idx=0, prioridad=alta, intento=1, en_cola=0) --------
+2026-04-28 10:36:11,995 | INFO |  Registro tomado desde Excel:
+2026-04-28 10:36:11,995 | INFO |    - id_registro: 1
+2026-04-28 10:36:11,995 | INFO |    - sede: LIMA
+2026-04-28 10:36:11,995 | INFO |    - fecha: 19/05/2026
+2026-04-28 10:36:11,995 | INFO |    - hora_rango: 12:00-12:15
+2026-04-28 10:36:11,995 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-28 10:36:11,995 | INFO |    - doc_vigilante: 40598949
+2026-04-28 10:36:11,995 | INFO |    - nro_solicitud: 052333-0
+2026-04-28 10:36:11,995 | INFO |    - fecha_programacion: 28/04/2026
+2026-04-28 10:36:11,995 | INFO |    - ruc: J & V Resguardo
+2026-04-28 10:36:11,995 | INFO |    - prioridad: alta
+2026-04-28 10:36:11,995 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-28 10:36:11,995 | INFO |    - indices_relacionados_excel: [0]
+2026-04-28 10:36:11,995 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-28 10:36:11,995 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-28 10:36:11,995 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-28 10:36:11,995 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-28 10:36:12,004 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-28 10:36:12,438 | INFO |    [INFO] Sede seleccionado: LIMA
+2026-04-28 10:36:13,539 | INFO |    [INFO] Fecha seleccionado: 19/05/2026
+2026-04-28 10:36:13,539 | INFO |  Buscando hora en tabla: 12:00-12:15
+2026-04-28 10:36:28,863 | INFO |    [INFO] Screenshot tabla cupos: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\screenshots\20260428_103547\screenshots_w1\step_1_reserva_cupos\20260428_103613_tabla_inicial_i1_h12_00-12_15.png
+2026-04-28 10:36:28,863 | INFO |    [INFO] Correo Graph preparado | sender=fserrano@liderman.com.pe | to=fserrano@liderman.com.pe | attachment=20260428_103613_tabla_inicial_i1_h12_00-12_15.png | client_id=d7a40f3a-d0c0-4360-9c49-f4ffe160badb | tenant_id=93649bc8-8277-40ea-ad16-e299bc964aa9 | secret=U6Y8...xcS3
+2026-04-28 10:36:30,585 | INFO |    [INFO] Correo Graph enviado [SEND_OK] | sender=fserrano@liderman.com.pe | to=fserrano@liderman.com.pe | attachment=20260428_103613_tabla_inicial_i1_h12_00-12_15.png
+2026-04-28 10:36:30,820 | INFO |    [INFO] Estrategia horario: bloque completo de mediodia (11:45-13:00)
+2026-04-28 10:36:30,944 | INFO |    [INFO] Screenshot tabla sin cupo: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\screenshots\20260428_103547\screenshots_w1\step_1_reserva_cupos\20260428_103630_sin_cupo_candidatos_0_i1_h12_00-12_15.png
+2026-04-28 10:36:31,348 | INFO |    [INFO] Click en boton 'Limpiar' por falta de cupos
+2026-04-28 10:36:32,356 | INFO | [WARNING] Error en registro idx=0: No hay cupos en horarios candidatos. Objetivo: 12:00-12:15 | Candidatos: 11:45-12:00(0), 12:00-12:15(0), 12:15-12:30(0), 12:30-12:45(0), 12:45-13:00(0)
+2026-04-28 10:36:32,371 | INFO |    [INFO] Excel actualizado: observaciones='No alcanzo cupo para horario 12:00-12:15' en 1 fila(s)
+2026-04-28 10:36:32,371 | INFO | [INFO] Registro idx=0 marcado como terminal 'SIN_CUPO' tras 1 confirmaciones
+2026-04-28 10:36:32,907 | INFO | [INFO] Wizard limpiado para siguiente registro (recuperacion por error)
+2026-04-28 10:36:33,908 | INFO | [DEBUG] PERSISTENT_SESSION: cerrando contexto anterior para siguiente grupo
+2026-04-28 10:36:33,932 | INFO |  Tiempo total del flujo: 36.39 segundos
+2026-04-28 10:36:33,932 | INFO |  Resumen: OK=0 | SIN_CUPO=1 | ERROR=0
+2026-04-28 10:36:33,932 | INFO | [INFO] Flujo completado.
+2026-04-28 10:36:33,932 | INFO |     Duracin final del flujo: 36.39 segundos
+2026-04-28 10:36:34,246 | INFO | Navegador cerrado.
+2026-04-28 10:36:34,246 | INFO | Pipeline finalizado
+2026-04-28 10:36:34,246 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\20260428_103547\logs_w1\run_20260428_103547.log

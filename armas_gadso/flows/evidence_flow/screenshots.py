@@ -5,6 +5,8 @@ import re
 from datetime import datetime
 from pathlib import Path
 
+from ..notifications import notify_step_1_table_capture
+
 
 def _safe_filename_part(value: object, fallback: str = "sin_valor") -> str:
     text = str(value or "").strip()
@@ -98,6 +100,7 @@ def capture_step_1_tabla(page, registro: dict, table_selector: str, hora_objetiv
         )
         capture_locator(page.locator(table_selector), destination)
         print(f"   [INFO] Screenshot tabla cupos: {destination}")
+        notify_step_1_table_capture(registro, destination, hora_objetivo, reason)
         return destination
     except Exception as exc:
         print(f"   [WARNING] No se pudo capturar screenshot de tabla cupos: {exc}")

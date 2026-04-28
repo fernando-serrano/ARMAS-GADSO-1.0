@@ -1,0 +1,56 @@
+2026-04-28 10:31:49,400 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-04-28 10:31:49,400 | INFO | Modo: scheduled
+2026-04-28 10:31:49,400 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\data\programaciones-armas.xlsx
+2026-04-28 10:31:49,400 | INFO | Screenshots: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\screenshots\20260428_103149
+2026-04-28 10:31:53,727 | INFO | [INFO] OCR (easyocr) cargado correctamente | langs=['en'] | gpu=False
+2026-04-28 10:31:53,742 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-04-28 10:31:53,742 | INFO | [INFO] SCHEDULED_MULTIWORKER activado | workers=4 | mode=sticky
+2026-04-28 10:31:53,743 | INFO | [INFO] Excel origen multihilo: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\data\programaciones-armas.xlsx
+2026-04-28 10:31:53,900 | INFO |    -> Registros con estado 'PENDIENTE': 2
+2026-04-28 10:31:53,900 | INFO |    -> Validando fecha de hoy: 28/04/2026
+2026-04-28 10:31:53,900 | INFO |    -> Registros despues de filtrar por fecha: 2 (filtrados: 0)
+2026-04-28 10:31:53,911 | INFO |  Registro tomado desde Excel:
+2026-04-28 10:31:53,911 | INFO |    - id_registro: 1
+2026-04-28 10:31:53,911 | INFO |    - sede: LIMA
+2026-04-28 10:31:53,911 | INFO |    - fecha: 19/05/2026
+2026-04-28 10:31:53,911 | INFO |    - hora_rango: 12:00-12:15
+2026-04-28 10:31:53,911 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-28 10:31:53,911 | INFO |    - doc_vigilante: 40598949
+2026-04-28 10:31:53,911 | INFO |    - nro_solicitud: 052333-0
+2026-04-28 10:31:53,911 | INFO |    - fecha_programacion: 28/04/2026
+2026-04-28 10:31:53,911 | INFO |    - ruc: J & V Resguardo
+2026-04-28 10:31:53,911 | INFO |    - prioridad: alta
+2026-04-28 10:31:53,911 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-28 10:31:53,912 | INFO |    - indices_relacionados_excel: [0]
+2026-04-28 10:31:53,912 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-28 10:31:53,912 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-28 10:31:53,912 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-28 10:31:53,912 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-28 10:31:53,920 | INFO |  Registro tomado desde Excel:
+2026-04-28 10:31:53,920 | INFO |    - id_registro: 2
+2026-04-28 10:31:53,920 | INFO |    - sede: LIMA
+2026-04-28 10:31:53,920 | INFO |    - fecha: 19/05/2026
+2026-04-28 10:31:53,920 | INFO |    - hora_rango: 12:00-12:15
+2026-04-28 10:31:53,920 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-28 10:31:53,920 | INFO |    - doc_vigilante: 73799884
+2026-04-28 10:31:53,920 | INFO |    - nro_solicitud: 037411-0
+2026-04-28 10:31:53,920 | INFO |    - fecha_programacion: 28/04/2026
+2026-04-28 10:31:53,920 | INFO |    - ruc: J & V Resguardo
+2026-04-28 10:31:53,920 | INFO |    - prioridad: alta
+2026-04-28 10:31:53,920 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-28 10:31:53,920 | INFO |    - indices_relacionados_excel: [1]
+2026-04-28 10:31:53,920 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-28 10:31:53,920 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-28 10:31:53,920 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-28 10:31:53,920 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-28 10:31:53,920 | INFO | [INFO] Unidades multihilo a procesar: 2
+2026-04-28 10:31:53,921 | INFO | [INFO][W1] Lote asignado idx=[0]
+2026-04-28 10:31:53,922 | INFO | [INFO][W2] Lote asignado idx=[1]
+2026-04-28 10:33:14,154 | INFO | [INFO][W2] Lote idx=[1] finalizo OK en 80.20s
+2026-04-28 10:33:14,575 | INFO | [INFO][W1] Lote idx=[0] finalizo OK en 80.64s
+2026-04-28 10:33:14,576 | INFO | [INFO] Conteo por worker: [1, 1, 0, 0]
+2026-04-28 10:33:14,577 | INFO | [INFO] Unidades procesadas: 2/2
+2026-04-28 10:33:14,577 | INFO | [INFO] Tiempo total multihilo: 80.66s
+2026-04-28 10:33:14,577 | INFO | [OK] Flujo multihilo scheduled finalizado sin fallos de proceso
+2026-04-28 10:33:14,577 | INFO | Pipeline finalizado
+2026-04-28 10:33:14,577 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\20260428_103149\run_20260428_103149.log

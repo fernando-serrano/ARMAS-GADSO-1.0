@@ -1,0 +1,72 @@
+2026-04-28 10:31:54,030 | INFO | Iniciando pipeline ARMAS-GADSO
+2026-04-28 10:31:54,031 | INFO | Modo: scheduled
+2026-04-28 10:31:54,031 | INFO | Excel: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\20260428_103149\worker_1_batch_1_idxs_0.xlsx
+2026-04-28 10:31:54,031 | INFO | Screenshots: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\screenshots\20260428_103149\screenshots_w1
+2026-04-28 10:31:58,664 | INFO | [INFO] OCR (easyocr) cargado correctamente | langs=['en'] | gpu=False
+2026-04-28 10:31:58,691 | INFO | [INFO] INICIANDO SCRIPT SEL - Login Automtico
+2026-04-28 10:31:58,692 | INFO | [INFO] PERSISTENT_SESSION activado - navegador se reutilizara entre grupos sin cerrarse
+2026-04-28 10:31:59,420 | INFO |    -> Registros con estado 'PENDIENTE': 1
+2026-04-28 10:31:59,420 | INFO |    -> Validando fecha de hoy: 28/04/2026
+2026-04-28 10:31:59,421 | INFO |    -> Registros despues de filtrar por fecha: 1 (filtrados: 0)
+2026-04-28 10:31:59,426 | INFO |  Registros pendientes a procesar: 1
+2026-04-28 10:31:59,426 | INFO |  Procesando grupo RUC JV - Registros: 1
+2026-04-28 10:31:59,426 | INFO | [INFO] Intento login 1/12 para grupo JV
+2026-04-28 10:31:59,426 | INFO | [TILE] Lanzando Chromium con args: ['--disable-infobars', '--window-size=1366,900', '--window-position=0,0']
+2026-04-28 10:32:06,331 | INFO | [INFO] Pagina de login cargada
+2026-04-28 10:32:06,628 | INFO | [INFO] Pestaña 'Autenticación Tradicional' seleccionada
+2026-04-28 10:32:08,648 | INFO | [INFO] Credenciales llenadas para grupo JV
+2026-04-28 10:32:08,648 | INFO |  OCR CAPTCHA: intento interno 1/6...
+2026-04-28 10:32:09,672 | ERROR | C:\Users\fserrano\AppData\Local\Programs\Python\Python314\Lib\site-packages\torch\utils\data\dataloader.py:775: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+2026-04-28 10:32:09,672 | ERROR |   super().__init__(loader)
+2026-04-28 10:32:09,840 | INFO |    -> Variante 0, Decoder greedy: 'DLUEA' -> 'DLUEA' [INFO]
+2026-04-28 10:32:09,840 | INFO |    [INFO] CAPTCHA valido -> Usando: DLUEA
+2026-04-28 10:32:09,942 | INFO | [INFO] Captcha automatico: DLUEA
+2026-04-28 10:32:09,943 | INFO | [INFO] Enviando login...
+2026-04-28 10:32:10,437 | INFO | [INFO] Validando acceso...
+2026-04-28 10:32:10,437 | INFO | [INFO] Acceso exitoso
+2026-04-28 10:32:10,437 | INFO |    -> URL: https://www.sucamec.gob.pe/sel/faces/aplicacion/inicio.xhtml
+2026-04-28 10:32:10,438 | INFO | [INFO] Tiempo total login: 4.11 segundos
+2026-04-28 10:32:10,438 | INFO |  Navegando a RESERVAS DE CITAS...
+2026-04-28 10:32:14,413 | INFO |    [INFO] Menu CITAS expandido
+2026-04-28 10:32:16,312 | INFO |    [INFO] Click en 'RESERVAS DE CITAS'
+2026-04-28 10:32:16,312 | INFO |  Seleccionando tipo de cita: EXAMEN PARA POLIGONO DE TIRO
+2026-04-28 10:32:16,767 | INFO |    [INFO] Tipo de cita seleccionado: EXAMEN PARA POLÍGONO DE TIRO
+2026-04-28 10:32:16,768 | INFO | -------- JV Registro iterativo 1 (idx=0, prioridad=alta, intento=1, en_cola=0) --------
+2026-04-28 10:32:16,868 | INFO |  Registro tomado desde Excel:
+2026-04-28 10:32:16,868 | INFO |    - id_registro: 1
+2026-04-28 10:32:16,868 | INFO |    - sede: LIMA
+2026-04-28 10:32:16,868 | INFO |    - fecha: 19/05/2026
+2026-04-28 10:32:16,868 | INFO |    - hora_rango: 12:00-12:15
+2026-04-28 10:32:16,868 | INFO |    - tipo_operacion: RENOVACION DE LICENCIA DE USO
+2026-04-28 10:32:16,869 | INFO |    - doc_vigilante: 40598949
+2026-04-28 10:32:16,869 | INFO |    - nro_solicitud: 052333-0
+2026-04-28 10:32:16,869 | INFO |    - fecha_programacion: 28/04/2026
+2026-04-28 10:32:16,869 | INFO |    - ruc: J & V Resguardo
+2026-04-28 10:32:16,869 | INFO |    - prioridad: alta
+2026-04-28 10:32:16,869 | INFO |    - siguiente_mismo_doc_y_fecha: False
+2026-04-28 10:32:16,869 | INFO |    - indices_relacionados_excel: [0]
+2026-04-28 10:32:16,869 | INFO |    - tipo_arma (excel): ['CORTA']
+2026-04-28 10:32:16,869 | INFO |    - arma (excel): ['REVOLVER']
+2026-04-28 10:32:16,869 | INFO |    - objetivos_arma: [('CORTA', 'REVOLVER')]
+2026-04-28 10:32:16,869 | INFO |    - tipos_arma_objetivo: ['CORTA']
+2026-04-28 10:32:16,878 | INFO |  Completando Reserva de Cupos con datos del Excel...
+2026-04-28 10:32:17,276 | INFO |    [INFO] Sede seleccionado: LIMA
+2026-04-28 10:32:18,436 | INFO |    [INFO] Fecha seleccionado: 19/05/2026
+2026-04-28 10:32:18,437 | INFO |  Buscando hora en tabla: 12:00-12:15
+2026-04-28 10:32:49,291 | INFO |    [WARNING] No se pudo capturar screenshot de tabla cupos: Locator.screenshot: Timeout 29996ms exceeded.
+2026-04-28 10:32:49,291 | INFO | Call log:
+2026-04-28 10:32:49,292 | INFO |   - taking element screenshot
+2026-04-28 10:32:49,292 | INFO |   - waiting for fonts to load...
+2026-04-28 10:32:49,613 | INFO |    [INFO] Estrategia horario: bloque completo de mediodia (11:45-13:00)
+2026-04-28 10:33:13,375 | INFO |    [WARNING] No se pudo capturar screenshot de tabla sin cupo: Locator.screenshot: Target page, context or browser has been closed
+2026-04-28 10:33:13,375 | INFO | Call log:
+2026-04-28 10:33:13,375 | INFO |   - taking element screenshot
+2026-04-28 10:33:13,375 | INFO |   - waiting for fonts to load...
+2026-04-28 10:33:13,378 | INFO | Registro idx=0 no procesado: la ventana/contexto del navegador fue cerrada.
+2026-04-28 10:33:13,378 | INFO |  Ejecucin interrumpida.
+2026-04-28 10:33:13,378 | INFO |    -> Motivo: Ventana del navegador cerrada durante procesamiento
+2026-04-28 10:33:13,378 | INFO |     Tiempo transcurrido: 74.69 segundos
+2026-04-28 10:33:13,378 | INFO |     Resumen parcial: OK=0 | SIN_CUPO=0 | ERROR=0
+2026-04-28 10:33:13,666 | INFO | Navegador cerrado.
+2026-04-28 10:33:13,667 | INFO | Pipeline finalizado
+2026-04-28 10:33:13,667 | INFO | Log disponible en: C:\Users\fserrano\Desktop\ARMAS-GADSO-1.0\logs\20260428_103149\logs_w1\run_20260428_103149.log
