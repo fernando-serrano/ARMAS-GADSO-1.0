@@ -23,6 +23,7 @@ def _limpiar_confirmaciones_idx(confirmaciones_terminales: dict, idx_excel: int)
         "HORA_NO_DISPONIBLE",
         "FECHA_NO_DISPONIBLE",
         "TURNO_DUPLICADO",
+        "RESTRICCION_48H_EXAMEN",
     ]:
         confirmaciones_terminales.pop((idx_excel, categoria), None)
 
@@ -47,6 +48,8 @@ def procesar_grupo_ruc(
     seleccionar_sede_y_fecha_desde_registro = deps["seleccionar_sede_y_fecha_desde_registro"]
     seleccionar_hora_con_cupo_y_avanzar = deps["seleccionar_hora_con_cupo_y_avanzar"]
     completar_paso_2_desde_registro = deps["completar_paso_2_desde_registro"]
+    detectar_cita_ya_registrada_visible = deps["detectar_cita_ya_registrada_visible"]
+    detectar_restriccion_48h_examen_visible = deps["detectar_restriccion_48h_examen_visible"]
     validar_turno_duplicado_o_lanzar = deps["validar_turno_duplicado_o_lanzar"]
     completar_tabla_tipos_arma_y_avanzar = deps["completar_tabla_tipos_arma_y_avanzar"]
     completar_fase_3_resumen = deps["completar_fase_3_resumen"]
@@ -60,6 +63,7 @@ def procesar_grupo_ruc(
     normalizar_hora_rango = deps["normalizar_hora_rango"]
     registrar_sin_cupo_en_excel = deps["registrar_sin_cupo_en_excel"]
     turno_duplicado_error = deps["turno_duplicado_error"]
+    cita_ya_registrada_error = deps["cita_ya_registrada_error"]
     clasificar_error_terminal_registro = deps["clasificar_error_terminal_registro"]
     confirmaciones_requeridas_para_categoria = deps["confirmaciones_requeridas_para_categoria"]
     observacion_terminal_por_categoria = deps["observacion_terminal_por_categoria"]
@@ -282,6 +286,42 @@ def procesar_grupo_ruc(
                         )
                         raise Exception("RELOGIN_UI_DESYNC") from e
 
+                    cita_visible = isinstance(e, cita_ya_registrada_error)
+                    if not cita_visible:
+                        try:
+                            cita_visible = detectar_cita_ya_registrada_visible(page, registro_excel)
+                        except Exception:
+                            cita_visible = False
+
+                    if cita_visible:
+                        print(
+                            f"[INFO] Registro idx={idx_excel} tratado como cita programada "
+                            f"por validacion intermedia: {e}"
+                        )
+                        registrar_cita_programada_en_excel(excel_path, registro_excel)
+                        state["total_ok"] += 1
+                        intentos_no_mapeados_por_idx.pop(idx_excel, None)
+                        intentos_replan_hora_por_idx.pop(idx_excel, None)
+                        _limpiar_confirmaciones_idx(confirmaciones_terminales, idx_excel)
+                        try:
+                            limpiar_para_siguiente_registro(page, motivo="cita ya registrada")
+                        except Exception:
+                            pass
+                        time.sleep(1)
+                        continue
+
+                    restriccion_48h_visible = False
+                    try:
+                        restriccion_48h_visible = detectar_restriccion_48h_examen_visible(page, registro_excel)
+                    except Exception:
+                        restriccion_48h_visible = False
+
+                    if restriccion_48h_visible:
+                        e = Exception(
+                            "No esta permitido reservar una cita con fecha anterior a las 48 horas "
+                            "de rendido el examen"
+                        )
+
                     if isinstance(e, cupos_ocupados_error):
                         hora_actual = normalizar_hora_rango(registro_excel.get("_hora_seleccionada_actual", ""))
                         descartadas = list(trabajo.get("_horas_descartadas", []) or [])
@@ -339,7 +379,9 @@ def procesar_grupo_ruc(
                         if hits >= requeridas:
                             obs = observacion_terminal_por_categoria(categoria_terminal, registro_excel, e)
                             registrar_sin_cupo_en_excel(excel_path, registro_excel, obs)
-                            if categoria_terminal == "NRO_SOLICITUD":
+                            if categoria_terminal in {"NRO_SOLICITUD", "RESTRICCION_48H_EXAMEN"}:
+                                if categoria_terminal == "RESTRICCION_48H_EXAMEN":
+                                    registro_excel["_terminal_reason_label"] = "Restriccion 48h por examen"
                                 screenshot_raw = str(registro_excel.get("_step2_error_screenshot_path", "") or "").strip()
                                 screenshot_path = Path(screenshot_raw) if screenshot_raw else None
                                 register_nro_solicitud_terminal(

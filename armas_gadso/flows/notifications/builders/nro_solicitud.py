@@ -7,7 +7,7 @@ from .sin_cupo import case_label
 
 
 def build_subject(config: dict, total_cases: int) -> str:
-    pieces = [config["subject_prefix"], "No se encontro Nro. Solicitud"]
+    pieces = [config["subject_prefix"], "Errores de validacion de cita"]
     if total_cases > 1:
         pieces.append(f"{total_cases} casos")
     return " | ".join(pieces)
@@ -32,11 +32,16 @@ def build_html_body(events: list[dict]) -> str:
     highlight_style = "background:#fff3b0;padding:2px 6px;border-radius:4px;"
 
     rows = []
+    reasons = []
     for event in events:
         registro = event["registro"]
+        reason = str(registro.get("_terminal_reason_label", "") or "No se encontro Nro. Solicitud").strip()
+        if reason not in reasons:
+            reasons.append(reason)
         rows.append(
             "<tr>"
             f"<td style='border:1px solid #d0d7de;padding:8px;'>{case_label(registro)}</td>"
+            f"<td style='border:1px solid #d0d7de;padding:8px;'>{reason}</td>"
             f"<td style='border:1px solid #d0d7de;padding:8px;'>{str(registro.get('sede', '') or '').strip()}</td>"
             f"<td style='border:1px solid #d0d7de;padding:8px;'>{_format_fecha_larga(str(registro.get('fecha', '') or '').strip())}</td>"
             f"<td style='border:1px solid #d0d7de;padding:8px;'>{str(event.get('hora_objetivo', '') or registro.get('hora_rango', '') or '').strip()}</td>"
@@ -51,15 +56,17 @@ def build_html_body(events: list[dict]) -> str:
         else "<p>No se generaron evidencias adjuntas para estos casos.</p>"
     )
     label = "Caso detectado:" if len(events) == 1 else "Casos detectados:"
+    title = reasons[0] if len(reasons) == 1 else "Errores de validacion de cita"
     return (
         "<p>Buen dia &#129302;</p>"
-        f"<p><span style='font-weight:700;'>No se encontro Nro. Solicitud</span> en la ejecucion del "
+        f"<p><span style='font-weight:700;'>{title}</span> en la ejecucion del "
         f"<span style='{highlight_style}'>{today}</span> a las "
         f"<span style='{highlight_style}'>{now_hhmmss} hrs</span>.</p>"
         f"<p>{label}</p>"
         "<table style='border-collapse:collapse;border:1px solid #d0d7de;'>"
         "<thead><tr>"
         "<th style='border:1px solid #d0d7de;padding:8px;background:#f6f8fa;text-align:left;'>DNI</th>"
+        "<th style='border:1px solid #d0d7de;padding:8px;background:#f6f8fa;text-align:left;'>Motivo</th>"
         "<th style='border:1px solid #d0d7de;padding:8px;background:#f6f8fa;text-align:left;'>Sede</th>"
         "<th style='border:1px solid #d0d7de;padding:8px;background:#f6f8fa;text-align:left;'>Fecha objetivo</th>"
         "<th style='border:1px solid #d0d7de;padding:8px;background:#f6f8fa;text-align:left;'>Hora objetivo</th>"

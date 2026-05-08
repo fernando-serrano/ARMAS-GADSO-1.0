@@ -6,6 +6,7 @@ import time
 from ... import excel as excel_ops
 from ... import utils as shared_utils
 from ...exceptions import (
+    CitaYaRegistradaError as DomainCitaYaRegistradaError,
     CuposOcupadosPostValidacionError as DomainCuposOcupadosPostValidacionError,
     FechaNoDisponibleError as DomainFechaNoDisponibleError,
     SinCupoError as DomainSinCupoError,
@@ -39,6 +40,8 @@ from ..cita_flow.step_1_reserva_cupos import (
 from ..cita_flow.step_2_datos_tramite import (
     completar_paso_2_desde_registro as completar_paso_2_desde_registro_paso_2,
     completar_tabla_tipos_arma_y_avanzar as completar_tabla_tipos_arma_y_avanzar_paso_2,
+    detectar_y_capturar_cita_ya_registrada_visible as detectar_cita_ya_registrada_visible_paso_2,
+    detectar_y_capturar_restriccion_48h_examen_visible as detectar_restriccion_48h_examen_visible_paso_2,
 )
 from ..cita_flow.step_2_datos_tramite.selectors import SELECTORS as STEP_2_SELECTORS
 from ..cita_flow.step_3_validacion_final import (
@@ -110,6 +113,7 @@ SEL = {
 SinCupoError = DomainSinCupoError
 FechaNoDisponibleError = DomainFechaNoDisponibleError
 TurnoDuplicadoError = DomainTurnoDuplicadoError
+CitaYaRegistradaError = DomainCitaYaRegistradaError
 CuposOcupadosPostValidacionError = DomainCuposOcupadosPostValidacionError
 
 normalizar_hora_rango = shared_utils.normalizar_hora_rango
@@ -268,6 +272,7 @@ def _deps_paso_2_datos_tramite() -> dict:
         "extraer_token_solicitud": extraer_token_solicitud,
         "normalizar_tipo_arma_excel": normalizar_tipo_arma_excel,
         "validar_turno_duplicado_o_lanzar": validar_turno_duplicado_o_lanzar,
+        "cita_ya_registrada_error": CitaYaRegistradaError,
     }
 
 
@@ -281,6 +286,22 @@ def completar_paso_2_desde_registro(page, registro: dict):
 
 def completar_tabla_tipos_arma_y_avanzar(page, registro: dict):
     return completar_tabla_tipos_arma_y_avanzar_paso_2(
+        page,
+        registro,
+        deps=_deps_paso_2_datos_tramite(),
+    )
+
+
+def detectar_cita_ya_registrada_visible(page, registro: dict) -> bool:
+    return detectar_cita_ya_registrada_visible_paso_2(
+        page,
+        registro,
+        deps=_deps_paso_2_datos_tramite(),
+    )
+
+
+def detectar_restriccion_48h_examen_visible(page, registro: dict) -> bool:
+    return detectar_restriccion_48h_examen_visible_paso_2(
         page,
         registro,
         deps=_deps_paso_2_datos_tramite(),
@@ -379,6 +400,8 @@ def llenar_login_sel():
             "seleccionar_sede_y_fecha_desde_registro": seleccionar_sede_y_fecha_desde_registro,
             "seleccionar_hora_con_cupo_y_avanzar": seleccionar_hora_con_cupo_y_avanzar,
             "completar_paso_2_desde_registro": completar_paso_2_desde_registro,
+            "detectar_cita_ya_registrada_visible": detectar_cita_ya_registrada_visible,
+            "detectar_restriccion_48h_examen_visible": detectar_restriccion_48h_examen_visible,
             "validar_turno_duplicado_o_lanzar": validar_turno_duplicado_o_lanzar,
             "completar_tabla_tipos_arma_y_avanzar": completar_tabla_tipos_arma_y_avanzar,
             "completar_fase_3_resumen": completar_fase_3_resumen,
@@ -392,6 +415,7 @@ def llenar_login_sel():
             "normalizar_hora_rango": normalizar_hora_rango,
             "registrar_sin_cupo_en_excel": registrar_sin_cupo_en_excel,
             "turno_duplicado_error": TurnoDuplicadoError,
+            "cita_ya_registrada_error": CitaYaRegistradaError,
             "clasificar_error_terminal_registro": lambda e: clasificar_error_terminal_registro(
                 e,
                 SinCupoError,

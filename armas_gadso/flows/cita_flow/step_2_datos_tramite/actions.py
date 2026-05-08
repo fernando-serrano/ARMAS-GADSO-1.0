@@ -6,6 +6,7 @@ import time
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 from ..step_3_validacion_final.selectors import SELECTORS as STEP_3_SELECTORS
+from ...evidence_flow.screenshots import capture_step_4_confirmacion
 from .screenshots import capturar_error_paso_2
 from .selectors import SELECTORS
 
@@ -41,12 +42,103 @@ def seleccionar_opcion_flexible_en_panel(page, panel_selector: str, texto_objeti
     )
 
 
+def detectar_y_capturar_cita_ya_registrada_visible(page, registro: dict, deps: dict) -> bool:
+    """
+    Detecta el modal/resumen de cita ya visible y lo registra como evidencia de confirmacion.
+    Cubre reintentos donde SEL programa o muestra una cita registrada antes de que el flujo
+    llegue al paso final esperado por el bot.
+    """
+    normalizar_texto_comparable = deps["normalizar_texto_comparable"]
+    extraer_token_solicitud = deps["extraer_token_solicitud"]
+
+    doc_vigilante = registro.get("doc_vigilante", "").strip()
+    token_solicitud = extraer_token_solicitud(registro.get("nro_solicitud", "").strip())
+
+    try:
+        body_text = page.locator("body").inner_text(timeout=1200)
+    except Exception:
+        return False
+
+    body_norm = normalizar_texto_comparable(body_text)
+    if "REGISTRO DE CITA" not in body_norm or "RESUMEN DE CITA" not in body_norm:
+        return False
+
+    bloques = [b.lstrip("0") or "0" for b in re.findall(r"\d+", body_text)]
+    doc_ok = not doc_vigilante or doc_vigilante in body_text
+    token_ok = bool(token_solicitud) and token_solicitud in bloques
+    if not doc_ok or not token_ok:
+        return False
+
+    print(
+        "   [INFO] Validacion intermedia: modal 'Registro de Cita' detectado "
+        "con DNI/token esperado; se registrara como confirmacion."
+    )
+    capture_step_4_confirmacion(page, registro, ["body"])
+    return True
+
+
+def detectar_y_capturar_restriccion_48h_examen_visible(page, registro: dict, deps: dict) -> bool:
+    """Detecta la alerta SEL que impide reservar dentro de las 48h posteriores al examen."""
+    normalizar_texto_comparable = deps["normalizar_texto_comparable"]
+
+    mensajes = []
+    for selector in [
+        ".ui-growl-item .ui-growl-title",
+        ".ui-growl-item .ui-growl-message",
+        ".ui-growl-message",
+        "#mensajesGrowl_container .ui-growl-title",
+        "#mensajesGrowl_container .ui-growl-message",
+    ]:
+        try:
+            loc = page.locator(selector)
+            total = min(loc.count(), 8)
+            for i in range(total):
+                txt = (loc.nth(i).text_content() or "").strip()
+                if txt:
+                    mensajes.append(txt)
+        except Exception:
+            pass
+
+    try:
+        buffer_msgs = page.evaluate(
+            """
+            () => (window.__armasGrowlBuffer || []).map(x => x && x.text ? String(x.text) : '')
+            """
+        )
+        if isinstance(buffer_msgs, list):
+            mensajes.extend(str(txt or "").strip() for txt in buffer_msgs if str(txt or "").strip())
+    except Exception:
+        pass
+
+    try:
+        body_text = page.locator("body").inner_text(timeout=800)
+        if body_text:
+            mensajes.append(body_text)
+    except Exception:
+        pass
+
+    for msg in mensajes:
+        msg_norm = normalizar_texto_comparable(msg)
+        if (
+            "NO ESTA PERMITIDO RESERVAR UNA CITA" in msg_norm
+            and "48 HORAS" in msg_norm
+            and "RENDIDO EL EXAMEN" in msg_norm
+        ):
+            print("   [INFO] Validacion intermedia: alerta de restriccion 48h por examen detectada.")
+            registro["_terminal_reason_label"] = "Restriccion 48h por examen"
+            capturar_error_paso_2(page, registro, "restriccion_48h_examen")
+            return True
+
+    return False
+
+
 def completar_paso_2_desde_registro(page, registro: dict, deps: dict):
     """
     Paso 2: tipo operacion, doc. vigilante, solicitud y numero de solicitud.
     """
     normalizar_texto_comparable = deps["normalizar_texto_comparable"]
     extraer_token_solicitud = deps["extraer_token_solicitud"]
+    cita_ya_registrada_error = deps.get("cita_ya_registrada_error")
 
     tipo_operacion = registro.get("tipo_operacion", "").strip()
     doc_vigilante = registro.get("doc_vigilante", "").strip()
@@ -222,6 +314,10 @@ def completar_paso_2_desde_registro(page, registro: dict, deps: dict):
             break
 
     if not seleccionado_label:
+        if cita_ya_registrada_error and detectar_y_capturar_cita_ya_registrada_visible(page, registro, deps):
+            raise cita_ya_registrada_error(
+                f"Cita ya registrada para DNI {doc_vigilante} y token {token_solicitud}"
+            )
         disponibles = []
         for i in range(total_nro):
             item = items_nro.nth(i)

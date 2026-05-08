@@ -252,6 +252,12 @@ def clasificar_error_terminal_registro(
         return "NRO_SOLICITUD"
     if "no hay opciones en el combo de nro solicitud" in txt_low:
         return "NRO_SOLICITUD"
+    if (
+        "no esta permitido reservar una cita" in txt_low
+        and "48 horas" in txt_low
+        and "rendido el examen" in txt_low
+    ):
+        return "RESTRICCION_48H_EXAMEN"
     if "documento vigilante" in txt_low:
         return "DOC_VIGILANTE"
     if "no se encontró la hora objetivo en la tabla" in txt:
@@ -264,6 +270,11 @@ def observacion_terminal_por_categoria(categoria: str, registro_excel: dict, err
         return f"No alcanzo cupo para horario {registro_excel.get('hora_rango', '')}"
     if categoria == "NRO_SOLICITUD":
         return f"No se encontró Nro Solicitud/Código de pago para token de {registro_excel.get('nro_solicitud', '')}"
+    if categoria == "RESTRICCION_48H_EXAMEN":
+        return (
+            "No esta permitido reservar una cita con fecha anterior a las 48 horas "
+            "de rendido el examen"
+        )
     if categoria == "DOC_VIGILANTE":
         return (
             "Documento vigilante no disponible para esta razón social/RUC. "
@@ -291,6 +302,8 @@ def confirmaciones_requeridas_para_categoria(
     if categoria == "SIN_CUPO":
         return sin_cupo_confirmaciones_requeridas
     if categoria == "TURNO_DUPLICADO":
+        return 1
+    if categoria == "RESTRICCION_48H_EXAMEN":
         return 1
     if categoria == "NRO_SOLICITUD":
         return nro_solicitud_confirmaciones_requeridas
