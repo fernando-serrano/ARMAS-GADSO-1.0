@@ -72,21 +72,25 @@ SEL = {
     # ── Menú PanelMenu PrimeFaces ─────────────────────────────────────────────
     # Header del acordeón CITAS  ->  el <h3> que contiene el <a>CITAS</a>
     # Hacemos clic en él para expandir/colapsar el panel
-    "menu_citas_header": '#j_idt11\\:menuPrincipal .ui-panelmenu-header:has(a:text-is("CITAS"))',
+    # NOTA: el prefijo de formulario JSF (j_idtNN) es autogenerado y cambia entre
+    # versiones del portal. Anclamos por el id de componente estable (menuPrincipal,
+    # vía sufijo) y por el texto visible, NO por el número j_idt.
+    "menu_citas_header": '[id$=":menuPrincipal"] .ui-panelmenu-header:has(a:text-is("CITAS")), .ui-panelmenu-header:has(a:text-is("CITAS"))',
 
-    # Panel de contenido que se despliega al hacer clic en el header CITAS
-    # id fijo según el HTML: j_idt11:menuPrincipal_7
-    "menu_citas_panel": '#j_idt11\\:menuPrincipal_7',
+    # Panel de contenido del acordeón CITAS: lo identificamos por el ítem que
+    # contiene (RESERVAS DE CITAS), no por el índice posicional (menuPrincipal_7).
+    "menu_citas_panel": '.ui-panelmenu-content:has(.ui-menuitem-text:text-is("RESERVAS DE CITAS"))',
 
-    # Ítem "RESERVAS DE CITAS" — usa el onclick con menuid='7_1'
-    # Selector más robusto: busca dentro del panel CITAS el span con ese texto
-    "submenu_reservas": '#j_idt11\\:menuPrincipal_7 span.ui-menuitem-text:text-is("RESERVAS DE CITAS")',
+    # Ítem "RESERVAS DE CITAS" anclado por su texto visible (estable).
+    "submenu_reservas": '.ui-panelmenu .ui-menuitem-text:text-is("RESERVAS DE CITAS")',
 
     # ── SelectOneMenu: tipo de cita en Gestión de Citas ──────────────────────
-    "tipo_cita_trigger": '#gestionCitasForm\\:j_idt32 .ui-selectonemenu-trigger',
-    "tipo_cita_panel": '#gestionCitasForm\\:j_idt32_panel',
-    "tipo_cita_label": '#gestionCitasForm\\:j_idt32_label',
-    "tipo_cita_opcion_poligono": '#gestionCitasForm\\:j_idt32_panel li[data-label="EXAMEN PARA POLÍGONO DE TIRO"]',
+    # gestionCitasForm es un id estable; el combo (antes j_idt32) lo ubicamos
+    # dentro del form y la opción/panel por su contenido, no por el número j_idt.
+    "tipo_cita_trigger": '#gestionCitasForm .ui-selectonemenu-trigger',
+    "tipo_cita_panel": '.ui-selectonemenu-panel[id^="gestionCitasForm:"]:has(li[data-label*="TIRO"]), .ui-selectonemenu-panel:has(li[data-label*="TIRO"])',
+    "tipo_cita_label": '#gestionCitasForm .ui-selectonemenu-label',
+    "tipo_cita_opcion_poligono": '.ui-selectonemenu-panel li[data-label*="POLÍGONO DE TIRO"], .ui-selectonemenu-panel li[data-label*="POLIGONO DE TIRO"]',
 
     # ── Reserva de Cupos (tabGestion:creaCitaPolJurForm) ───────────────────
     "reserva_form": '#tabGestion\\:creaCitaPolJurForm',

@@ -14,10 +14,12 @@ def validar_resultado_login_por_ui(page, timeout_ms: int = 3000):
     """
     inicio = time.time()
 
+    # Señales de sesión autenticada ancladas a ids/clases estables, no al
+    # prefijo j_idtNN (autogenerado por JSF y variable entre versiones).
     selectores_exito = [
-        "#j_idt11\\:menuPrincipal",
-        "#j_idt11\\:j_idt18",
+        '[id$=":menuPrincipal"]',
         "form#gestionCitasForm",
+        ".ui-panelmenu",
     ]
     selectores_error = [
         ".ui-messages-error",

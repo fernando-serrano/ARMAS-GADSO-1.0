@@ -6,7 +6,7 @@ def pagina_muestra_servicio_no_disponible(page, selectors: dict) -> bool:
     selectores_ok = [
         selectors["tab_tradicional"],
         selectors["numero_documento"],
-        "#j_idt11\\:menuPrincipal",
+        '[id$=":menuPrincipal"]',
         "form#gestionCitasForm",
         selectors["reserva_form"],
     ]

@@ -142,7 +142,8 @@ En scheduled, si `SCHEDULED_MULTIWORKER=1`, el orquestador padre divide trabajos
 Variables importantes:
 
 - `SCHEDULED_MULTIWORKER`
-- `SCHEDULED_WORKERS`, maximo 4
+- `SCHEDULED_WORKERS`, tope configurable via `SCHEDULED_WORKERS_MAX` (default 8)
+- `SCHEDULED_WORKERS_MAX`, tope maximo de workers (default 8)
 - `SCHEDULED_WORKER_MODE`, `sticky` o `dynamic`
 - `SCHEDULED_MAX_UNITS`
 

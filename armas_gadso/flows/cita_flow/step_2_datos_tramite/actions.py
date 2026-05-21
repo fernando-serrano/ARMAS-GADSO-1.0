@@ -435,27 +435,40 @@ def completar_tabla_tipos_arma_y_avanzar(page, registro: dict, deps: dict):
     esperar_transicion_a_fase3_o_turno_duplicado(
         page,
         validar_turno_duplicado_o_lanzar=validar_turno_duplicado_o_lanzar,
-        timeout_ms=12000,
+        timeout_ms=22000,
     )
 
 
-def esperar_transicion_a_fase3_o_turno_duplicado(page, validar_turno_duplicado_o_lanzar, timeout_ms: int = 12000):
+# Señales de que YA estamos en Fase 3 (cualquiera basta). No dependemos de un solo
+# id: bajo carga de SUCAMEC a las 00:00 el panel puede tardar o renderizarse como
+# panelPaso3_content en vez de panelPaso4, lo que antes causaba un falso negativo
+# y botaba el intento completo.
+_SEÑALES_FASE3 = [
+    STEP_3_SELECTORS["fase3_panel"],
+    '#tabGestion\\:creaCitaPolJurForm\\:panelPaso3_content',
+    STEP_3_SELECTORS["fase3_captcha_img"],
+    STEP_3_SELECTORS["fase3_terminos_box"],
+]
+
+
+def esperar_transicion_a_fase3_o_turno_duplicado(page, validar_turno_duplicado_o_lanzar, timeout_ms: int = 22000):
     """
     Espera robusta de transicion tras 'Siguiente' en Paso 2:
     - Si aparece mensaje de turno duplicado, lanza TurnoDuplicadoError.
-    - Si aparece panel de Fase 3, retorna OK.
+    - Si aparece cualquier señal de Fase 3 (panel/captcha/terminos), retorna OK.
     """
     deadline = time.time() + (max(1000, int(timeout_ms)) / 1000.0)
     while time.time() < deadline:
         validar_turno_duplicado_o_lanzar(page, max_wait_ms=0)
 
-        try:
-            if page.locator(STEP_3_SELECTORS["fase3_panel"]).is_visible(timeout=200):
-                return
-        except Exception:
-            pass
+        for señal in _SEÑALES_FASE3:
+            try:
+                if page.locator(señal).first.is_visible(timeout=120):
+                    return
+            except Exception:
+                pass
 
-        page.wait_for_timeout(180)
+        page.wait_for_timeout(150)
 
     validar_turno_duplicado_o_lanzar(page, max_wait_ms=1200)
     raise Exception("No se confirmo transicion a Fase 3 tras 'Siguiente' de Paso 2")

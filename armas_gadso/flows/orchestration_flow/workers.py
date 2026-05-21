@@ -73,7 +73,8 @@ def ejecutar_scheduled_multihilo_orquestador(excel_path: str, project_root: str)
     if pd is None:
         raise Exception("pandas no esta disponible para preparar lotes multihilo")
 
-    workers = max(1, min(4, _safe_int_env("SCHEDULED_WORKERS", 4)))
+    workers_ceiling = max(1, _safe_int_env("SCHEDULED_WORKERS_MAX", 8))
+    workers = max(1, min(workers_ceiling, _safe_int_env("SCHEDULED_WORKERS", 4)))
     max_units = _safe_int_env("SCHEDULED_MAX_UNITS", 0)
     worker_mode = str(os.getenv("SCHEDULED_WORKER_MODE", "sticky") or "sticky").strip().lower()
     if worker_mode not in {"dynamic", "sticky"}:

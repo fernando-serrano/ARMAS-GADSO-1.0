@@ -104,7 +104,8 @@ En `scheduled` se aplica orquestacion multihilo a nivel de workers, manteniendo 
 ### Variables del multihilo scheduled
 
 - `SCHEDULED_MULTIWORKER`: `1` habilita multihilo (default en scheduled), `0` lo deshabilita.
-- `SCHEDULED_WORKERS`: cantidad de workers (default `4`, maximo `4`).
+- `SCHEDULED_WORKERS`: cantidad de workers (default `4`, maximo configurable via `SCHEDULED_WORKERS_MAX`, default `8`).
+- `SCHEDULED_WORKERS_MAX`: tope maximo de workers permitido (default `8`).
 - `SCHEDULED_WORKER_MODE`: `sticky` (default) o `dynamic`.
 - `SCHEDULED_MAX_UNITS`: limite de unidades a procesar (`0` = todas).
 

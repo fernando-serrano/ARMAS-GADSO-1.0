@@ -30,11 +30,15 @@ def completar_fase_3_resumen(page, deps: dict):
     captcha_text = solve_captcha_ocr_base(
         page,
         captcha_img_selector=SELECTORS["fase3_captcha_img"],
-        boton_refresh_selector=None,
+        # Pasamos el boton de refresh y un limite finito: sin esto, si el OCR no
+        # lee el captcha, el bucle 'while True' giraba para siempre sobre la MISMA
+        # imagen (cuelgue infinito de un worker en produccion). Ahora pide captcha
+        # nuevo en cada intento y se rinde tras un maximo.
+        boton_refresh_selector=SELECTORS["fase3_boton_refresh"],
         contexto="CAPTCHA Fase 3",
         evitar_ambiguos=False,
         min_fuzzy_hits=0,
-        max_intentos=None,
+        max_intentos=10,
     )
 
     if captcha_text and len(captcha_text) == 5:
