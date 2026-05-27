@@ -1,8 +1,14 @@
 from __future__ import annotations
 
+import os
+
+from .sync import esperar_fin_ajax_primefaces
+
 
 def pagina_muestra_servicio_no_disponible(page, selectors: dict) -> bool:
-    """Detecta HTML de caida del servicio (HTTP 503 / Service Unavailable)."""
+    """Detecta paginas de caida de SUCAMEC: HTTP 503 / Service Unavailable y tambien
+    'Error del servidor / Ha ocurrido un error interno en el sistema' (que pide volver a
+    ingresar al sistema). Si algun elemento valido del portal esta visible, retorna False."""
     selectores_ok = [
         selectors["tab_tradicional"],
         selectors["numero_documento"],
@@ -18,21 +24,27 @@ def pagina_muestra_servicio_no_disponible(page, selectors: dict) -> bool:
         except Exception:
             pass
 
+    _SEÑALES_CAIDA = [
+        "SERVICE UNAVAILABLE",
+        "HTTP STATUS 503",
+        "503 - SERVICE UNAVAILABLE",
+        # Error interno de SUCAMEC: "Error del servidor / Ha ocurrido un error interno en
+        # el sistema. Por favor vuelva a ingresar al sistema." (link a login.xhtml)
+        "ERROR DEL SERVIDOR",
+        "HA OCURRIDO UN ERROR INTERNO EN EL SISTEMA",
+        "POR FAVOR VUELVA A INGRESAR AL SISTEMA",
+    ]
+
     try:
         titulo = (page.title() or "").strip().upper()
-        if "SERVICE UNAVAILABLE" in titulo:
+        if any(s in titulo for s in _SEÑALES_CAIDA):
             return True
     except Exception:
         pass
 
     try:
         html = (page.content() or "").upper()
-        señales = [
-            "SERVICE UNAVAILABLE",
-            "HTTP STATUS 503",
-            "503 - SERVICE UNAVAILABLE",
-        ]
-        if any(s in html for s in señales):
+        if any(s in html for s in _SEÑALES_CAIDA):
             return True
     except Exception:
         pass
@@ -40,12 +52,28 @@ def pagina_muestra_servicio_no_disponible(page, selectors: dict) -> bool:
     return False
 
 
-def esperar_hasta_servicio_disponible(page, url_objetivo: str, selectors: dict, espera_segundos: int = 8):
-    """Reintenta mientras la pagina muestre señal de 503/Service Unavailable."""
+def esperar_hasta_servicio_disponible(page, url_objetivo: str, selectors: dict, espera_segundos: int = 8, max_intentos: int | None = None):
+    """Reintenta mientras la pagina muestre señal de caida (503 o error interno de SUCAMEC).
+
+    Recupera re-ingresando por la URL de login (que es lo que pide la propia pagina de error).
+    Tiene TOPE de reintentos para no quedarse ejecutando infinitamente: al agotarse, lanza una
+    excepcion marcada como RELOGIN_UI_DESYNC para que el orquestador reintente el login/grupo.
+    """
+    if max_intentos is None:
+        try:
+            max_intentos = int(str(os.getenv("SERVICIO_NO_DISPONIBLE_MAX_RETRIES", "20") or "20").strip())
+        except Exception:
+            max_intentos = 20
+
     intento = 0
     while pagina_muestra_servicio_no_disponible(page, selectors):
         intento += 1
-        print(f"[WARNING] SUCAMEC no disponible (Service Unavailable). Reintento {intento} en {espera_segundos}s...")
+        if max_intentos > 0 and intento > max_intentos:
+            raise Exception(
+                "RELOGIN_UI_DESYNC: SUCAMEC sigue caido (503 o error interno del sistema) "
+                f"tras {max_intentos} reintentos de reingreso"
+            )
+        print(f"[WARNING] SUCAMEC no disponible (503/error interno). Reintento {intento}/{max_intentos} en {espera_segundos}s...")
         page.wait_for_timeout(max(1000, int(espera_segundos * 1000)))
         try:
             page.goto(url_objetivo, wait_until="domcontentloaded", timeout=45000)
@@ -89,7 +117,9 @@ def seleccionar_en_selectonemenu(page, trigger_selector: str, panel_selector: st
             )
 
         opcion_objetivo.click()
-        page.wait_for_timeout(250)
+        # No leer el label hasta que el AJAX de la seleccion termine (a medianoche
+        # tarda); evita confirmar contra el valor viejo o tocar el combo a medio render.
+        esperar_fin_ajax_primefaces(page)
 
         texto_label = page.locator(label_selector).inner_text().strip()
         if texto_label.upper() != valor_norm:
@@ -100,7 +130,7 @@ def seleccionar_en_selectonemenu(page, trigger_selector: str, panel_selector: st
         return
 
     panel.locator(f"li[data-label='{valor}']").first.click()
-    page.wait_for_timeout(250)
+    esperar_fin_ajax_primefaces(page)
     texto_label = page.locator(label_selector).inner_text().strip()
     if texto_label.upper() != valor.upper():
         raise Exception(

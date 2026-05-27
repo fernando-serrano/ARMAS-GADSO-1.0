@@ -48,6 +48,7 @@ def seleccionar_hora_con_cupo_y_avanzar(page, registro: dict, deps: dict):
     hora_adaptativa_habilitada = deps["hora_adaptativa_habilitada"]
     hora_adaptativa_bloque_mediodia_completo = deps["hora_adaptativa_bloque_mediodia_completo"]
     sin_cupo_error = deps["sin_cupo_error"]
+    esperar_fin_ajax = deps.get("esperar_fin_ajax")
 
     hora_objetivo = normalizar_hora_rango(registro.get("hora_rango", ""))
     if not hora_objetivo:
@@ -243,7 +244,11 @@ def seleccionar_hora_con_cupo_y_avanzar(page, registro: dict, deps: dict):
         raise Exception("No se encontro radiobutton en la fila de la hora objetivo")
 
     radio_box.first.click()
-    page.wait_for_timeout(250)
+    # Confirmar que el AJAX de seleccion de fila termino antes de validar/seguir.
+    if esperar_fin_ajax:
+        esperar_fin_ajax(page)
+    else:
+        page.wait_for_timeout(250)
 
     clase_radio = (radio_box.first.get_attribute("class") or "")
     aria_fila = (fila_objetivo.get_attribute("aria-selected") or "").lower()

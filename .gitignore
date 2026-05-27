@@ -7,3 +7,8 @@ __pycache__/
 .env
 logs/
 screenshots/
+
+# Archivos auxiliares de contexto para Claude (no versionar)
+CLAUDE.md
+.claude/
+PROYECTO.md

@@ -9,6 +9,7 @@ from ...exceptions import (
     CitaYaRegistradaError as DomainCitaYaRegistradaError,
     CuposOcupadosPostValidacionError as DomainCuposOcupadosPostValidacionError,
     FechaNoDisponibleError as DomainFechaNoDisponibleError,
+    GrowlErrorSucamec as DomainGrowlErrorSucamec,
     SinCupoError as DomainSinCupoError,
     TurnoDuplicadoError as DomainTurnoDuplicadoError,
 )
@@ -16,6 +17,7 @@ from ..captcha_flow import solve_captcha_manual, solve_captcha_ocr_base, solve_l
 from .group_runner import agrupar_trabajos_por_grupo, procesar_grupo_ruc
 from .workers import ejecutar_scheduled_multihilo_orquestador, multihilo_scheduled_habilitado
 from .monitoring import activar_monitor_growl, detectar_turno_duplicado_en_growl
+from .sync import esperar_fin_ajax_primefaces, hay_growl_de_error_nuevo, leer_growls
 from .navigation import (
     esperar_hasta_servicio_disponible as esperar_hasta_servicio_disponible_nav,
     navegar_reservas_citas as navegar_reservas_citas_nav,
@@ -119,6 +121,7 @@ FechaNoDisponibleError = DomainFechaNoDisponibleError
 TurnoDuplicadoError = DomainTurnoDuplicadoError
 CitaYaRegistradaError = DomainCitaYaRegistradaError
 CuposOcupadosPostValidacionError = DomainCuposOcupadosPostValidacionError
+GrowlErrorSucamec = DomainGrowlErrorSucamec
 
 normalizar_hora_rango = shared_utils.normalizar_hora_rango
 normalizar_hora_fragmento = shared_utils.normalizar_hora_fragmento
@@ -166,6 +169,7 @@ def _deps_paso_3_validacion_final() -> dict:
         "turno_duplicado_error": TurnoDuplicadoError,
         "normalizar_texto_comparable": normalizar_texto_comparable,
         "cupos_ocupados_error": CuposOcupadosPostValidacionError,
+        "esperar_fin_ajax": esperar_fin_ajax_primefaces,
     }
 
 
@@ -227,6 +231,7 @@ def _deps_paso_1_reserva_cupos() -> dict:
         "hora_adaptativa_habilitada": _hora_adaptativa_habilitada,
         "hora_adaptativa_bloque_mediodia_completo": _hora_adaptativa_bloque_mediodia_completo,
         "sin_cupo_error": SinCupoError,
+        "esperar_fin_ajax": esperar_fin_ajax_primefaces,
     }
 
 
@@ -277,6 +282,10 @@ def _deps_paso_2_datos_tramite() -> dict:
         "normalizar_tipo_arma_excel": normalizar_tipo_arma_excel,
         "validar_turno_duplicado_o_lanzar": validar_turno_duplicado_o_lanzar,
         "cita_ya_registrada_error": CitaYaRegistradaError,
+        "esperar_fin_ajax": esperar_fin_ajax_primefaces,
+        "hay_growl_de_error_nuevo": hay_growl_de_error_nuevo,
+        "leer_growls": leer_growls,
+        "growl_error_sucamec": GrowlErrorSucamec,
     }
 
 
@@ -425,6 +434,7 @@ def llenar_login_sel():
                 SinCupoError,
                 FechaNoDisponibleError,
                 TurnoDuplicadoError,
+                GrowlErrorSucamec,
             ),
             "confirmaciones_requeridas_para_categoria": lambda categoria: confirmaciones_requeridas_para_categoria(
                 categoria,

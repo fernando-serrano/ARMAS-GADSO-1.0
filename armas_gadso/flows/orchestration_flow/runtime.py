@@ -237,9 +237,12 @@ def clasificar_error_terminal_registro(
     sin_cupo_error,
     fecha_no_disponible_error,
     turno_duplicado_error,
+    growl_error_sucamec=None,
 ) -> str:
     txt = str(error or "")
     txt_low = txt.lower()
+    if growl_error_sucamec is not None and isinstance(error, growl_error_sucamec):
+        return "GROWL_ERROR"
     if isinstance(error, sin_cupo_error):
         return "SIN_CUPO"
     if isinstance(error, fecha_no_disponible_error):
@@ -290,6 +293,9 @@ def observacion_terminal_por_categoria(categoria: str, registro_excel: dict, err
             f"DNI={registro_excel.get('doc_vigilante', '')} | "
             f"TipoOperacion={registro_excel.get('tipo_operacion', '')}"
         )
+    if categoria == "GROWL_ERROR":
+        # El texto del growl viene dentro de la excepcion; lo usamos como observacion.
+        return str(error)
     return f"Error en procesamiento: {error}"
 
 
@@ -304,6 +310,8 @@ def confirmaciones_requeridas_para_categoria(
     if categoria == "TURNO_DUPLICADO":
         return 1
     if categoria == "RESTRICCION_48H_EXAMEN":
+        return 1
+    if categoria == "GROWL_ERROR":
         return 1
     if categoria == "NRO_SOLICITUD":
         return nro_solicitud_confirmaciones_requeridas

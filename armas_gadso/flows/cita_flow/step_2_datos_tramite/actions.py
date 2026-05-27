@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 import time
 
@@ -139,6 +140,7 @@ def completar_paso_2_desde_registro(page, registro: dict, deps: dict):
     normalizar_texto_comparable = deps["normalizar_texto_comparable"]
     extraer_token_solicitud = deps["extraer_token_solicitud"]
     cita_ya_registrada_error = deps.get("cita_ya_registrada_error")
+    esperar_fin_ajax = deps.get("esperar_fin_ajax")
 
     tipo_operacion = registro.get("tipo_operacion", "").strip()
     doc_vigilante = registro.get("doc_vigilante", "").strip()
@@ -169,7 +171,13 @@ def completar_paso_2_desde_registro(page, registro: dict, deps: dict):
     if not opcion_tipo:
         raise Exception(f"No se encontro Tipo Operacion '{tipo_operacion}' en el combo")
 
-    page.wait_for_timeout(250)
+    # Confirmar que el AJAX de Tipo de Operacion se registro en el server antes de seguir.
+    # Si no, el autocomplete del DNI luego devuelve 0 sugerencias y SUCAMEC responde
+    # "Debe seleccionar el tipo de tramite".
+    if esperar_fin_ajax:
+        esperar_fin_ajax(page)
+    else:
+        page.wait_for_timeout(250)
     label_tipo = page.locator(SELECTORS["tipo_operacion_label"]).inner_text().strip()
     if not label_tipo or label_tipo == "---":
         raise Exception("No se confirmo la seleccion de Tipo Operacion")
@@ -183,26 +191,43 @@ def completar_paso_2_desde_registro(page, registro: dict, deps: dict):
     def seleccionar_doc_vigilante_autocomplete():
         doc_input = page.locator(SELECTORS["doc_vig_input"])
         doc_input.wait_for(state="visible", timeout=12000)
-        doc_input.click()
-        doc_input.fill("")
-        doc_input.type(doc_vigilante, delay=20)
-
         panel_doc = page.locator(SELECTORS["doc_vig_panel"])
         items_doc = page.locator(SELECTORS["doc_vig_items"])
+        esperar_fin_ajax = deps.get("esperar_fin_ajax")
 
-        elegido = False
+        # El input es un AUTOCOMPLETE PrimeFaces con forceSelection: si se teclea el DNI
+        # pero NO se fija una sugerencia del desplegable, al perder el foco PrimeFaces BORRA
+        # lo tecleado (campo vacio -> DOC_VIGILANTE falso, visto a las 00:00). Por eso aqui:
+        #   1) esperamos a que las SUGERENCIAS (items) lleguen por AJAX,
+        #   2) elegimos la que contiene el DNI (o la unica disponible),
+        #   3) NUNCA hacemos blur sin seleccionar,
+        #   4) reintentamos si no quedo fijado.
         try:
-            panel_doc.wait_for(state="visible", timeout=2500)
-        except PlaywrightTimeoutError:
-            doc_input.press("ArrowDown")
-            page.wait_for_timeout(350)
+            sugerencias_timeout = int(str(os.getenv("DOC_VIG_SUGERENCIAS_TIMEOUT_MS", "12000") or "12000").strip())
+        except Exception:
+            sugerencias_timeout = 12000
 
-        if panel_doc.is_visible():
+        intentos = 3
+        for intento in range(1, intentos + 1):
+            # Asegurar que los AJAX previos (Tipo Operacion/Licencia) ya quedaron
+            # registrados en el server antes de consultar el autocomplete del DNI.
+            if esperar_fin_ajax:
+                esperar_fin_ajax(page, timeout_ms=12000)
+            doc_input.click()
+            doc_input.fill("")
+            doc_input.type(doc_vigilante, delay=20)
+
+            # Esperar a que aparezca la lista de sugerencias (resultado del AJAX).
             try:
-                items_doc.first.wait_for(state="visible", timeout=2500)
+                items_doc.first.wait_for(state="visible", timeout=sugerencias_timeout)
             except PlaywrightTimeoutError:
-                page.wait_for_timeout(700)
+                try:
+                    doc_input.press("ArrowDown")
+                    items_doc.first.wait_for(state="visible", timeout=3000)
+                except PlaywrightTimeoutError:
+                    pass
 
+            objetivo = None
             total_doc = items_doc.count()
             for i in range(total_doc):
                 item = items_doc.nth(i)
@@ -210,25 +235,39 @@ def completar_paso_2_desde_registro(page, registro: dict, deps: dict):
                 data_value = (item.get_attribute("data-item-value") or "").strip()
                 texto_item = item.inner_text().strip()
                 if doc_vigilante in data_label or doc_vigilante in data_value or doc_vigilante in texto_item:
-                    item.click()
-                    elegido = True
+                    objetivo = item
                     break
+            if objetivo is None and total_doc == 1:
+                objetivo = items_doc.first  # unica sugerencia: la tomamos
 
-            if not elegido and total_doc > 0:
-                items_doc.first.click()
-                elegido = True
+            if objetivo is not None:
+                objetivo.click()
+                # Confirmar que el AJAX de seleccion termino antes de leer el valor.
+                if esperar_fin_ajax:
+                    esperar_fin_ajax(page, timeout_ms=8000, estable_ms=200)
+                else:
+                    page.wait_for_timeout(300)
 
-        if not elegido:
-            doc_input.evaluate(
-                'el => { el.dispatchEvent(new Event("input", {bubbles:true})); el.dispatchEvent(new Event("change", {bubbles:true})); el.blur(); }'
+            valor_doc = doc_input.input_value().strip()
+            if objetivo is not None and doc_vigilante in valor_doc:
+                print(f"   [INFO] Documento vigilante seleccionado: {valor_doc}")
+                return
+
+            print(
+                f"   [WARNING] Autocomplete Doc. Vigilante intento {intento}/{intentos} "
+                f"sin fijar (sugerencias={total_doc}, valor='{valor_doc}'). Reintentando..."
             )
+            try:
+                doc_input.fill("")  # limpiar SIN blur de forceSelection
+            except Exception:
+                pass
+            page.wait_for_timeout(400)
 
-        page.wait_for_timeout(300)
-        valor_doc = doc_input.input_value().strip()
-        if doc_vigilante not in valor_doc:
-            capturar_si_falla("doc_vigilante")
-            raise Exception(f"No se confirmo el documento vigilante. Esperado contiene '{doc_vigilante}' | Actual '{valor_doc}'")
-        print(f"   [INFO] Documento vigilante seleccionado: {valor_doc}")
+        capturar_si_falla("doc_vigilante")
+        raise Exception(
+            f"No se confirmo el documento vigilante tras {intentos} intentos. "
+            f"Esperado contiene '{doc_vigilante}'"
+        )
 
     if es_inicial:
         print("    Flujo INICIAL detectado: primero Tipo de Licencia, luego Documento Vigilante")
@@ -265,7 +304,11 @@ def completar_paso_2_desde_registro(page, registro: dict, deps: dict):
                 deps=deps,
             )
 
-        page.wait_for_timeout(350)
+        # Confirmar el AJAX de Tipo de Licencia antes de tocar el autocomplete del DNI.
+        if esperar_fin_ajax:
+            esperar_fin_ajax(page)
+        else:
+            page.wait_for_timeout(350)
         texto_tramite = page.locator(SELECTORS["tipo_tramite_label"]).inner_text().strip()
         if normalizar_texto_comparable(texto_tramite) != "SEGURIDAD PRIVADA":
             raise Exception(f"No se confirmo Tipo de Licencia = SEGURIDAD PRIVADA. Actual: '{texto_tramite}'")
@@ -279,7 +322,10 @@ def completar_paso_2_desde_registro(page, registro: dict, deps: dict):
     page.locator(SELECTORS["seleccione_solicitud_trigger"]).click()
     page.locator(SELECTORS["seleccione_solicitud_panel"]).wait_for(state="visible", timeout=7000)
     page.locator(SELECTORS["seleccione_solicitud_si"]).first.click()
-    page.wait_for_timeout(350)
+    if esperar_fin_ajax:
+        esperar_fin_ajax(page)  # espera el AJAX; techo 45s, continua al instante si ya termino
+    else:
+        page.wait_for_timeout(350)
     label_si = page.locator(SELECTORS["seleccione_solicitud_label"]).inner_text().strip().upper()
     if label_si.replace(" ", "") != "SI":
         raise Exception(f"No se confirmo Seleccione Solicitud = SI. Actual: '{label_si}'")
@@ -327,7 +373,10 @@ def completar_paso_2_desde_registro(page, registro: dict, deps: dict):
             f"No se encontro Nro Solicitud con token '{token_solicitud}'. Opciones: {disponibles}"
         )
 
-    page.wait_for_timeout(300)
+    if esperar_fin_ajax:
+        esperar_fin_ajax(page)  # confirmar el AJAX del Nro. Solicitud antes de leer el label
+    else:
+        page.wait_for_timeout(300)
     label_nro = page.locator(SELECTORS["nro_solicitud_label"]).inner_text().strip()
     bloques_final = [b.lstrip("0") or "0" for b in re.findall(r"\d+", label_nro)]
     if token_solicitud not in bloques_final:
@@ -343,8 +392,24 @@ def completar_tabla_tipos_arma_y_avanzar(page, registro: dict, deps: dict):
     normalizar_tipo_arma_excel = deps["normalizar_tipo_arma_excel"]
     normalizar_texto_comparable = deps["normalizar_texto_comparable"]
     validar_turno_duplicado_o_lanzar = deps["validar_turno_duplicado_o_lanzar"]
+    esperar_fin_ajax = deps.get("esperar_fin_ajax")
+    hay_growl_de_error_nuevo = deps.get("hay_growl_de_error_nuevo")
+    growl_error_sucamec = deps.get("growl_error_sucamec")
 
     print("\n Completando tabla de tipos de arma (Fase 2)...")
+
+    # CRITICO: la seleccion previa de Nro. Solicitud dispara un AJAX que re-renderiza
+    # ESTA tabla (a medianoche tardo ~20s). Esperar a que termine ANTES de tocarla,
+    # para no accionar el combo de arma a medio render (causa del fallo "petó").
+    if esperar_fin_ajax:
+        esperar_fin_ajax(page)
+    if hay_growl_de_error_nuevo:
+        err = hay_growl_de_error_nuevo(page)
+        if err:
+            # Decision operativa: abortar el registro con el texto exacto del growl.
+            if growl_error_sucamec:
+                raise growl_error_sucamec(err)
+            raise Exception(f"SUCAMEC reporto error antes de la tabla de armas: {err}")
 
     objetivos_excel = registro.get("objetivos_arma", []) or []
     objetivos = []
@@ -358,13 +423,18 @@ def completar_tabla_tipos_arma_y_avanzar(page, registro: dict, deps: dict):
     if not objetivos:
         raise Exception("No se recibieron objetivos de arma validos desde Excel (tipo_arma + arma)")
 
+    try:
+        _tabla_timeout = int(str(os.getenv("ARMAS_TABLA_TIMEOUT_MS", "15000") or "15000").strip())
+    except Exception:
+        _tabla_timeout = 15000
+
     filas = page.locator(SELECTORS["dt_tipo_lic_rows"])
     try:
-        filas.first.wait_for(state="visible", timeout=9000)
+        filas.first.wait_for(state="visible", timeout=_tabla_timeout)
     except PlaywrightTimeoutError:
         filas = page.locator(SELECTORS["dt_tipo_lic_rows_fallback"])
         try:
-            filas.first.wait_for(state="visible", timeout=4000)
+            filas.first.wait_for(state="visible", timeout=5000)
         except PlaywrightTimeoutError:
             raise Exception("No se encontro la tabla de tipos de arma (dtTipoLic)")
 
@@ -398,7 +468,10 @@ def completar_tabla_tipos_arma_y_avanzar(page, registro: dict, deps: dict):
         celdas_editables = fila_match.locator("td.ui-editable-column")
         if celdas_editables.count() > 0:
             celdas_editables.last.click()
-            page.wait_for_timeout(180)
+            if esperar_fin_ajax:
+                esperar_fin_ajax(page)  # esperar a que la celda/combo quede listo
+            else:
+                page.wait_for_timeout(180)
 
         combo = fila_match.locator("select")
         if combo.count() == 0:
@@ -406,12 +479,13 @@ def completar_tabla_tipos_arma_y_avanzar(page, registro: dict, deps: dict):
 
         combo.first.wait_for(state="visible", timeout=3500)
         combo.first.select_option(label=arma_objetivo)
-        page.wait_for_timeout(350)
 
-        try:
-            page.wait_for_load_state("networkidle", timeout=3500)
-        except Exception:
-            pass
+        # El cambio de arma dispara un AJAX. networkidle no es fiable con AJAX parcial
+        # de PrimeFaces; esperamos a que la cola de PrimeFaces quede en reposo.
+        if esperar_fin_ajax:
+            esperar_fin_ajax(page)
+        else:
+            page.wait_for_timeout(350)
 
         seleccionado = combo.first.evaluate(
             "el => el.options[el.selectedIndex] ? el.options[el.selectedIndex].text.trim() : ''"

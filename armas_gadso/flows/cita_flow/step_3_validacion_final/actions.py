@@ -15,11 +15,30 @@ def completar_fase_3_resumen(page, deps: dict):
     solve_captcha_manual = deps["solve_captcha_manual"]
     validar_turno_duplicado_o_lanzar = deps["validar_turno_duplicado_o_lanzar"]
     turno_duplicado_error = deps["turno_duplicado_error"]
+    esperar_fin_ajax = deps.get("esperar_fin_ajax")
 
     print("\n Completando Fase 3 (Resumen de cita)...")
 
+    # Confirmar que el AJAX que renderiza el resumen termino antes de buscar el captcha
+    # (no actuar sobre una vista a medio cargar).
+    if esperar_fin_ajax:
+        esperar_fin_ajax(page)
+
+    # El servidor SUCAMEC renderiza el resumen tras un AJAX que en la ventana de
+    # medianoche puede tardar mucho: en el log del 00:00 supero los 25s y reencolaba el
+    # registro (~50s perdidos). Subimos el default a 45s y lo dejamos configurable.
     try:
-        page.locator(SELECTORS["fase3_panel"]).wait_for(state="visible", timeout=12000)
+        fase3_timeout_ms = int(str(os.getenv("FASE3_PANEL_TIMEOUT_MS", "45000") or "45000").strip())
+    except Exception:
+        fase3_timeout_ms = 45000
+    if fase3_timeout_ms < 12000:
+        fase3_timeout_ms = 12000
+
+    # Esperamos el ELEMENTO que realmente necesitamos (la imagen del captcha), no solo el
+    # panelPaso4: a medianoche el resumen puede renderizarse como panelPaso3_content, y
+    # antes esto causaba timeout aunque la Fase 3 ya estuviera lista.
+    try:
+        page.locator(SELECTORS["fase3_captcha_img"]).wait_for(state="visible", timeout=fase3_timeout_ms)
     except Exception as e:
         try:
             validar_turno_duplicado_o_lanzar(page, max_wait_ms=4500)
@@ -60,7 +79,10 @@ def completar_fase_3_resumen(page, deps: dict):
 
     if not marcado:
         checkbox_box.click()
-        page.wait_for_timeout(180)
+        if esperar_fin_ajax:
+            esperar_fin_ajax(page)  # techo 45s; continua al instante (el check es client-side)
+        else:
+            page.wait_for_timeout(180)
 
     try:
         marcado = checkbox_input.is_checked()
@@ -92,16 +114,16 @@ def generar_cita_final_con_reintento_rapido(page, deps: dict, registro: dict | N
     print("\n Paso final opcional: Generar Cita (reintento rapido)")
 
     try:
-        confirm_window_s = float(str(os.getenv("GENERAR_CITA_CONFIRM_WINDOW_S", "2.5") or "2.5").strip())
+        confirm_window_s = float(str(os.getenv("GENERAR_CITA_CONFIRM_WINDOW_S", "20.0") or "20.0").strip())
     except Exception:
-        confirm_window_s = 2.5
+        confirm_window_s = 20.0
     if confirm_window_s < 1.5:
         confirm_window_s = 1.5
 
     try:
-        confirm_grace_s = float(str(os.getenv("GENERAR_CITA_CONFIRM_GRACE_S", "2.0") or "2.0").strip())
+        confirm_grace_s = float(str(os.getenv("GENERAR_CITA_CONFIRM_GRACE_S", "5.0") or "5.0").strip())
     except Exception:
-        confirm_grace_s = 2.0
+        confirm_grace_s = 5.0
     if confirm_grace_s < 0:
         confirm_grace_s = 0.0
 

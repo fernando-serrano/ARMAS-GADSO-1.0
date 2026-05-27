@@ -24,6 +24,7 @@ def _limpiar_confirmaciones_idx(confirmaciones_terminales: dict, idx_excel: int)
         "FECHA_NO_DISPONIBLE",
         "TURNO_DUPLICADO",
         "RESTRICCION_48H_EXAMEN",
+        "GROWL_ERROR",
     ]:
         confirmaciones_terminales.pop((idx_excel, categoria), None)
 

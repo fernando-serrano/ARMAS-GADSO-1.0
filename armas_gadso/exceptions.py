@@ -19,3 +19,8 @@ class CitaYaRegistradaError(Exception):
 
 class CuposOcupadosPostValidacionError(Exception):
     """Se lanza cuando SEL indica que el horario ya se ocupo al generar la cita final."""
+
+
+class GrowlErrorSucamec(Exception):
+    """Se lanza cuando SUCAMEC muestra un growl de error no catalogado.
+    Decision operativa: abortar el registro usando el texto del growl como observacion."""
