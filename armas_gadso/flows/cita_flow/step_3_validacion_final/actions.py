@@ -25,12 +25,14 @@ def completar_fase_3_resumen(page, deps: dict):
         esperar_fin_ajax(page)
 
     # El servidor SUCAMEC renderiza el resumen tras un AJAX que en la ventana de
-    # medianoche puede tardar mucho: en el log del 00:00 supero los 25s y reencolaba el
-    # registro (~50s perdidos). Subimos el default a 45s y lo dejamos configurable.
+    # medianoche puede tardar muchisimo: en logs reales del 00:00, 60s no bastaron para
+    # que apareciera la imagen del captcha. Subimos el default a 120s (2 min) como TECHO
+    # tolerante; el wait_for continua APENAS aparezca el elemento (no es espera fija).
+    # Configurable via env FASE3_PANEL_TIMEOUT_MS.
     try:
-        fase3_timeout_ms = int(str(os.getenv("FASE3_PANEL_TIMEOUT_MS", "45000") or "45000").strip())
+        fase3_timeout_ms = int(str(os.getenv("FASE3_PANEL_TIMEOUT_MS", "120000") or "120000").strip())
     except Exception:
-        fase3_timeout_ms = 45000
+        fase3_timeout_ms = 120000
     if fase3_timeout_ms < 12000:
         fase3_timeout_ms = 12000
 
@@ -198,6 +200,18 @@ def generar_cita_final_con_reintento_rapido(page, deps: dict, registro: dict | N
                 return msg
         return ""
 
+    def detectar_error_certificado_salud(mensajes: list) -> str:
+        # Rechazo terminal de SUCAMEC: la persona no tiene certificado de salud vigente
+        # para la fecha de la cita. Conservamos la frase con ambas fechas como motivo.
+        for msg in mensajes:
+            m = normalizar_texto_comparable(msg)
+            if "CERTIFICADO DE SALUD" in m and ("VIGENTE" in m or "VENCIMIENTO" in m):
+                idx = msg.lower().find("la persona no cuenta")
+                if idx < 0:
+                    idx = 0
+                return re.sub(r"\s+", " ", msg[idx:idx + 300]).strip()
+        return ""
+
     def detectar_exito_fuerte() -> bool:
         try:
             if boton_generar.count() == 0 or not boton_generar.first.is_visible():
@@ -220,6 +234,8 @@ def generar_cita_final_con_reintento_rapido(page, deps: dict, registro: dict | N
         page.wait_for_timeout(150)
         return detectar_exito_fuerte()
 
+    estado_cert_salud = {"msg": ""}
+
     def observar_post_click_hasta(deadline_ts: float, error_captcha_msg: str, error_cupos_msg: str, ultimo_error: str):
         while time.time() < deadline_ts:
             mensajes = recolectar_mensajes_ui()
@@ -227,6 +243,12 @@ def generar_cita_final_con_reintento_rapido(page, deps: dict, registro: dict | N
                 for msg in mensajes:
                     if not ultimo_error:
                         ultimo_error = msg
+                # El rechazo por certificado de salud vencido es terminal y debe primar
+                # sobre cualquier deteccion de exito (el growl puede desaparecer en segundos).
+                candidato_cert = detectar_error_certificado_salud(mensajes)
+                if candidato_cert:
+                    estado_cert_salud["msg"] = candidato_cert
+                    break
                 candidato_cupos = detectar_error_cupos_ocupados(mensajes)
                 if candidato_cupos:
                     error_cupos_msg = candidato_cupos
@@ -251,6 +273,7 @@ def generar_cita_final_con_reintento_rapido(page, deps: dict, registro: dict | N
         error_captcha_msg = ""
         error_cupos_msg = ""
         ultimo_error = ""
+        estado_cert_salud["msg"] = ""
         deadline = time.time() + confirm_window_s
         confirmado, error_captcha_msg, error_cupos_msg, ultimo_error = observar_post_click_hasta(
             deadline,
@@ -271,6 +294,17 @@ def generar_cita_final_con_reintento_rapido(page, deps: dict, registro: dict | N
                 error_cupos_msg,
                 ultimo_error,
             )
+
+        if estado_cert_salud["msg"]:
+            mensaje_cert = estado_cert_salud["msg"]
+            print(f"   [WARNING] Certificado de salud vencido detectado: {mensaje_cert}")
+            if registro is not None:
+                registro["_terminal_reason_label"] = mensaje_cert
+                registro["_cert_salud_msg"] = mensaje_cert
+                ruta_cert = capturar_error_codigo_validacion("certificado_salud_vencido")
+                if ruta_cert:
+                    registro["_step2_error_screenshot_path"] = str(ruta_cert)
+            raise Exception(mensaje_cert)
 
         if confirmado:
             tiempo = time.time() - inicio_validacion

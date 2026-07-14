@@ -133,6 +133,69 @@ def detectar_y_capturar_restriccion_48h_examen_visible(page, registro: dict, dep
     return False
 
 
+def detectar_y_capturar_certificado_salud_vencido_visible(page, registro: dict, deps: dict) -> bool:
+    """Detecta la alerta SEL que rechaza la cita porque el certificado de salud esta vencido.
+
+    El growl trae las fechas (vencimiento del certificado y fecha de la cita); las
+    conservamos como motivo para el correo de no programados / errores de validacion.
+    """
+    normalizar_texto_comparable = deps["normalizar_texto_comparable"]
+
+    mensajes = []
+    for selector in [
+        ".ui-growl-item .ui-growl-title",
+        ".ui-growl-item .ui-growl-message",
+        ".ui-growl-message",
+        ".ui-growl-message-error",
+        "#mensajesGrowl_container .ui-growl-title",
+        "#mensajesGrowl_container .ui-growl-message",
+    ]:
+        try:
+            loc = page.locator(selector)
+            total = min(loc.count(), 8)
+            for i in range(total):
+                txt = (loc.nth(i).text_content() or "").strip()
+                if txt:
+                    mensajes.append(txt)
+        except Exception:
+            pass
+
+    try:
+        buffer_msgs = page.evaluate(
+            """
+            () => (window.__armasGrowlBuffer || []).map(x => x && x.text ? String(x.text) : '')
+            """
+        )
+        if isinstance(buffer_msgs, list):
+            mensajes.extend(str(txt or "").strip() for txt in buffer_msgs if str(txt or "").strip())
+    except Exception:
+        pass
+
+    try:
+        body_text = page.locator("body").inner_text(timeout=800)
+        if body_text:
+            mensajes.append(body_text)
+    except Exception:
+        pass
+
+    for msg in mensajes:
+        msg_norm = normalizar_texto_comparable(msg)
+        if "CERTIFICADO DE SALUD" in msg_norm and ("VIGENTE" in msg_norm or "VENCIMIENTO" in msg_norm):
+            # Recortamos desde la frase util para no arrastrar todo el body; conservamos
+            # ambas fechas (vencimiento y fecha de la cita).
+            idx = msg.lower().find("la persona no cuenta")
+            if idx < 0:
+                idx = 0
+            etiqueta = re.sub(r"\s+", " ", msg[idx:idx + 300]).strip()
+            print("   [INFO] Validacion intermedia: alerta de certificado de salud vencido detectada.")
+            registro["_terminal_reason_label"] = etiqueta
+            registro["_cert_salud_msg"] = etiqueta
+            capturar_error_paso_2(page, registro, "certificado_salud_vencido")
+            return True
+
+    return False
+
+
 def completar_paso_2_desde_registro(page, registro: dict, deps: dict):
     """
     Paso 2: tipo operacion, doc. vigilante, solicitud y numero de solicitud.

@@ -29,6 +29,7 @@ from .runtime import (
     clasificar_error_terminal_registro,
     confirmaciones_requeridas_para_categoria,
     es_error_transitorio_para_relogin,
+    esperar_hasta_hora_objetivo,
     load_runtime_options,
     observacion_error_no_mapeado,
     observacion_terminal_por_categoria,
@@ -44,6 +45,7 @@ from ..cita_flow.step_2_datos_tramite import (
     completar_tabla_tipos_arma_y_avanzar as completar_tabla_tipos_arma_y_avanzar_paso_2,
     detectar_y_capturar_cita_ya_registrada_visible as detectar_cita_ya_registrada_visible_paso_2,
     detectar_y_capturar_restriccion_48h_examen_visible as detectar_restriccion_48h_examen_visible_paso_2,
+    detectar_y_capturar_certificado_salud_vencido_visible as detectar_certificado_salud_vencido_visible_paso_2,
 )
 from ..cita_flow.step_2_datos_tramite.selectors import SELECTORS as STEP_2_SELECTORS
 from ..cita_flow.step_3_validacion_final import (
@@ -321,6 +323,14 @@ def detectar_restriccion_48h_examen_visible(page, registro: dict) -> bool:
     )
 
 
+def detectar_certificado_salud_vencido_visible(page, registro: dict) -> bool:
+    return detectar_certificado_salud_vencido_visible_paso_2(
+        page,
+        registro,
+        deps=_deps_paso_2_datos_tramite(),
+    )
+
+
 # ============================================================
 # FLUJO PRINCIPAL
 # ============================================================
@@ -362,9 +372,18 @@ def llenar_login_sel():
     max_unmapped_retries_per_record = options.max_unmapped_retries_per_record
     max_hora_fallback_retries = options.max_hora_fallback_retries
     persistent_session = options.persistent_session
+    prewarm_enable = options.prewarm_enable
+    disparo_hhmm = options.disparo_hhmm
+    prewarm_keepalive_ms = options.prewarm_keepalive_ms
+    prewarm_adelanto_ms = options.prewarm_adelanto_ms
 
     if persistent_session:
         print("[INFO] PERSISTENT_SESSION activado - navegador se reutilizara entre grupos sin cerrarse")
+    if prewarm_enable:
+        print(
+            f"[INFO] PREWARM activado - login+navegacion antes de {disparo_hhmm}; "
+            f"golpe a cupos al liberar la barrera (adelanto {prewarm_adelanto_ms}ms)"
+        )
 
     inicio_total_flujo = time.time()
     duracion_total_flujo = None
@@ -415,6 +434,7 @@ def llenar_login_sel():
             "completar_paso_2_desde_registro": completar_paso_2_desde_registro,
             "detectar_cita_ya_registrada_visible": detectar_cita_ya_registrada_visible,
             "detectar_restriccion_48h_examen_visible": detectar_restriccion_48h_examen_visible,
+            "detectar_certificado_salud_vencido_visible": detectar_certificado_salud_vencido_visible,
             "validar_turno_duplicado_o_lanzar": validar_turno_duplicado_o_lanzar,
             "completar_tabla_tipos_arma_y_avanzar": completar_tabla_tipos_arma_y_avanzar,
             "completar_fase_3_resumen": completar_fase_3_resumen,
@@ -459,6 +479,11 @@ def llenar_login_sel():
             "max_unmapped_retries_per_record": max_unmapped_retries_per_record,
             "max_hora_fallback_retries": max_hora_fallback_retries,
             "persistent_session": persistent_session,
+            "prewarm_enable": prewarm_enable,
+            "disparo_hhmm": disparo_hhmm,
+            "prewarm_keepalive_ms": prewarm_keepalive_ms,
+            "prewarm_adelanto_ms": prewarm_adelanto_ms,
+            "esperar_hasta_hora_objetivo": esperar_hasta_hora_objetivo,
             "browser_start_maximized": browser_start_maximized,
             "browser_window_w": browser_window_w,
             "browser_window_h": browser_window_h,

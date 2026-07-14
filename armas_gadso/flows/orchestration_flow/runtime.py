@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import time
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
@@ -70,6 +71,10 @@ class RuntimeOptions:
     max_unmapped_retries_per_record: int
     max_hora_fallback_retries: int
     persistent_session: bool
+    prewarm_enable: bool
+    disparo_hhmm: str
+    prewarm_keepalive_ms: int
+    prewarm_adelanto_ms: int
 
 
 def load_runtime_options() -> RuntimeOptions:
@@ -129,6 +134,11 @@ def load_runtime_options() -> RuntimeOptions:
     max_hora_fallback_retries = max(1, _env_int("MAX_HOUR_FALLBACK_RETRIES", 8))
     persistent_session = str(os.getenv("PERSISTENT_SESSION", "0")).strip().lower() in ("1", "true", "yes")
 
+    prewarm_enable = _env_bool("PREWARM_ENABLE", default=False)
+    disparo_hhmm = str(os.getenv("DISPARO_HHMM", "00:00") or "00:00").strip()
+    prewarm_keepalive_ms = max(0, _env_int("PREWARM_KEEPALIVE_MS", 40000))
+    prewarm_adelanto_ms = max(0, _env_int("PREWARM_ADELANTO_MS", 2500))
+
     return RuntimeOptions(
         run_mode=run_mode,
         is_scheduled=is_scheduled,
@@ -159,6 +169,10 @@ def load_runtime_options() -> RuntimeOptions:
         max_unmapped_retries_per_record=max_unmapped_retries_per_record,
         max_hora_fallback_retries=max_hora_fallback_retries,
         persistent_session=persistent_session,
+        prewarm_enable=prewarm_enable,
+        disparo_hhmm=disparo_hhmm,
+        prewarm_keepalive_ms=prewarm_keepalive_ms,
+        prewarm_adelanto_ms=prewarm_adelanto_ms,
     )
 
 
@@ -232,6 +246,68 @@ def validar_tiempo_maximo(inicio_total_flujo: float, max_run_minutes: float) -> 
         raise KeyboardInterrupt(f"MAX_RUN_MINUTES alcanzado ({max_run_minutes} min)")
 
 
+def _keepalive_ping(page) -> None:
+    """Toque inocuo al servidor para que SUCAMEC no cuente inactividad durante la
+    barrera. Best-effort: un fetch GET a la misma URL lleva la cookie de sesion y
+    reinicia el temporizador de inactividad del lado servidor sin navegar la vista.
+    """
+    try:
+        page.evaluate(
+            "() => { try { fetch(window.location.href, {method:'GET', credentials:'include', cache:'no-store'}); } catch(e){} }"
+        )
+    except Exception:
+        pass
+
+
+def esperar_hasta_hora_objetivo(
+    page,
+    hhmm: str,
+    keepalive_ms: int = 40000,
+    adelanto_ms: int = 2500,
+) -> bool:
+    """Bloquea hasta `adelanto_ms` antes de la hora objetivo del dia (HH:MM, reloj
+    LOCAL del SO). Devuelve True si llego a esperar; False si la hora ya habia pasado
+    (arranque post-objetivo o corrida normal -> no rompe nada).
+
+    El `adelanto_ms` hace que se libere un poco ANTES del objetivo, para no llegar
+    tarde por drift del reloj; el "ya" real lo confirma el servidor en el paso de
+    refresco/reload (ver group_runner). Mantiene la sesion viva con un ping cada
+    `keepalive_ms`.
+    """
+    try:
+        partes = str(hhmm or "").strip().split(":")
+        hh = int(partes[0])
+        mm = int(partes[1]) if len(partes) > 1 else 0
+    except Exception:
+        print(f"[PREWARM] DISPARO_HHMM invalido ('{hhmm}'); se omite la barrera.")
+        return False
+
+    ahora = datetime.now()
+    objetivo = ahora.replace(hour=hh, minute=mm, second=0, microsecond=0)
+    objetivo = objetivo - timedelta(milliseconds=max(0, adelanto_ms))
+
+    if objetivo <= ahora:
+        print(f"[PREWARM] Hora objetivo {hhmm} ya paso; se continua sin barrera.")
+        return False
+
+    print(
+        f"[PREWARM] Barrera activa: esperando hasta {objetivo.strftime('%H:%M:%S')} "
+        f"(objetivo {hhmm}, adelanto {adelanto_ms}ms, keepalive {keepalive_ms}ms)..."
+    )
+    ultimo_keepalive = time.time()
+    while True:
+        restante = (objetivo - datetime.now()).total_seconds()
+        if restante <= 0:
+            break
+        if keepalive_ms > 0 and (time.time() - ultimo_keepalive) * 1000.0 >= keepalive_ms:
+            _keepalive_ping(page)
+            ultimo_keepalive = time.time()
+        time.sleep(min(0.5, max(0.05, restante)))
+
+    print(f"[PREWARM] Barrera liberada a las {datetime.now().strftime('%H:%M:%S.%f')[:-3]}")
+    return True
+
+
 def clasificar_error_terminal_registro(
     error: BaseException,
     sin_cupo_error,
@@ -261,6 +337,8 @@ def clasificar_error_terminal_registro(
         and "rendido el examen" in txt_low
     ):
         return "RESTRICCION_48H_EXAMEN"
+    if "certificado de salud" in txt_low and ("vigente" in txt_low or "vencimiento" in txt_low):
+        return "CERTIFICADO_SALUD_VENCIDO"
     if "documento vigilante" in txt_low:
         return "DOC_VIGILANTE"
     if "no se encontró la hora objetivo en la tabla" in txt:
@@ -278,6 +356,9 @@ def observacion_terminal_por_categoria(categoria: str, registro_excel: dict, err
             "No esta permitido reservar una cita con fecha anterior a las 48 horas "
             "de rendido el examen"
         )
+    if categoria == "CERTIFICADO_SALUD_VENCIDO":
+        base = str(error or "").strip()
+        return base or "La persona no cuenta con un certificado de salud vigente"
     if categoria == "DOC_VIGILANTE":
         return (
             "Documento vigilante no disponible para esta razón social/RUC. "
@@ -310,6 +391,8 @@ def confirmaciones_requeridas_para_categoria(
     if categoria == "TURNO_DUPLICADO":
         return 1
     if categoria == "RESTRICCION_48H_EXAMEN":
+        return 1
+    if categoria == "CERTIFICADO_SALUD_VENCIDO":
         return 1
     if categoria == "GROWL_ERROR":
         return 1

@@ -16,25 +16,49 @@ ImageEnhance = None
 ImageOps = None
 BytesIO = None
 
-try:
-    from PIL import Image, ImageEnhance, ImageFilter, ImageOps
-    from io import BytesIO
-    import numpy as np
-    import easyocr
+_OCR_INTENTADO = False
 
-    langs_env = str(os.getenv("EASYOCR_LANGS", "en") or "en")
-    EASYOCR_LANGS = [x.strip() for x in langs_env.split(",") if x.strip()] or ["en"]
-    EASYOCR_ALLOWLIST = str(os.getenv("EASYOCR_ALLOWLIST", EASYOCR_ALLOWLIST) or EASYOCR_ALLOWLIST).strip() or EASYOCR_ALLOWLIST
-    easyocr_use_gpu = str(os.getenv("EASYOCR_USE_GPU", "0") or "0").strip().lower() in {"1", "true", "yes", "si", "sí"}
 
-    EASYOCR_READER = easyocr.Reader(EASYOCR_LANGS, gpu=easyocr_use_gpu, verbose=False)
-    OCR_AVAILABLE = True
-    OCR_BACKEND = "easyocr"
-    print(f"[INFO] OCR (easyocr) cargado correctamente | langs={EASYOCR_LANGS} | gpu={easyocr_use_gpu}")
-except ImportError as e:
-    print(f"[WARNING] easyocr no esta instalado ({e}) -> se usara modo MANUAL (captcha a mano)")
-except Exception as e:
-    print(f"[WARNING] Error al cargar easyocr: {e} -> modo MANUAL")
+def _ensure_easyocr() -> bool:
+    """Carga EasyOCR/PyTorch de forma PEREZOSA: solo en la primera llamada real
+    (al resolver el primer captcha).
+
+    Antes el Reader se creaba a nivel de modulo (import-time), asi que CUALQUIER
+    proceso que importara este modulo pagaba ~15s de carga de torch aunque nunca
+    resolviera un captcha. En multiworker, el proceso padre solo orquesta y manda
+    correos -> cargaba el OCR en vano y retrasaba el lanzamiento de los workers.
+
+    Idempotente: tras el primer intento (exito o fallo) no vuelve a probar.
+    """
+    global _OCR_INTENTADO, OCR_AVAILABLE, OCR_BACKEND, EASYOCR_READER
+    global EASYOCR_ALLOWLIST, EASYOCR_LANGS
+    global np, Image, ImageEnhance, ImageFilter, ImageOps, BytesIO
+
+    if _OCR_INTENTADO:
+        return OCR_AVAILABLE
+    _OCR_INTENTADO = True
+
+    try:
+        from PIL import Image, ImageEnhance, ImageFilter, ImageOps
+        from io import BytesIO
+        import numpy as np
+        import easyocr
+
+        langs_env = str(os.getenv("EASYOCR_LANGS", "en") or "en")
+        EASYOCR_LANGS = [x.strip() for x in langs_env.split(",") if x.strip()] or ["en"]
+        EASYOCR_ALLOWLIST = str(os.getenv("EASYOCR_ALLOWLIST", EASYOCR_ALLOWLIST) or EASYOCR_ALLOWLIST).strip() or EASYOCR_ALLOWLIST
+        easyocr_use_gpu = str(os.getenv("EASYOCR_USE_GPU", "0") or "0").strip().lower() in {"1", "true", "yes", "si", "sí"}
+
+        EASYOCR_READER = easyocr.Reader(EASYOCR_LANGS, gpu=easyocr_use_gpu, verbose=False)
+        OCR_AVAILABLE = True
+        OCR_BACKEND = "easyocr"
+        print(f"[INFO] OCR (easyocr) cargado correctamente | langs={EASYOCR_LANGS} | gpu={easyocr_use_gpu}")
+    except ImportError as e:
+        print(f"[WARNING] easyocr no esta instalado ({e}) -> se usara modo MANUAL (captcha a mano)")
+    except Exception as e:
+        print(f"[WARNING] Error al cargar easyocr: {e} -> modo MANUAL")
+
+    return OCR_AVAILABLE
 
 
 def _is_scheduled_mode() -> bool:
@@ -267,6 +291,7 @@ def solve_captcha_ocr_base(
     min_fuzzy_hits: int = 0,
     max_intentos=6,
 ):
+    _ensure_easyocr()  # carga perezosa del OCR en la primera resolucion real
     if not OCR_AVAILABLE:
         return None
 

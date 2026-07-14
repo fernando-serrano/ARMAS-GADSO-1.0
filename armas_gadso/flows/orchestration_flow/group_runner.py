@@ -24,9 +24,63 @@ def _limpiar_confirmaciones_idx(confirmaciones_terminales: dict, idx_excel: int)
         "FECHA_NO_DISPONIBLE",
         "TURNO_DUPLICADO",
         "RESTRICCION_48H_EXAMEN",
+        "CERTIFICADO_SALUD_VENCIDO",
         "GROWL_ERROR",
     ]:
         confirmaciones_terminales.pop((idx_excel, categoria), None)
+
+
+def _prewarm_refrescar_hasta_fecha(page, trabajos_grupo: list, deps: dict, techo_s: float = 30.0) -> None:
+    """Tras liberar la barrera de las 00:00: recarga la vista y re-navega en BUCLE
+    hasta que la fecha objetivo aparezca en el combo (el primer click a Sede ya es
+    post-medianoche). Neutraliza el desfase entre el reloj local y el del servidor:
+    el "ya" lo marca el servidor cuando publica la fecha, no la PC.
+
+    Reutiliza `seleccionar_sede_y_fecha_desde_registro`, que lanza error si la fecha
+    aun no esta -> ese error dispara el reintento. Con techo para no colgarse.
+    """
+    navegar_reservas_citas = deps["navegar_reservas_citas"]
+    seleccionar_tipo_cita_poligono = deps["seleccionar_tipo_cita_poligono"]
+    asegurar_contexto_reserva_operativo = deps["asegurar_contexto_reserva_operativo"]
+    esperar_hasta_servicio_disponible = deps["esperar_hasta_servicio_disponible"]
+    cargar_primer_registro_pendiente_desde_excel = deps["cargar_primer_registro_pendiente_desde_excel"]
+    seleccionar_sede_y_fecha_desde_registro = deps["seleccionar_sede_y_fecha_desde_registro"]
+    selectors = deps["selectors"]
+    excel_path = deps["excel_path"]
+
+    if not trabajos_grupo:
+        return
+    idx0 = trabajos_grupo[0].get("idx_excel")
+    try:
+        reg0 = cargar_primer_registro_pendiente_desde_excel(excel_path, indice_excel_objetivo=idx0)
+    except Exception as e:
+        print(f"[PREWARM] No se pudo leer registro de referencia (idx={idx0}): {e}. Se continua con flujo normal.")
+        return
+
+    fecha_ref = str(reg0.get("fecha", "") or "").strip()
+    print(f"[PREWARM] Refrescando hasta que la fecha {fecha_ref} aparezca (techo {techo_s:.0f}s)...")
+    deadline = time.time() + max(1.0, techo_s)
+    intento = 0
+    while True:
+        intento += 1
+        try:
+            page.reload(wait_until="domcontentloaded", timeout=45000)
+            esperar_hasta_servicio_disponible(page, page.url, espera_segundos=8)
+            navegar_reservas_citas(page)
+            seleccionar_tipo_cita_poligono(page)
+            asegurar_contexto_reserva_operativo(page, selectors, seleccionar_tipo_cita_poligono)
+            seleccionar_sede_y_fecha_desde_registro(page, reg0)
+            print(f"[PREWARM] Fecha {fecha_ref} disponible (intento {intento}); UI lista en sede+fecha.")
+            return
+        except Exception as e:
+            if time.time() >= deadline:
+                print(f"[PREWARM] Techo alcanzado tras {intento} intentos (ult. error: {e}); se continua con flujo normal.")
+                return
+            print(f"[PREWARM] Intento {intento}: fecha aun no disponible / refrescando ({e}). Reintentando...")
+            try:
+                page.wait_for_timeout(700)
+            except Exception:
+                time.sleep(0.7)
 
 
 def procesar_grupo_ruc(
@@ -51,6 +105,7 @@ def procesar_grupo_ruc(
     completar_paso_2_desde_registro = deps["completar_paso_2_desde_registro"]
     detectar_cita_ya_registrada_visible = deps["detectar_cita_ya_registrada_visible"]
     detectar_restriccion_48h_examen_visible = deps["detectar_restriccion_48h_examen_visible"]
+    detectar_certificado_salud_vencido_visible = deps["detectar_certificado_salud_vencido_visible"]
     validar_turno_duplicado_o_lanzar = deps["validar_turno_duplicado_o_lanzar"]
     completar_tabla_tipos_arma_y_avanzar = deps["completar_tabla_tipos_arma_y_avanzar"]
     completar_fase_3_resumen = deps["completar_fase_3_resumen"]
@@ -83,6 +138,11 @@ def procesar_grupo_ruc(
     max_unmapped_retries_per_record = deps["max_unmapped_retries_per_record"]
     max_hora_fallback_retries = deps["max_hora_fallback_retries"]
     persistent_session = deps["persistent_session"]
+    prewarm_enable = deps.get("prewarm_enable", False)
+    disparo_hhmm = deps.get("disparo_hhmm", "00:00")
+    prewarm_keepalive_ms = deps.get("prewarm_keepalive_ms", 40000)
+    prewarm_adelanto_ms = deps.get("prewarm_adelanto_ms", 2500)
+    esperar_hasta_hora_objetivo = deps.get("esperar_hasta_hora_objetivo")
     browser_start_maximized = deps["browser_start_maximized"]
     browser_window_w = deps["browser_window_w"]
     browser_window_h = deps["browser_window_h"]
@@ -209,6 +269,19 @@ def procesar_grupo_ruc(
             navegar_reservas_citas(page)
             seleccionar_tipo_cita_poligono(page)
 
+            # PREWARM: tras login+navegacion (ya hechos arriba, sin tocar Sede para no
+            # cargar fechas viejas), frenar en la barrera hasta las 00:00 y recien
+            # entonces refrescar para que el primer click a Sede traiga la fecha nueva.
+            # Se ejecuta una sola vez (no en relogins) y solo si la barrera espero de
+            # verdad (en corridas normales / post-00:00 retorna al instante).
+            if prewarm_enable and esperar_hasta_hora_objetivo and not state.get("_prewarm_hecho"):
+                state["_prewarm_hecho"] = True
+                espero = esperar_hasta_hora_objetivo(
+                    page, disparo_hhmm, prewarm_keepalive_ms, prewarm_adelanto_ms
+                )
+                if espero:
+                    _prewarm_refrescar_hasta_fecha(page, trabajos_grupo, deps)
+
             cola_trabajos = deque(trabajos_grupo)
             intentos_por_idx = {}
             intentos_no_mapeados_por_idx = {}
@@ -323,6 +396,18 @@ def procesar_grupo_ruc(
                             "de rendido el examen"
                         )
 
+                    cert_salud_visible = False
+                    try:
+                        cert_salud_visible = detectar_certificado_salud_vencido_visible(page, registro_excel)
+                    except Exception:
+                        cert_salud_visible = False
+
+                    if cert_salud_visible:
+                        e = Exception(
+                            str(registro_excel.get("_cert_salud_msg", "") or "").strip()
+                            or "La persona no cuenta con un certificado de salud vigente"
+                        )
+
                     if isinstance(e, cupos_ocupados_error):
                         hora_actual = normalizar_hora_rango(registro_excel.get("_hora_seleccionada_actual", ""))
                         descartadas = list(trabajo.get("_horas_descartadas", []) or [])
@@ -380,9 +465,12 @@ def procesar_grupo_ruc(
                         if hits >= requeridas:
                             obs = observacion_terminal_por_categoria(categoria_terminal, registro_excel, e)
                             registrar_sin_cupo_en_excel(excel_path, registro_excel, obs)
-                            if categoria_terminal in {"NRO_SOLICITUD", "RESTRICCION_48H_EXAMEN"}:
+                            if categoria_terminal in {"NRO_SOLICITUD", "RESTRICCION_48H_EXAMEN", "CERTIFICADO_SALUD_VENCIDO"}:
                                 if categoria_terminal == "RESTRICCION_48H_EXAMEN":
                                     registro_excel["_terminal_reason_label"] = "Restriccion 48h por examen"
+                                elif categoria_terminal == "CERTIFICADO_SALUD_VENCIDO":
+                                    if not str(registro_excel.get("_terminal_reason_label", "") or "").strip():
+                                        registro_excel["_terminal_reason_label"] = str(e)
                                 screenshot_raw = str(registro_excel.get("_step2_error_screenshot_path", "") or "").strip()
                                 screenshot_path = Path(screenshot_raw) if screenshot_raw else None
                                 register_nro_solicitud_terminal(
