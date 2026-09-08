@@ -8,6 +8,29 @@ from .screenshots import capturar_error_validacion_final
 from .selectors import SELECTORS
 
 
+def captcha_forzado_para_pruebas() -> str:
+    """CAPTCHA fijo a inyectar en Fase 3 durante pruebas de extremo a extremo.
+
+    Reemplaza al runner `test/run_test_easyocr.py` (eliminado en el refactor d9c38b8), que
+    hacia lo mismo por monkeypatch sobre `legacy_flow.escribir_input_rapido`.
+
+    Con un CAPTCHA deliberadamente incorrecto se recorre TODO el flujo hasta el paso final
+    sin generar una cita real. Devuelve "" (inactivo, flujo productivo intacto) salvo que
+    TEST_FORCED_CAPTCHA traiga exactamente 5 caracteres, que es lo que exige SUCAMEC: con
+    cualquier otra longitud el flujo caeria al solver manual y se quedaria esperando a una
+    persona, que es justo lo contrario de lo que se busca en una prueba desatendida.
+    """
+    valor = str(os.getenv("TEST_FORCED_CAPTCHA", "") or "").strip().upper()
+    if len(valor) != 5:
+        if valor:
+            print(
+                "   [WARNING] TEST_FORCED_CAPTCHA='" + valor + "' ignorado: debe tener"
+                " exactamente 5 caracteres"
+            )
+        return ""
+    return valor
+
+
 def completar_fase_3_resumen(page, deps: dict):
     """Paso 3: resolver captcha del resumen y aceptar terminos y condiciones."""
     solve_captcha_ocr_base = deps["solve_captcha_ocr_base"]
@@ -48,19 +71,29 @@ def completar_fase_3_resumen(page, deps: dict):
             raise turno_duplicado_error(str(e_dup)) from e
         raise
 
-    captcha_text = solve_captcha_ocr_base(
-        page,
-        captcha_img_selector=SELECTORS["fase3_captcha_img"],
-        # Pasamos el boton de refresh y un limite finito: sin esto, si el OCR no
-        # lee el captcha, el bucle 'while True' giraba para siempre sobre la MISMA
-        # imagen (cuelgue infinito de un worker en produccion). Ahora pide captcha
-        # nuevo en cada intento y se rinde tras un maximo.
-        boton_refresh_selector=SELECTORS["fase3_boton_refresh"],
-        contexto="CAPTCHA Fase 3",
-        evitar_ambiguos=False,
-        min_fuzzy_hits=0,
-        max_intentos=10,
-    )
+    forzado = captcha_forzado_para_pruebas()
+    if forzado:
+        # Se omite el OCR a proposito: no aporta nada a la prueba y evita el bucle de
+        # reintentos sobre una imagen que igualmente se va a ignorar.
+        captcha_text = forzado
+        print(
+            "   [TEST] CAPTCHA Fase 3 FORZADO a '" + forzado + "' por TEST_FORCED_CAPTCHA:"
+            " la cita NO se generara"
+        )
+    else:
+        captcha_text = solve_captcha_ocr_base(
+            page,
+            captcha_img_selector=SELECTORS["fase3_captcha_img"],
+            # Pasamos el boton de refresh y un limite finito: sin esto, si el OCR no
+            # lee el captcha, el bucle 'while True' giraba para siempre sobre la MISMA
+            # imagen (cuelgue infinito de un worker en produccion). Ahora pide captcha
+            # nuevo en cada intento y se rinde tras un maximo.
+            boton_refresh_selector=SELECTORS["fase3_boton_refresh"],
+            contexto="CAPTCHA Fase 3",
+            evitar_ambiguos=False,
+            min_fuzzy_hits=0,
+            max_intentos=10,
+        )
 
     if captcha_text and len(captcha_text) == 5:
         escribir_input_rapido(page, SELECTORS["fase3_captcha_input"], captcha_text)
@@ -329,15 +362,23 @@ def generar_cita_final_con_reintento_rapido(page, deps: dict, registro: dict | N
                 "(sin senales claras de exito y sin captcha incorrecto explicito)"
             )
 
-        nuevo_captcha = solve_captcha_ocr_base(
-            page,
-            captcha_img_selector=SELECTORS["fase3_captcha_img"],
-            boton_refresh_selector=SELECTORS["fase3_boton_refresh"],
-            contexto="CAPTCHA Fase 3 (reintento final)",
-            evitar_ambiguos=False,
-            min_fuzzy_hits=0,
-            max_intentos=3,
-        )
+        forzado_reintento = captcha_forzado_para_pruebas()
+        if forzado_reintento:
+            nuevo_captcha = forzado_reintento
+            print(
+                "   [TEST] CAPTCHA de reintento FORZADO a '" + forzado_reintento + "'"
+                " por TEST_FORCED_CAPTCHA"
+            )
+        else:
+            nuevo_captcha = solve_captcha_ocr_base(
+                page,
+                captcha_img_selector=SELECTORS["fase3_captcha_img"],
+                boton_refresh_selector=SELECTORS["fase3_boton_refresh"],
+                contexto="CAPTCHA Fase 3 (reintento final)",
+                evitar_ambiguos=False,
+                min_fuzzy_hits=0,
+                max_intentos=3,
+            )
 
         if nuevo_captcha and len(nuevo_captcha) == 5:
             escribir_input_rapido(page, SELECTORS["fase3_captcha_input"], nuevo_captcha)

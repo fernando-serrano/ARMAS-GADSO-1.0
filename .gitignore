@@ -12,3 +12,6 @@ screenshots/
 CLAUDE.md
 .claude/
 PROYECTO.md
+
+# Archivos de bloqueo temporales de Excel (~$archivo.xlsx)
+~$*
